@@ -52,9 +52,8 @@ public sealed class GeneratedParallaxCache : IPostInjectInit
 
         datum.RefCount += 1;
 
-        // TODO: FIXME
-        //if (!datum.LoadTask.IsCompleted)
-        //    cancel.Register(() => Unload(id));
+        if (!datum.LoadTask.IsCompleted)
+            cancel.Register(() => Unload(id));
 
         return datum.LoadTask;
     }
