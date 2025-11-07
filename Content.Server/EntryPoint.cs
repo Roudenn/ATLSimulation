@@ -1,3 +1,4 @@
+using Content.Server.IoC;
 using JetBrains.Annotations;
 using Robust.Server.ServerStatus;
 using Robust.Shared.ContentPack;
@@ -9,6 +10,11 @@ namespace Content.Server;
 [UsedImplicitly]
 public sealed class EntryPoint : GameServer
 {
+    public override void PreInit()
+    {
+        ServerContentIoC.Register(Dependencies);
+    }
+
     public override void Init()
     {
         base.Init();
@@ -22,8 +28,6 @@ public sealed class EntryPoint : GameServer
             factory.RegisterIgnore(ignoreName);
         }
 
-        ServerContentIoC.Register();
-
         IoCManager.BuildGraph();
             
         factory.GenerateNetIds();
@@ -35,11 +39,5 @@ public sealed class EntryPoint : GameServer
     {
         base.PostInit();
         // DEVNOTE: Can also initialize IoC stuff more here.
-    }
-
-    public override void Update(ModUpdateLevel level, FrameEventArgs frameEventArgs)
-    {
-        base.Update(level, frameEventArgs);
-        // DEVNOTE: Game update loop goes here. Usually you'll want some independent GameTicker.
     }
 }
