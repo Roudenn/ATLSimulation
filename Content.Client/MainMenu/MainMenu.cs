@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using Content.Client.MainMenu.UI;
+using Content.Client.UserInterface.Systems.EscapeMenu;
 using Robust.Client;
 using Robust.Client.ResourceManagement;
 using Robust.Client.UserInterface;
@@ -61,7 +62,7 @@ namespace Content.Client.MainMenu
 
         private void OptionsButtonPressed(BaseButton.ButtonEventArgs args)
         {
-            //_userInterfaceManager.GetUIController<OptionsUIController>().ToggleWindow();
+            _userInterfaceManager.GetUIController<OptionsUIController>().ToggleWindow();
         }
 
         private void QuitButtonPressed(BaseButton.ButtonEventArgs args)

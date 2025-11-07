@@ -16,4 +16,5 @@ public static class ContentKeyFunctions
         public static readonly BoundKeyFunction EditorCopyObject = "EditorCopyObject";
         public static readonly BoundKeyFunction EditorFlipObject = "EditorFlipObject";
         public static readonly BoundKeyFunction ToggleStatsSummaryWindow = "ToggleStatsSummaryWindow";
+        public static readonly BoundKeyFunction InspectEntity = "InspectEntity";
 }
