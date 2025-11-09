@@ -1,8 +1,7 @@
 using Content.Server.IoC;
 using JetBrains.Annotations;
-using Robust.Server.ServerStatus;
 using Robust.Shared.ContentPack;
-using Robust.Shared.Timing;
+using Robust.Shared.Prototypes;
 
 // DEVNOTE: Games that want to be on the hub can change their namespace prefix in the "manifest.yml" file.
 namespace Content.Server;
@@ -10,6 +9,9 @@ namespace Content.Server;
 [UsedImplicitly]
 public sealed class EntryPoint : GameServer
 {
+    [Dependency] private readonly IComponentFactory _componentFactory = default!;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    
     public override void PreInit()
     {
         ServerContentIoC.Register(Dependencies);
@@ -17,20 +19,22 @@ public sealed class EntryPoint : GameServer
 
     public override void Init()
     {
-        base.Init();
+        Dependencies.BuildGraph();
+        Dependencies.InjectDependencies(this);
         
-        var factory = IoCManager.Resolve<IComponentFactory>();
-
-        factory.DoAutoRegistrations();
+        _componentFactory.DoAutoRegistrations();
 
         foreach (var ignoreName in IgnoredComponents.List)
         {
-            factory.RegisterIgnore(ignoreName);
+            _componentFactory.RegisterIgnore(ignoreName);
         }
-
-        IoCManager.BuildGraph();
+        
+        foreach (var ignoreName in IgnoredPrototypes.List)
+        {
+            _prototypeManager.RegisterIgnore(ignoreName);
+        }
             
-        factory.GenerateNetIds();
+        _componentFactory.GenerateNetIds();
 
         // DEVNOTE: This is generally where you'll be setting up the IoCManager further.
     }

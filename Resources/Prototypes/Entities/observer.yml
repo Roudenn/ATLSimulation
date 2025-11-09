@@ -1,0 +1,18 @@
+﻿- type: entity
+  save: false
+  id: MobObserver
+  name: observer
+  description: Default camera entity that has a player attached to it.
+  components:
+  - type: Sprite
+    texture: /Textures/weh.png
+  - type: Physics
+    bodyType: KinematicController
+  - type: InputMover
+  - type: MovementSpeedModifier
+  - type: Eye
+    drawFov: false
+  - type: ContentEye
+    maxZoom: 2,2
+  - type: LagCompensation
+  - type: Input
