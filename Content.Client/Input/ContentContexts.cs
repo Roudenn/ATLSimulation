@@ -29,7 +29,7 @@ public static class ContentContexts
         common.AddFunction(ContentKeyFunctions.ZoomOut);
         common.AddFunction(ContentKeyFunctions.ZoomIn);
         common.AddFunction(ContentKeyFunctions.ResetZoom);
-        common.AddFunction(ContentKeyFunctions.ToggleStatsSummaryWindow);
+        common.AddFunction(ContentKeyFunctions.ToggleEntitySpawningWindow);
 
         // Editor
         common.AddFunction(ContentKeyFunctions.EditorCopyObject);
