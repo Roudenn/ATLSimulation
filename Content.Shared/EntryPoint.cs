@@ -1,6 +1,9 @@
 using System.Globalization;
+using Content.Shared.Maps;
 using JetBrains.Annotations;
 using Robust.Shared.ContentPack;
+using Robust.Shared.Map;
+using Robust.Shared.Prototypes;
 
 // DEVNOTE: Games that want to be on the hub can change their namespace prefix in the "manifest.yml" file.
 namespace Content.Shared;
@@ -8,6 +11,9 @@ namespace Content.Shared;
 [UsedImplicitly]
 public sealed class EntryPoint : GameShared
 {
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    [Dependency] private readonly ITileDefinitionManager _tileDefinitionManager = default!;
+    
     // IoC services shared between the client and the server go here...
         
     // See line 24. Controls the default game culture and language.
@@ -24,18 +30,50 @@ public sealed class EntryPoint : GameShared
         // DEVNOTE: If you want your game to be multiregional at runtime, you'll need to 
         // do something more complicated here.
         IoCManager.Resolve<ILocalizationManager>().LoadCulture(new CultureInfo(Culture));
-        // TODO: Document what else you might want to put here
-    }
-
-    public override void Init()
-    {
-        // TODO: Document what you put here
+        
     }
 
     public override void PostInit()
     {
-        base.PostInit();
-        // DEVNOTE: You might want to put special init handlers for, say, tiles here.
-        // TODO: Document what else you might want to put here
+        InitTileDefinitions();
+    }
+    
+    private void InitTileDefinitions()
+    {
+        _prototypeManager.PrototypesReloaded += PrototypeReload;
+
+        // Register space first because I'm a hard coding hack.
+        var spaceDef = _prototypeManager.Index<ContentTileDefinition>(ContentTileDefinition.SpaceID);
+
+        _tileDefinitionManager.Register(spaceDef);
+
+        var prototypeList = new List<ContentTileDefinition>();
+        foreach (var tileDef in _prototypeManager.EnumeratePrototypes<ContentTileDefinition>())
+        {
+            if (tileDef.ID == ContentTileDefinition.SpaceID)
+                continue;
+
+            prototypeList.Add(tileDef);
+        }
+
+        // Sort ordinal to ensure it's consistent client and server.
+        // So that tile IDs match up.
+        prototypeList.Sort((a, b) => string.Compare(a.ID, b.ID, StringComparison.Ordinal));
+
+        foreach (var tileDef in prototypeList)
+        {
+            _tileDefinitionManager.Register(tileDef);
+        }
+
+        _tileDefinitionManager.Initialize();
+    }
+
+    private void PrototypeReload(PrototypesReloadedEventArgs obj)
+    {
+        // Need to re-allocate tiledefs due to how prototype reloads work
+        foreach (var def in _prototypeManager.EnumeratePrototypes<ContentTileDefinition>())
+        {
+            def.AssignTileId(_tileDefinitionManager[def.ID].TileId);
+        }
     }
 }

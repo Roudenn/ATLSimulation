@@ -1,0 +1,5 @@
+- type: tile
+  id: Plating
+  name: tiles-plating
+  sprite: /Textures/Tiles/plating.png
+  friction: 1.5

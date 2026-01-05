@@ -1,0 +1,45 @@
+- type: entity
+  abstract: true
+  id: BaseWall
+  name: basewall
+  description: Keeps the air in and the greytide out.
+  placement:
+    mode: SnapgridCenter
+    snap:
+      - Wall
+  components:
+  - type: Transform
+    anchored: true
+  - type: Clickable
+  - type: Physics
+    bodyType: Static
+  - type: Sprite
+    drawdepth: Walls
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeAabb
+          bounds: "-0.5,-0.5,0.5,0.5"
+        mask:
+        - FullTileMask
+        layer:
+        - WallLayer
+        density: 1000
+  - type: Occluder
+  #- type: Tag
+  #  tags:
+  #  - Wall
+
+- type: entity
+  parent: BaseWall
+  id: WallReinforced
+  name: reinforced wall
+  components:
+  - type: Sprite
+    sprite: Structures/Walls/solid.rsi
+    #state: rgeneric
+  - type: IconSmooth
+    key: walls
+    base: reinf_over
+  - type: Appearance

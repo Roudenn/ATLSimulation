@@ -187,6 +187,7 @@ namespace Content.Client.Options.UI.Tabs
             AddButton(ContentKeyFunctions.EditorFlipObject);
             AddButton(ContentKeyFunctions.EditorCopyObject);
             AddButton(ContentKeyFunctions.ToggleEntitySpawningWindow);
+            AddButton(ContentKeyFunctions.ToggleTileSpawningWindow);
 
             AddHeader("ui-options-header-dev");
             AddButton(EngineKeyFunctions.ShowDebugConsole);

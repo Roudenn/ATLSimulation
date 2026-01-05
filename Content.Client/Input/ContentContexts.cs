@@ -30,6 +30,7 @@ public static class ContentContexts
         common.AddFunction(ContentKeyFunctions.ZoomIn);
         common.AddFunction(ContentKeyFunctions.ResetZoom);
         common.AddFunction(ContentKeyFunctions.ToggleEntitySpawningWindow);
+        common.AddFunction(ContentKeyFunctions.ToggleTileSpawningWindow);
 
         // Editor
         common.AddFunction(ContentKeyFunctions.EditorCopyObject);

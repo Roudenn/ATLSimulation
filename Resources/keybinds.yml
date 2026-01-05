@@ -195,3 +195,9 @@ binds: # These are all the current engine keybinds.
   - function: TextCompletePrev
     type: State
     key: Up
+  - function: ToggleEntitySpawningWindow
+    type: State
+    key: H
+  - function: ToggleTileSpawningWindow
+    type: State
+    key: J
