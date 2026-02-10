@@ -1,4 +1,5 @@
 using System.Globalization;
+using Content.Shared.Atmospherics;
 using Content.Shared.Maps;
 using JetBrains.Annotations;
 using Robust.Shared.ContentPack;
@@ -13,6 +14,7 @@ public sealed class EntryPoint : GameShared
 {
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly ITileDefinitionManager _tileDefinitionManager = default!;
+    [Dependency] private readonly IGasPrototypeManager _gasPrototypeManager = default!;
     
     // IoC services shared between the client and the server go here...
         
@@ -35,13 +37,13 @@ public sealed class EntryPoint : GameShared
 
     public override void PostInit()
     {
+        _prototypeManager.PrototypesReloaded += PrototypeReload;
         InitTileDefinitions();
+        InitGasDefinitions();
     }
     
     private void InitTileDefinitions()
     {
-        _prototypeManager.PrototypesReloaded += PrototypeReload;
-
         // Register space first because I'm a hard coding hack.
         var spaceDef = _prototypeManager.Index<ContentTileDefinition>(ContentTileDefinition.SpaceID);
 
@@ -67,6 +69,26 @@ public sealed class EntryPoint : GameShared
 
         _tileDefinitionManager.Initialize();
     }
+    
+    private void InitGasDefinitions()
+    {
+        var prototypeList = new List<GasPrototype>();
+        foreach (var tileDef in _prototypeManager.EnumeratePrototypes<GasPrototype>())
+        {
+            prototypeList.Add(tileDef);
+        }
+
+        // Sort ordinal to ensure it's consistent client and server.
+        // So that tile IDs match up.
+        prototypeList.Sort((a, b) => string.Compare(a.ID, b.ID, StringComparison.Ordinal));
+
+        foreach (var tileDef in prototypeList)
+        {
+            _gasPrototypeManager.Register(tileDef);
+        }
+
+        _gasPrototypeManager.Initialize();
+    }
 
     private void PrototypeReload(PrototypesReloadedEventArgs obj)
     {
@@ -74,6 +96,11 @@ public sealed class EntryPoint : GameShared
         foreach (var def in _prototypeManager.EnumeratePrototypes<ContentTileDefinition>())
         {
             def.AssignTileId(_tileDefinitionManager[def.ID].TileId);
+        }
+        
+        foreach (var gas in _prototypeManager.EnumeratePrototypes<GasPrototype>())
+        {
+            gas.AssignGasId(_gasPrototypeManager[gas.ID].GasId);
         }
     }
 }

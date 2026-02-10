@@ -1,0 +1,34 @@
+# All basic gas elements listed in the periodic table.
+
+- type: gas
+  id: Hydrogen
+
+- type: gas
+  id: Helium
+
+- type: gas
+  id: Nitrogen
+
+- type: gas
+  id: Oxygen
+
+- type: gas
+  id: Fluorine
+
+- type: gas
+  id: Neon
+
+- type: gas
+  id: Chlorine
+
+- type: gas
+  id: Argon
+
+- type: gas
+  id: Krypton
+
+- type: gas
+  id: Xenon
+
+- type: gas
+  id: Radon

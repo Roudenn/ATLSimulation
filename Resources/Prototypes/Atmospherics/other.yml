@@ -1,0 +1,11 @@
+# Unsorted category for all remaining gases.
+
+- type: gas
+  id: Ammonia
+  name: gas-ammonia
+
+- type: gas
+  id: Methane
+
+- type: gas
+  id: Plasma

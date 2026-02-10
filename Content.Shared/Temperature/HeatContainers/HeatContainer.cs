@@ -1,7 +1,7 @@
-using Content.Shared.Maths;
+using Content.Shared.Constants;
 using Robust.Shared.Serialization;
 
-namespace Content.Shared.Temperature.HeatContainer;
+namespace Content.Shared.Temperature.HeatContainers;
 
 /// <summary>
 /// A general-purpose container for heat energy.

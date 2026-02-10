@@ -1,0 +1,10 @@
+# Lists every gas that has oxygen in it.
+
+- type: gas
+  id: WaterVapor
+
+- type: gas
+  id: CarbonDioxide
+
+- type: gas
+  id: NitrogenOxide # N20

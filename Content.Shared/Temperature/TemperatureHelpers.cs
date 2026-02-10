@@ -1,4 +1,4 @@
-﻿using Content.Shared.Maths;
+﻿using Content.Shared.Constants;
 
 namespace Content.Shared.Temperature;
 
