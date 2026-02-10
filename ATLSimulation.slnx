@@ -1,0 +1,81 @@
+<Solution>
+  <Configurations>
+    <BuildType Name="Debug" />
+    <BuildType Name="DebugOpt" />
+    <BuildType Name="Release" />
+    <BuildType Name="Tools" />
+  </Configurations>
+  <Folder Name="/RobustToolbox/">
+    <Project Path="RobustToolbox/Avalonia.Base/Avalonia.Base.csproj">
+      <BuildType Solution="DebugOpt|*" Project="Release" />
+      <BuildType Solution="Tools|*" Project="Release" />
+    </Project>
+    <Project Path="RobustToolbox/Lidgren.Network/Lidgren.Network.csproj" />
+    <Project Path="RobustToolbox/OpenToolkit.GraphicsLibraryFramework/OpenToolkit.GraphicsLibraryFramework.csproj" />
+    <Project Path="RobustToolbox/Robust.Analyzers/Robust.Analyzers.csproj">
+      <BuildType Solution="DebugOpt|*" Project="Release" />
+      <BuildType Solution="Tools|*" Project="Release" />
+    </Project>
+    <Project Path="RobustToolbox/Robust.Client.Injectors/Robust.Client.Injectors.csproj">
+      <BuildType Solution="DebugOpt|*" Project="Release" />
+      <BuildType Solution="Tools|*" Project="Release" />
+    </Project>
+    <Project Path="RobustToolbox/Robust.Client.NameGenerator/Robust.Client.NameGenerator.csproj">
+      <BuildType Solution="DebugOpt|*" Project="Release" />
+      <BuildType Solution="Tools|*" Project="Release" />
+    </Project>
+    <Project Path="RobustToolbox/Robust.Client/Robust.Client.csproj" />
+    <Project Path="RobustToolbox/Robust.Generators/Robust.Generators.csproj">
+      <BuildType Solution="DebugOpt|*" Project="Release" />
+      <BuildType Solution="Tools|*" Project="Release" />
+    </Project>
+    <Project Path="RobustToolbox/Robust.Packaging/Robust.Packaging.csproj" />
+    <Project Path="RobustToolbox/Robust.Serialization.Generator/Robust.Serialization.Generator.csproj">
+      <BuildType Solution="DebugOpt|*" Project="Debug" />
+      <BuildType Solution="Tools|*" Project="Debug" />
+    </Project>
+    <Project Path="RobustToolbox/Robust.Server/Robust.Server.csproj" />
+    <Project Path="RobustToolbox/Robust.Shared.CompNetworkGenerator/Robust.Shared.CompNetworkGenerator.csproj">
+      <BuildType Solution="DebugOpt|*" Project="Debug" />
+      <BuildType Solution="Tools|*" Project="Release" />
+    </Project>
+    <Project Path="RobustToolbox/Robust.Shared.Maths/Robust.Shared.Maths.csproj" />
+    <Project Path="RobustToolbox/Robust.Shared.Scripting/Robust.Shared.Scripting.csproj" />
+    <Project Path="RobustToolbox/Robust.Shared/Robust.Shared.csproj" />
+    <Project Path="RobustToolbox/Robust.Xaml/Robust.Xaml.csproj">
+      <BuildType Solution="DebugOpt|*" Project="Debug" />
+      <BuildType Solution="Tools|*" Project="Debug" />
+    </Project>
+  </Folder>
+  <Folder Name="/RobustToolbox/NetSerializer/">
+    <Project Path="RobustToolbox/NetSerializer/NetSerializer/NetSerializer.csproj">
+      <BuildType Solution="DebugOpt|*" Project="Debug" />
+      <BuildType Solution="Tools|*" Project="Release" />
+    </Project>
+  </Folder>
+  <Folder Name="/RobustToolbox/Robust.LoaderApi/">
+    <Project Path="RobustToolbox/Robust.LoaderApi/Robust.LoaderApi/Robust.LoaderApi.csproj">
+      <BuildType Solution="DebugOpt|*" Project="Release" />
+      <BuildType Solution="Tools|*" Project="Release" />
+    </Project>
+  </Folder>
+  <Folder Name="/RobustToolbox/XamlX/" />
+  <Folder Name="/RobustToolbox/XamlX/src/">
+    <Project Path="RobustToolbox/XamlX/src/XamlX.IL.Cecil/XamlX.IL.Cecil.csproj">
+      <BuildType Solution="DebugOpt|*" Project="Debug" />
+      <BuildType Solution="Tools|*" Project="Release" />
+    </Project>
+    <Project Path="RobustToolbox/XamlX/src/XamlX.Runtime/XamlX.Runtime.csproj">
+      <BuildType Solution="DebugOpt|*" Project="Debug" />
+      <BuildType Solution="Tools|*" Project="Release" />
+    </Project>
+    <Project Path="RobustToolbox/XamlX/src/XamlX/XamlX.csproj">
+      <BuildType Solution="DebugOpt|*" Project="Debug" />
+      <BuildType Solution="Tools|*" Project="Release" />
+    </Project>
+  </Folder>
+  <Project Path="Content.Client/Content.Client.csproj" />
+  <Project Path="Content.Packaging/Content.Packaging.csproj" />
+  <Project Path="Content.Server/Content.Server.csproj" />
+  <Project Path="Content.Shared/Content.Shared.csproj" />
+</Solution>
