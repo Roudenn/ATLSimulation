@@ -6,7 +6,7 @@ using Robust.Shared.Utility;
 namespace Content.Shared.Maps
 {
     [Prototype("tile")]
-    public sealed class ContentTileDefinition : IInheritingPrototype, ITileDefinition
+    public sealed partial class ContentTileDefinition : IInheritingPrototype, ITileDefinition
     {
         // ReSharper disable once InconsistentNaming
         public const string SpaceID = "Space";

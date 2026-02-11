@@ -19,7 +19,6 @@ public abstract partial class SharedAtmosphericsSystem : EntitySystem
     public float[] GasMolarMassesSquareRoots = Array.Empty<float>();
     public float[] GasViscosities = Array.Empty<float>();
     public float[] GasThermalConductivities = Array.Empty<float>();
-    public float[] GasPrandtlNumbers = Array.Empty<float>();
     public float[] GasPrandtlNumbersCubicRoots = Array.Empty<float>();
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -30,7 +29,6 @@ public abstract partial class SharedAtmosphericsSystem : EntitySystem
         Array.Resize(ref GasViscosities, MathHelper.NextMultipleOf(_gasManager.Count, 4));
         Array.Resize(ref GasThermalConductivities, MathHelper.NextMultipleOf(_gasManager.Count, 4));
         Array.Resize(ref GasMolarMassesSquareRoots, MathHelper.NextMultipleOf(_gasManager.Count, 4));
-        Array.Resize(ref GasPrandtlNumbers, MathHelper.NextMultipleOf(_gasManager.Count, 4));
         Array.Resize(ref GasPrandtlNumbersCubicRoots, MathHelper.NextMultipleOf(_gasManager.Count, 4));
         for (var i = 0; i < _gasManager.Count; i++)
         {
@@ -46,7 +44,6 @@ public abstract partial class SharedAtmosphericsSystem : EntitySystem
             GasMolarMassesSquareRoots[i] = MathF.Sqrt(gas.MolarMass);
             
             var prandtl = gas.SpecificMolarHeat * gas.Viscosity / (gas.MolarMass * gas.ThermalConductivity);
-            GasPrandtlNumbers[i] = prandtl;
             GasPrandtlNumbersCubicRoots[i] = MathF.Cbrt(prandtl);
         }
     }

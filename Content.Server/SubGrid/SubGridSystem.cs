@@ -48,7 +48,7 @@ public sealed partial class SubGridSystem : SharedSubGridSystem
             ResolveTemperatureChunkMap((uid, grid), ref TemperatureCache);
             
             // TODO add tick rate scaling
-            _atmos.ProcessAtmosGrid((uid, grid), frameTime);
+            //_atmos.ProcessAtmosGrid((uid, grid), frameTime);
         }
     }
     

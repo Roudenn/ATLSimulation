@@ -8,6 +8,6 @@ internal static class ServerContentIoC
     public static void Register(IDependencyCollection deps)
     {
         SharedContentIoC.Register(deps);
-        deps.Register<IContentConGroupController, ContentConGroupController>();
+        deps.Register<IContentConGroupController, LocalHostConGroup>();
     }
 }

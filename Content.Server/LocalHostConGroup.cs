@@ -1,20 +1,28 @@
 ﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using JetBrains.Annotations;
 using Robust.Server.Console;
-using Robust.Server.Player;
 using Robust.Shared.Player;
 using Robust.Shared.Toolshed;
 using Robust.Shared.Toolshed.Errors;
 using Robust.Shared.Utility;
 
-namespace Content.Server;
+namespace Content.Server.Commands;
 
 /// <summary>
 ///     Debug/example ConGroup controller implementation that gives any client connected through localhost every permission.
 /// </summary>
 [UsedImplicitly]
-public sealed class LocalHostConGroup : IConGroupControllerImplementation, IPostInjectInit {
+public sealed class LocalHostConGroup : IConGroupControllerImplementation, IContentConGroupController, IPostInjectInit
+{
+    [Dependency] private readonly IConGroupController _conGroup = default!;
+    
+    public void PostInject()
+    {
+        _conGroup.Implementation = this;
+    }
+    
     public bool CanCommand(ICommonSession session, string cmdName) {
         return IsLocal(session);
     }
@@ -39,7 +47,11 @@ public sealed class LocalHostConGroup : IConGroupControllerImplementation, IPost
         return IsLocal(session);
     }
 
-    private static bool IsLocal(ICommonSession player) {
+    private static bool IsLocal(ICommonSession? player)
+    {
+        if (player == null)
+            return false;
+            
         var ep = player.Channel.RemoteEndPoint;
         var addr = ep.Address;
         if (addr.IsIPv4MappedToIPv6) {
@@ -49,10 +61,6 @@ public sealed class LocalHostConGroup : IConGroupControllerImplementation, IPost
         return Equals(addr, IPAddress.Loopback) || Equals(addr, IPAddress.IPv6Loopback);
     }
 
-    void IPostInjectInit.PostInject() {
-        IoCManager.Resolve<IConGroupController>().Implementation = this;
-    }
-
     private record NotLocalError : IConError
     {
         public FormattedMessage DescribeInner()
@@ -60,14 +68,14 @@ public sealed class LocalHostConGroup : IConGroupControllerImplementation, IPost
             return FormattedMessage.FromUnformatted("Not the local user, refusing!");
         }
 
-        public string Expression { get; set; }
+        public string? Expression { get; set; }
 
         public Vector2i? IssueSpan { get; set; }
 
-        public StackTrace Trace { get; set; }
+        public StackTrace? Trace { get; set; }
     }
     
-    public bool CheckInvokable(CommandSpec command, ICommonSession user, out IConError error)
+    public bool CheckInvokable(CommandSpec command, ICommonSession? user, [NotNullWhen(false)] out IConError? error)
     {
         if (!IsLocal(user))
         {

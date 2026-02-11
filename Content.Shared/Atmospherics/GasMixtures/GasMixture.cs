@@ -72,11 +72,22 @@ public partial struct GasMixture : IRobustCloneable<GasMixture>
     }
     
     /// <summary>
-    /// Constructs a new gas mixture based on the array of moles.
+    /// Constructs a new gas mixture out of an array of moles and a heat container.
     /// </summary>
     /// <remarks>
-    /// ENSURE THAT THE ARRAY SIZE IS EQUAL TO THE ONE IN THE GAS PROTOTYPE MANAGER!
+    /// Ensure that the array size is correct and heat container has correct heat capacity relatively to the <see cref="Moles"/> array.
     /// </remarks>
+    public GasMixture(float[] moles, float volume, HeatContainer container)
+    {
+        Moles = moles;
+        MolesRatio = this.CalculateMolesRatio();
+        Volume = volume;
+        HeatContainer = container;
+    }
+    
+    /// <summary>
+    /// Constructs a new gas mixture based on the array of moles.
+    /// </summary>
     public GasMixture(SharedAtmosphericsSystem system, float[] moles, float volume, float temperature)
     {
         Moles = moles;

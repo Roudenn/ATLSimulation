@@ -4,7 +4,7 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototy
 namespace Content.Shared.Atmospherics;
 
 [Prototype]
-public sealed class GasPrototype : IPrototype, IInheritingPrototype
+public sealed partial class GasPrototype : IPrototype, IInheritingPrototype
 {
     /// <summary>
     /// The literal name of the material that can be seen by users.
@@ -36,16 +36,16 @@ public sealed class GasPrototype : IPrototype, IInheritingPrototype
     
     /// <inheritdoc/>
     [IdDataField]
-    public string ID { get; } = default!;
+    public string ID { get; private set; } = default!;
 
     /// <inheritdoc/>
     [ParentDataField(typeof(AbstractPrototypeIdSerializer<GasPrototype>))]
-    public string[]? Parents { get; }
+    public string[]? Parents { get; private set; }
 
     /// <inheritdoc/>
     [NeverPushInheritance]
     [AbstractDataField]
-    public bool Abstract { get; }
+    public bool Abstract { get; private set; }
     
     public void AssignGasId(byte id)
     {

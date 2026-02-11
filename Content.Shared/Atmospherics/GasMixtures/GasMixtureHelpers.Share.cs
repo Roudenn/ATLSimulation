@@ -11,7 +11,7 @@ public static partial class GasMixtureHelpers
     /// <param name="m2">The second mixture to share the gas with.</param>
     /// <param name="k">Transfer coefficient of this sharing process.</param>
     /// <returns></returns>
-    [PublicAPI]
+    /*[PublicAPI]
     public static float ShareMixture(this ref GasMixture m1, ref GasMixture m2, float k)
     {
         var totalMolesShared = 0f;
@@ -19,5 +19,5 @@ public static partial class GasMixtureHelpers
         {
             var delta = m1
         }
-    }
+    }*/
 }
