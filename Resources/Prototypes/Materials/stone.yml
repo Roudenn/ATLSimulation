@@ -1,0 +1,17 @@
+﻿- type: material
+  id: Marble
+  density: 2700
+  specificHeatCapacity: 880
+  thermalConductivity: 2.1
+
+- type: material
+  id: Stone
+  density: 2600
+  specificHeatCapacity: 790
+  thermalConductivity: 2.5
+
+- type: material
+  id: Concrete
+  density: 2400
+  specificHeatCapacity: 880
+  thermalConductivity: 1.7

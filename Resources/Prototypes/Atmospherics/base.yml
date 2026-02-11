@@ -2,33 +2,77 @@
 
 - type: gas
   id: Hydrogen
+  molarMass: 2
+  specificMolarHeat: 28.8
+  thermalConductivity: 0.18
+  viscosity: 8.9
 
 - type: gas
   id: Helium
+  molarMass: 4
+  specificMolarHeat: 20.8
+  thermalConductivity: 0.151
+  viscosity: 19.6
 
 - type: gas
   id: Nitrogen
+  molarMass: 28
+  specificMolarHeat: 29.1
+  thermalConductivity: 0.026
+  viscosity: 17.8
 
 - type: gas
   id: Oxygen
+  molarMass: 32
+  specificMolarHeat: 29.4
+  thermalConductivity: 0.026
+  viscosity: 20.2
 
 - type: gas
   id: Fluorine
+  molarMass: 38
+  specificMolarHeat: 31.3
+  thermalConductivity: 0.027
+  viscosity: 18.5
 
 - type: gas
   id: Neon
+  molarMass: 20
+  specificMolarHeat: 20.8
+  thermalConductivity: 0.049
+  viscosity: 31
 
 - type: gas
   id: Chlorine
+  molarMass: 71
+  specificMolarHeat: 34
+  thermalConductivity: 0.009
+  viscosity: 12.9
 
 - type: gas
   id: Argon
+  molarMass: 40
+  specificMolarHeat: 20.8
+  thermalConductivity: 0.018
+  viscosity: 22.5
 
 - type: gas
   id: Krypton
+  molarMass: 84
+  specificMolarHeat: 20.8
+  thermalConductivity: 0.0095
+  viscosity: 24
 
 - type: gas
   id: Xenon
+  molarMass: 131
+  specificMolarHeat: 20.8
+  thermalConductivity: 0.0055
+  viscosity: 23
 
 - type: gas
   id: Radon
+  molarMass: 222
+  specificMolarHeat: 20.8
+  thermalConductivity: 0.0036
+  viscosity: 23

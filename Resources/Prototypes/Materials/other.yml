@@ -1,0 +1,17 @@
+﻿- type: material
+  id: Wood
+  density: 750
+  specificHeatCapacity: 2400
+  thermalConductivity: 0.17
+
+- type: material
+  id: Plastic
+  density: 1400
+  specificHeatCapacity: 900
+  thermalConductivity: 0.19
+
+- type: material
+  id: Glass
+  density: 2200
+  specificHeatCapacity: 740
+  thermalConductivity: 1.4

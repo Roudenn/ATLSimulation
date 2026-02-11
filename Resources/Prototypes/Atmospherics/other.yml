@@ -2,10 +2,14 @@
 
 - type: gas
   id: Ammonia
-  name: gas-ammonia
+  molarMass: 17
+  specificMolarHeat: 35.1
+  thermalConductivity: 0.025
+  viscosity: 9.8
 
 - type: gas
   id: Methane
-
-- type: gas
-  id: Plasma
+  molarMass: 16
+  specificMolarHeat: 35.7
+  thermalConductivity: 0.034
+  viscosity: 11

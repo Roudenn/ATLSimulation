@@ -7,12 +7,6 @@ namespace Content.Shared.Materials;
 public sealed partial class MaterialPrototype : IPrototype, IInheritingPrototype
 {
     /// <summary>
-    /// The literal name of the material that can be seen by users.
-    /// </summary>
-    [DataField(required: true)]
-    public LocId Name;
-    
-    /// <summary>
     /// Density in kg/m3.
     /// </summary>
     [DataField(required: true)]
@@ -29,6 +23,12 @@ public sealed partial class MaterialPrototype : IPrototype, IInheritingPrototype
     /// </summary>
     [DataField(required: true)]
     public float ThermalConductivity;
+    
+    /// <summary>
+    /// The literal name of the material that is displayed in UIs.
+    /// </summary>
+    [ViewVariables]
+    public LocId Name => $"material-name-{ID}";
     
     /// <inheritdoc/>
     [IdDataField]

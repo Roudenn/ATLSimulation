@@ -1,0 +1,23 @@
+gas-name-Hydrogen = hydrogen
+gas-name-Helium = helium
+gas-name-Nitrogen = nitrogen
+gas-name-Oxygen = oxygen
+gas-name-Fluorine = fluorine
+gas-name-Neon = neon
+gas-name-Chlorine = chlorine
+gas-name-Argon = argon
+gas-name-Krypton = krypton
+gas-name-Xenon = xenon
+gas-name-Radon = radon
+
+gas-abbreviation-Hydrogen = H₂
+gas-abbreviation-Helium = He
+gas-abbreviation-Nitrogen = N₂
+gas-abbreviation-Oxygen = O₂
+gas-abbreviation-Fluorine = F₂
+gas-abbreviation-Neon = Ne
+gas-abbreviation-Chlorine = Cl₂
+gas-abbreviation-Argon = Ar
+gas-abbreviation-Krypton = Kr
+gas-abbreviation-Xenon = Xe
+gas-abbreviation-Radon = Rn

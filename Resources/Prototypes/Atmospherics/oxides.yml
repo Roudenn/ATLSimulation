@@ -2,9 +2,21 @@
 
 - type: gas
   id: WaterVapor
+  molarMass: 18
+  specificMolarHeat: 33.6
+  thermalConductivity: 0.019
+  viscosity: 9
 
 - type: gas
   id: CarbonDioxide
+  molarMass: 44
+  specificMolarHeat: 37.1
+  thermalConductivity: 0.016
+  viscosity: 14.8
 
 - type: gas
   id: NitrogenOxide # N20
+  molarMass: 44
+  specificMolarHeat: 38.6
+  thermalConductivity: 0.017
+  viscosity: 14.7

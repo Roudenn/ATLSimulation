@@ -1,0 +1,47 @@
+﻿- type: material
+  id: StainlessSteel
+  density: 8000
+  specificHeatCapacity: 500
+  thermalConductivity: 16
+
+- type: material
+  id: CarbonSteel
+  density: 7850
+  specificHeatCapacity: 490
+  thermalConductivity: 50
+
+- type: material
+  id: Iron
+  density: 7870
+  specificHeatCapacity: 450
+  thermalConductivity: 80
+
+- type: material
+  id: Aluminum
+  density: 2700
+  specificHeatCapacity: 900
+  thermalConductivity: 205
+
+- type: material
+  id: Lead
+  density: 11340
+  specificHeatCapacity: 130
+  thermalConductivity: 35
+
+- type: material
+  id: Gold
+  density: 19300
+  specificHeatCapacity: 129
+  thermalConductivity: 318
+
+- type: material
+  id: Silver
+  density: 10490
+  specificHeatCapacity: 235
+  thermalConductivity: 429
+
+- type: material
+  id: Uranium
+  density: 19050
+  specificHeatCapacity: 116
+  thermalConductivity: 27
