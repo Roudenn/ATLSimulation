@@ -16,7 +16,7 @@ public partial struct GasMixture : IRobustCloneable<GasMixture>
     /// Contains an amount of every single gas in moles.
     /// </summary>
     [DataField(customTypeSerializer: typeof(GasArraySerializer))]
-    public float[] Moles; // TODO find a better way to save memory and at the same time not kill GC performance
+    public float[] Moles;
     
     /// <summary>
     /// Percentages of all moles in the gas mixture.
@@ -80,7 +80,7 @@ public partial struct GasMixture : IRobustCloneable<GasMixture>
     public GasMixture(float[] moles, float volume, HeatContainer container)
     {
         Moles = moles;
-        MolesRatio = this.CalculateMolesRatio();
+        MolesRatio = this.GetMolesRatioQuery();
         Volume = volume;
         HeatContainer = container;
     }
@@ -91,9 +91,9 @@ public partial struct GasMixture : IRobustCloneable<GasMixture>
     public GasMixture(SharedAtmosphericsSystem system, float[] moles, float volume, float temperature)
     {
         Moles = moles;
-        MolesRatio = this.CalculateMolesRatio();
+        MolesRatio = this.GetMolesRatioQuery();
         Volume = volume;
-        HeatContainer = new HeatContainer(this.CalculateHeatCapacity(ref system.GasSpecificHeats), temperature);
+        HeatContainer = new HeatContainer(this.GetHeatCapacityQuery(ref system.GasBuffer, ref system.GasSpecificHeats), temperature);
     }
     
     public GasMixture(GasMixture g)
@@ -102,6 +102,8 @@ public partial struct GasMixture : IRobustCloneable<GasMixture>
         MolesRatio = g.MolesRatio;
         Volume = g.Volume;
         HeatContainer = g.HeatContainer;
+        Immutable = g.Immutable;
+        IsSpace = g.IsSpace;
     }
     
     public GasMixture Clone()

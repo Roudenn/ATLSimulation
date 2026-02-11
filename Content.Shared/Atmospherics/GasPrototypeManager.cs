@@ -37,7 +37,7 @@ public class GasPrototypeManager : IGasPrototypeManager
 
     public int Count => GasDefs.Count;
     
-    public int ArraySize => (Count + 3) / 4 * 4;
+    public int ArraySize => MathHelper.NextMultipleOf(Count, 4);
 
     public GasPrototype this[string name] => _gasNames[name];
 

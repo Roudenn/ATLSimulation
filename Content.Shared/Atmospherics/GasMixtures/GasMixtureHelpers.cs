@@ -19,14 +19,14 @@ public static partial class GasMixtureHelpers
     }
     
     [PublicAPI]
-    public static float[] CalculateMolesRatio(this ref GasMixture m)
+    public static float[] GetMolesRatioQuery(this ref GasMixture m)
     {
-        NumericsHelpers.Divide(m.Moles, CalculateTotalMoles(ref m), m.MolesRatio);
+        NumericsHelpers.Divide(m.Moles, GetTotalMolesQuery(ref m), m.MolesRatio);
         return m.MolesRatio;
     }
     
     [PublicAPI]
-    public static float CalculateTotalMoles(this ref GasMixture m)
+    public static float GetTotalMolesQuery(this ref GasMixture m)
     {
         m.TotalMoles = NumericsHelpers.HorizontalAdd(m.Moles);
         return m.TotalMoles;
@@ -34,7 +34,6 @@ public static partial class GasMixtureHelpers
     
     /// <summary>
     /// Adds or removes moles of a gas inside the gas mixture, depending on the sign of the <see cref="moles"/> parameter.
-    /// 
     /// </summary>
     /// <param name="m"></param>
     /// <param name="gasId"></param>
@@ -73,7 +72,7 @@ public static partial class GasMixtureHelpers
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(volume);
         m.Volume = volume;
-        CalculatePressure(ref m);
+        GetPressure(ref m);
     }
 
     /// <summary>
@@ -82,9 +81,13 @@ public static partial class GasMixtureHelpers
     /// </summary>
     /// <param name="m"></param>
     [PublicAPI]
-    public static float CalculatePressure(this ref GasMixture m)
+    public static float GetPressure(this ref GasMixture m)
     {
         m.Pressure = m.TotalMoles * m.HeatContainer.Temperature * PhysicalConstants.R / m.Volume;
         return m.Pressure;
     }
+    
+    [PublicAPI]
+    public static float GetPressureQuery(this ref GasMixture m)
+        => m.TotalMoles * m.HeatContainer.Temperature * PhysicalConstants.R / m.Volume;
 }

@@ -22,4 +22,6 @@ public static class PhysicalConstants
     
     public const float ZERO_CELCIUS = 273.15f;
     public const float ROOM_TEMPERATURE = ZERO_CELCIUS + 20f;
+    
+    public const float GramsToKilograms = 0.001f;
 }

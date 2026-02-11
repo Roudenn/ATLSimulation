@@ -1,5 +1,6 @@
 ﻿using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype;
+using Robust.Shared.Utility;
 
 namespace Content.Shared.Atmospherics;
 
@@ -30,10 +31,25 @@ public sealed partial class GasPrototype : IPrototype, IInheritingPrototype
     [DataField(required: true)]
     public float Viscosity;
     
+    /// <summary>
+    /// Color of this gas that is used in UIs.
+    /// </summary>
+    [DataField]
+    public Color Color = Color.White;
+
+    /// <summary>
+    /// Sprite of this gas when it's placed inside <see cref="TileAtmosphere"/>.
+    /// </summary>
+    [DataField]
+    public SpriteSpecifier? TileSprite;
+    
     // for now a byte because an array is used to store gases and anything more than 255 will allocate gazzilion memory
     [ViewVariables]
     public byte GasId { get; private set; }
     
+    [ViewVariables]
+    public float PrandtlNumber => SpecificMolarHeat * Viscosity / (MolarMass * ThermalConductivity);
+
     /// <summary>
     /// The literal name of the material that can be seen by users.
     /// </summary>
