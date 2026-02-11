@@ -11,14 +11,17 @@
   <Import Project="..\MSBuild\Content.props" />
 
   <ItemGroup>
-      <ProjectReference Include="..\Content.Client\Content.Client.csproj" />
-      <ProjectReference Include="..\Content.Server\Content.Server.csproj" />
-      <ProjectReference Include="..\Content.Shared\Content.Shared.csproj" />
-      <ProjectReference Include="..\Content.UnitTesting\Content.UnitTesting.csproj" />
-    </ItemGroup>
-
+    <ProjectReference Include="..\Content.Client\Content.Client.csproj" />
+    <ProjectReference Include="..\Content.Server\Content.Server.csproj" />
+    <ProjectReference Include="..\Content.Shared\Content.Shared.csproj" />
+    <ProjectReference Include="..\Content.UnitTesting\Content.UnitTesting.csproj" />
+  </ItemGroup>
+    
   <ItemGroup>
-    <PackageReference Include="NUnit" />
+    <PackageReference Include="NUnit" Version="4.4.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="6.1.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
+    <PackageReference Include="Moq" Version="4.20.72" />
   </ItemGroup>
 
   <Import Project="..\RobustToolbox\MSBuild\Robust.Properties.targets" />
