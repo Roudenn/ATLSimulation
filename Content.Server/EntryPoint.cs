@@ -1,5 +1,7 @@
 using Content.Server.IoC;
+using Content.Shared.GameCVars;
 using JetBrains.Annotations;
+using Robust.Shared.Configuration;
 using Robust.Shared.ContentPack;
 using Robust.Shared.Prototypes;
 
@@ -9,8 +11,13 @@ namespace Content.Server;
 [UsedImplicitly]
 public sealed class EntryPoint : GameServer
 {
+    private const string ConfigPresetsDir = "/ConfigPresets/";
+    
     [Dependency] private readonly IComponentFactory _componentFactory = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    [Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Dependency] private readonly ILogManager _log = default!;
+    [Dependency] private readonly IResourceManager _res = default!;
     
     public override void PreInit()
     {
@@ -19,8 +26,11 @@ public sealed class EntryPoint : GameServer
 
     public override void Init()
     {
+        base.Init();
         Dependencies.BuildGraph();
         Dependencies.InjectDependencies(this);
+        
+        LoadConfigPresets(_cfg, _res, _log.GetSawmill("configpreset"));
         
         _componentFactory.DoAutoRegistrations();
 
@@ -38,10 +48,24 @@ public sealed class EntryPoint : GameServer
 
         // DEVNOTE: This is generally where you'll be setting up the IoCManager further.
     }
-
-    public override void PostInit()
+    
+    private static void LoadConfigPresets(IConfigurationManager cfg, IResourceManager res, ISawmill sawmill)
     {
-        base.PostInit();
-        // DEVNOTE: Can also initialize IoC stuff more here.
+        var presets = cfg.GetCVar(GameConfigVars.ConfigPresets);
+        if (presets == "")
+            return;
+
+        foreach (var preset in presets.Split(','))
+        {
+            var path = $"{ConfigPresetsDir}{preset}.toml";
+            if (!res.TryContentFileRead(path, out var file))
+            {
+                sawmill.Error("Unable to load config preset {Preset}!", path);
+                continue;
+            }
+
+            cfg.LoadDefaultsFromTomlStream(file);
+            sawmill.Info("Loaded config preset: {Preset}", path);
+        }
     }
 }
