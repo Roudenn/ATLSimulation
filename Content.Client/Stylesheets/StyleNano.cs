@@ -525,17 +525,6 @@ namespace Content.Client.Stylesheets
             };
             insetBack.SetPatchMargin(StyleBox.Margin.All, 10);
 
-            // Default paper background:
-            var paperBackground = new StyleBoxTexture
-            {
-                Texture = resCache.GetTexture("/Textures/Interface/Paper/paper_background_default.svg.96dpi.png"),
-                Modulate = Color.FromHex("#eaedde"), // A light cream
-            };
-            paperBackground.SetPatchMargin(StyleBox.Margin.All, 16.0f);
-
-            var contextMenuExpansionTexture = resCache.GetTexture("/Textures/Interface/VerbIcons/group.svg.192dpi.png");
-            var verbMenuConfirmationTexture = resCache.GetTexture("/Textures/Interface/VerbIcons/group.svg.192dpi.png");
-
             // south-facing arrow:
             var directionIconArrowTex = resCache.GetTexture("/Textures/Interface/VerbIcons/drop.svg.192dpi.png");
             var directionIconQuestionTex = resCache.GetTexture("/Textures/Interface/VerbIcons/information.svg.192dpi.png");
@@ -1320,9 +1309,6 @@ namespace Content.Client.Stylesheets
                     .Prop(TextureButton.StylePropertyTexture, resCache.GetTexture("/Textures/Interface/info.svg.192dpi.png"))
                     .Prop(Control.StylePropertyModulateSelf, Color.FromHex("#eeee11")),
 
-                // The default look of paper in UIs. Pages can have components which override this
-                Element<PanelContainer>().Class("PaperDefaultBorder")
-                    .Prop(PanelContainer.StylePropertyPanel, paperBackground),
                 Element<RichTextLabel>().Class("PaperWrittenText")
                     .Prop(Label.StylePropertyFont, notoSans12)
                     .Prop(Control.StylePropertyModulateSelf, Color.FromHex("#111111")),
