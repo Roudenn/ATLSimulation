@@ -2,11 +2,27 @@
     xmlns="https://spacestation14.io"
     xmlns:screens="clr-namespace:Content.Client.UserInterface.Screens"
     xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls"
+    xmlns:graphics="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
+    xmlns:tabs="clr-namespace:Content.Client.UserInterface.Systems.Tabs"
     Name="DefaultHud"
     VerticalExpand="False"
     VerticalAlignment="Bottom"
     HorizontalAlignment="Center">
-    <LayoutContainer Name="ViewportContainer" HorizontalExpand="True" VerticalExpand="True">
-        <controls:MainViewport Name="MainViewport"/>
-    </LayoutContainer>
+    <SplitContainer Name="ScreenContainer" HorizontalExpand="True" VerticalExpand="True" SplitWidth="0" StretchDirection="TopLeft">
+        <LayoutContainer Name="ViewportContainer" HorizontalExpand="True" VerticalExpand="True">
+            <controls:MainViewport Name="MainViewport"/>
+        </LayoutContainer>
+        <PanelContainer Name="SeparatedControlPanel" MinWidth="300">
+            <PanelContainer.PanelOverride>
+                <graphics:StyleBoxFlat BackgroundColor="#2B2C3B" />
+            </PanelContainer.PanelOverride>
+            <BoxContainer Orientation="Vertical" HorizontalExpand="True" SeparationOverride="10" Margin="10">
+                <TabContainer Name="Tabs" VerticalExpand="True">
+                    <tabs:StatisticsTab Name="Statistics"/>
+                    <tabs:VisualsTab Name="Visuals"/>
+                    <tabs:SimulationOptionsTab Name="SimulationOptions"/>
+                </TabContainer>
+            </BoxContainer>
+        </PanelContainer>
+    </SplitContainer>
 </screens:DefaultGameScreen>
