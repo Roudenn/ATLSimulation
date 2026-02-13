@@ -1,5 +1,5 @@
 ﻿using Robust.Shared.Prototypes;
-using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype;
+using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype.Array;
 using Robust.Shared.Utility;
 
 namespace Content.Shared.Atmospherics;
@@ -66,11 +66,11 @@ public sealed partial class GasPrototype : IPrototype, IInheritingPrototype
     [IdDataField]
     public string ID { get; private set; } = default!;
 
-    /// <inheritdoc/>
-    [ParentDataField(typeof(AbstractPrototypeIdSerializer<GasPrototype>))]
+    /// <inheritdoc />
+    [ParentDataField(typeof(AbstractPrototypeIdArraySerializer<GasPrototype>))]
     public string[]? Parents { get; private set; }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     [NeverPushInheritance]
     [AbstractDataField]
     public bool Abstract { get; private set; }

@@ -14,7 +14,8 @@ public sealed class EntryPoint : GameShared
 {
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly ITileDefinitionManager _tileDefinitionManager = default!;
-    [Dependency] private readonly IGasPrototypeManager _gasPrototypeManager = default!;
+    [Dependency] private readonly ILocalizationManager _localeManager = default!;
+    //[Dependency] private readonly GasPrototypeManager _gasPrototypeManager = default!;
     
     // IoC services shared between the client and the server go here...
         
@@ -26,13 +27,12 @@ public sealed class EntryPoint : GameShared
 
     public override void PreInit()
     {
-        IoCManager.InjectDependencies(this);
+        Dependencies.InjectDependencies(this);
 
         // Default to en-US.
         // DEVNOTE: If you want your game to be multiregional at runtime, you'll need to 
         // do something more complicated here.
-        IoCManager.Resolve<ILocalizationManager>().LoadCulture(new CultureInfo(Culture));
-        
+        _localeManager.LoadCulture(new CultureInfo(Culture));
     }
 
     public override void PostInit()
@@ -84,10 +84,10 @@ public sealed class EntryPoint : GameShared
 
         foreach (var tileDef in prototypeList)
         {
-            _gasPrototypeManager.Register(tileDef);
+            Dependencies.Resolve<GasPrototypeManager>().Register(tileDef);
         }
 
-        _gasPrototypeManager.Initialize();
+        Dependencies.Resolve<GasPrototypeManager>().Initialize();
     }
 
     private void PrototypeReload(PrototypesReloadedEventArgs obj)
@@ -100,7 +100,7 @@ public sealed class EntryPoint : GameShared
         
         foreach (var gas in _prototypeManager.EnumeratePrototypes<GasPrototype>())
         {
-            gas.AssignGasId(_gasPrototypeManager[gas.ID].GasId);
+            gas.AssignGasId(Dependencies.Resolve<GasPrototypeManager>()[gas.ID].GasId);
         }
     }
 }

@@ -1,6 +1,4 @@
 ﻿using Robust.Shared.Prototypes;
-using MethodImpl = System.Runtime.CompilerServices.MethodImplAttribute;
-using MethodImplOptions = System.Runtime.CompilerServices.MethodImplOptions;
 
 namespace Content.Shared.Atmospherics.Systems;
 
@@ -8,7 +6,7 @@ public abstract partial class SharedAtmosphericsSystem : EntitySystem
 {
     // TODO port stuff needed from the server system to here
     [Dependency] private readonly IPrototypeManager _protoMan = default!;
-    [Dependency] private readonly IGasPrototypeManager _gasManager = default!;
+    [Dependency] private readonly GasPrototypeManager _gasManager = default!;
     
     public override void Initialize()
     {
@@ -30,7 +28,6 @@ public abstract partial class SharedAtmosphericsSystem : EntitySystem
     public float[] GasThermalConductivities = Array.Empty<float>();
     public float[] GasPrandtlNumbersCubicRoots = Array.Empty<float>();
     
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void InitializeGases()
     {
         Array.Resize(ref GasBuffer, _gasManager.ArraySize);

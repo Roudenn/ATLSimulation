@@ -1,5 +1,5 @@
 ﻿using Robust.Shared.Prototypes;
-using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype;
+using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype.Array;
 
 namespace Content.Shared.Materials;
 
@@ -35,7 +35,7 @@ public sealed partial class MaterialPrototype : IPrototype, IInheritingPrototype
     public string ID { get; private set; } = default!;
 
     /// <inheritdoc/>
-    [ParentDataField(typeof(AbstractPrototypeIdSerializer<MaterialPrototype>))]
+    [ParentDataField(typeof(AbstractPrototypeIdArraySerializer<MaterialPrototype>))]
     public string[]? Parents { get; private set; }
 
     /// <inheritdoc/>

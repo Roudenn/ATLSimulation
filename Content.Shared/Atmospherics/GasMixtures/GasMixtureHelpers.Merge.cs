@@ -13,7 +13,6 @@ public static partial class GasMixtureHelpers
     /// <param name="m1">The mixture that initiated merge.</param>
     /// <param name="m2">The second mixture to merge the gas with.</param>
     [PublicAPI]
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Merge(this ref GasMixture m1, ref GasMixture m2)
     {
         DebugTools.Assert(m1.Immutable, "The mixture targeted for a merge was marked as immutable!");

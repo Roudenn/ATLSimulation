@@ -63,7 +63,7 @@ public partial struct GasMixture : IRobustCloneable<GasMixture>
     /// <summary>
     /// Constructs a new gas mixture without any gas.
     /// </summary>
-    public GasMixture(IGasPrototypeManager manager, float volume, float temperature)
+    public GasMixture(GasPrototypeManager manager, float volume, float temperature)
     {
         Moles = new float[manager.ArraySize];
         MolesRatio = new float[manager.ArraySize];

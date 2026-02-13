@@ -6,6 +6,6 @@ public static class SharedContentIoC
 {
     public static void Register(IDependencyCollection deps)
     {
-        deps.Register<IGasPrototypeManager, GasPrototypeManager>();
+        deps.Register<GasPrototypeManager, GasPrototypeManager>();
     }
 }

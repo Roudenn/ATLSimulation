@@ -2,10 +2,9 @@
 
 namespace Content.Shared.Atmospherics;
 
-[Virtual]
-public class GasPrototypeManager : IGasPrototypeManager
+public sealed class GasPrototypeManager : IEnumerable<GasPrototype> // : IGasPrototypeManager
 {
-    protected readonly List<GasPrototype> GasDefs;
+    private readonly List<GasPrototype> GasDefs;
     private readonly Dictionary<string, GasPrototype> _gasNames;
 
     /// <summary>
@@ -17,7 +16,7 @@ public class GasPrototypeManager : IGasPrototypeManager
         _gasNames = new Dictionary<string, GasPrototype>();
     }
 
-    public virtual void Initialize()
+    public void Initialize()
     {
     }
 
