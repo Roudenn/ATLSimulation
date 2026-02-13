@@ -2,6 +2,8 @@ using System.Globalization;
 using Content.Shared.Atmospherics;
 using Content.Shared.Maps;
 using JetBrains.Annotations;
+using Robust.Shared;
+using Robust.Shared.Configuration;
 using Robust.Shared.ContentPack;
 using Robust.Shared.Map;
 using Robust.Shared.Prototypes;
@@ -15,10 +17,10 @@ public sealed class EntryPoint : GameShared
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly ITileDefinitionManager _tileDefinitionManager = default!;
     [Dependency] private readonly ILocalizationManager _localeManager = default!;
-    //[Dependency] private readonly GasPrototypeManager _gasPrototypeManager = default!;
-    
+    //[Dependency] private readonly IConfigurationManager _configManager = default!;
+
     // IoC services shared between the client and the server go here...
-        
+
     // See line 24. Controls the default game culture and language.
     // Robust calls this culture, but you might find it more fitting to call it the game
     // language. Robust doesn't support changing this mid-game. Load your config file early
@@ -29,9 +31,6 @@ public sealed class EntryPoint : GameShared
     {
         Dependencies.InjectDependencies(this);
 
-        // Default to en-US.
-        // DEVNOTE: If you want your game to be multiregional at runtime, you'll need to 
-        // do something more complicated here.
         _localeManager.LoadCulture(new CultureInfo(Culture));
     }
 
@@ -41,7 +40,7 @@ public sealed class EntryPoint : GameShared
         InitTileDefinitions();
         InitGasDefinitions();
     }
-    
+
     private void InitTileDefinitions()
     {
         // Register space first because I'm a hard coding hack.
@@ -69,7 +68,7 @@ public sealed class EntryPoint : GameShared
 
         _tileDefinitionManager.Initialize();
     }
-    
+
     private void InitGasDefinitions()
     {
         var prototypeList = new List<GasPrototype>();
@@ -97,7 +96,7 @@ public sealed class EntryPoint : GameShared
         {
             def.AssignTileId(_tileDefinitionManager[def.ID].TileId);
         }
-        
+
         foreach (var gas in _prototypeManager.EnumeratePrototypes<GasPrototype>())
         {
             gas.AssignGasId(Dependencies.Resolve<GasPrototypeManager>()[gas.ID].GasId);
