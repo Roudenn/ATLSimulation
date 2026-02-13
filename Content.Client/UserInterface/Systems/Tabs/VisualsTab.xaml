@@ -3,6 +3,8 @@
     <BoxContainer Orientation="Vertical">
         <ScrollContainer VerticalExpand="True">
             <BoxContainer Orientation="Vertical" Margin="8 8 8 8">
+                <Label Text="{Loc 'ui-viewport-header-visuals'}" StyleClasses="LabelHeading"/>
+
                 <!-- Atmosphere -->
                 <Label Text="{Loc 'ui-viewport-header-atmosphere'}" StyleClasses="LabelKeyText"/>
                 <CheckBox Name="AtmosphereVisibilityCheckBox" Text="{Loc 'ui-viewport-tabs-visuals-atmosphere-visibility'}" />
@@ -13,8 +15,9 @@
                 <Label Text="{Loc 'ui-viewport-header-temperature'}" StyleClasses="LabelKeyText"/>
                 <CheckBox Name="TemperatureVisibilityCheckBox" Text="{Loc 'ui-viewport-tabs-visuals-temperature-visibility'}" />
 
-                <CheckBox Name="SolidsHeatCapacityCheckBox" Text="{Loc 'ui-ui-viewport-tabs-visuals-solids-heat-capacity'}" />
-                <CheckBox Name="SolidsConductivityCheckBox" Text="{Loc 'ui-ui-viewport-tabs-visuals-solids-conductivity'}" />
+                <CheckBox Name="SolidsHeatCapacityCheckBox" Text="{Loc 'ui-viewport-tabs-visuals-solids-heat-capacity'}" />
+                <CheckBox Name="SolidsConductivityCheckBox" Text="{Loc 'ui-viewport-tabs-visuals-solids-conductivity'}" />
+                <CheckBox Name="SolidsInternalEnergyCheckBox" Text="{Loc 'ui-viewport-tabs-visuals-solids-internal-energy'}" />
             </BoxContainer>
         </ScrollContainer>
     </BoxContainer>

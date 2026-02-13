@@ -409,3 +409,8 @@ ui-options-admin-enable-overlay-starting-job = Show starting job
 ui-options-admin-overlay-merge-distance = Stack merge distance
 ui-options-admin-overlay-ghost-fade-distance = Ghost overlay fade range from mouse
 ui-options-admin-overlay-ghost-hide-distance = Ghost overlay hide range from mouse
+
+ui-options-function-toggle-entity-spawning-window = Toggle Entity Spawning
+ui-options-function-toggle-tile-spawning-window = Toggle Tile Spawning
+
+cmd-replay-toggleui-desc = Toggle replay UI

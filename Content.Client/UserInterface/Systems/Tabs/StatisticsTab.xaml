@@ -2,16 +2,14 @@
           xmlns:visuals="clr-namespace:Content.Client.UserInterface.Systems.Tabs">
     <BoxContainer Orientation="Vertical">
         <ScrollContainer VerticalExpand="True">
-            <!-- Atmosphere -->
-            <Label Text="{Loc 'ui-viewport-header-atmosphere'}" StyleClasses="LabelKeyText"/>
-
-
-            <!-- Temperature -->
-            <Label Text="{Loc 'ui-viewport-header-temperature'}" StyleClasses="LabelKeyText"/>
-
-
             <BoxContainer Orientation="Vertical" Margin="8 8 8 8">
+                <Label Text="{Loc 'ui-viewport-header-statistics'}" StyleClasses="LabelHeading"/>
 
+                <!-- Atmosphere -->
+                <Label Text="{Loc 'ui-viewport-header-atmosphere'}" StyleClasses="LabelKeyText"/>
+
+                <!-- Temperature -->
+                <Label Text="{Loc 'ui-viewport-header-temperature'}" StyleClasses="LabelKeyText"/>
             </BoxContainer>
         </ScrollContainer>
     </BoxContainer>

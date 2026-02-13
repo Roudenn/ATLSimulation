@@ -12,7 +12,7 @@
         <LayoutContainer Name="ViewportContainer" HorizontalExpand="True" VerticalExpand="True">
             <controls:MainViewport Name="MainViewport"/>
         </LayoutContainer>
-        <PanelContainer Name="SeparatedControlPanel" MinWidth="300">
+        <PanelContainer Name="SeparatedControlPanel" MinWidth="350">
             <PanelContainer.PanelOverride>
                 <graphics:StyleBoxFlat BackgroundColor="#2B2C3B" />
             </PanelContainer.PanelOverride>

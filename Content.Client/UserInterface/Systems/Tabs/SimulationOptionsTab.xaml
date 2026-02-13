@@ -3,9 +3,12 @@
     <BoxContainer Orientation="Vertical">
         <ScrollContainer VerticalExpand="True">
             <BoxContainer Orientation="Vertical" Margin="8 8 8 8">
+                <Label Text="{Loc 'ui-viewport-header-simulation-options'}" StyleClasses="LabelHeading"/>
+
+                <!-- TODO: CLIENT->SERVER OPTIONS -->
+
                 <!-- Atmosphere -->
                 <Label Text="{Loc 'ui-viewport-header-atmosphere'}" StyleClasses="LabelKeyText"/>
-
 
                 <!-- Temperature -->
                 <Label Text="{Loc 'ui-viewport-header-temperature'}" StyleClasses="LabelKeyText"/>
