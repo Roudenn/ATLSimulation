@@ -4,6 +4,7 @@ using Content.Client.IoC;
 using Content.Client.MainMenu;
 using Content.Client.Parallax.Managers;
 using Content.Client.Screenshot;
+using Content.Client.Stylesheets;
 using Content.Client.Viewport;
 using JetBrains.Annotations;
 using Robust.Client.Graphics;
@@ -31,6 +32,7 @@ public sealed class EntryPoint : GameClient
     [Dependency] private readonly IScreenshotHook _screenshotHook = default!;
     [Dependency] private readonly FullscreenHook _fullscreenHook = default!;
     [Dependency] private readonly ViewportManager _viewportManager = default!;
+    [Dependency] private readonly IStylesheetManager _stylesheetManager = default!;
 
     public override void PreInit()
     {
@@ -74,11 +76,14 @@ public sealed class EntryPoint : GameClient
     {
         base.PostInit();
 
+        _stylesheetManager.Initialize();
+
         // Setup key contexts
         ContentContexts.SetupContexts(_inputManager.Contexts);
 
         _userInterfaceManager.SetDefaultTheme("SS14DefaultTheme");
         _userInterfaceManager.SetActiveTheme(_configManager.GetCVar(CVars.InterfaceTheme));
+
         _parallaxManager.LoadDefaultParallax();
 
         _lightManager.Enabled = false; // We don't need any lighting in a demo

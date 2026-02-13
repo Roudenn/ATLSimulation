@@ -2,6 +2,7 @@ using Content.Client.Clickable;
 using Content.Client.Fullscreen;
 using Content.Client.Parallax.Managers;
 using Content.Client.Screenshot;
+using Content.Client.Stylesheets;
 using Content.Client.Viewport;
 using Content.Shared.IoC;
 
@@ -17,6 +18,7 @@ internal static class ClientContentIoC
         collection.Register<IScreenshotHook, ScreenshotHook>();
         collection.Register<FullscreenHook, FullscreenHook>();
         collection.Register<IClickMapManager, ClickMapManager>();
+        collection.Register<IStylesheetManager, StylesheetManager>();
         collection.Register<ViewportManager, ViewportManager>();
     }
 }
