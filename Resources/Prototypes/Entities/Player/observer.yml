@@ -8,6 +8,7 @@
     texture: /Textures/weh.png
   - type: Physics
     bodyType: KinematicController
+    ignoreGravity: true
   - type: Fixtures
     fixtures:
       fix1:
@@ -16,10 +17,13 @@
           radius: 0.35
         density: 50
   - type: InputMover
-  - type: MovementSpeedModifier
+  #- type: MovementSpeedModifier
+  #  baseAcceleration: 20
+  #  baseFriction: 2.5
   - type: Eye
     drawFov: false
   - type: ContentEye
     maxZoom: 2,2
   - type: LagCompensation
   - type: Input
+    context: "common"

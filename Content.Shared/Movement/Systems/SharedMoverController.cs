@@ -16,14 +16,14 @@ public abstract partial class SharedMoverController : VirtualController
 {
     [Dependency] protected readonly IGameTiming Timing = default!;
     [Dependency] private   readonly SharedTransformSystem _transform = default!;
-    
+
     protected EntityQuery<InputMoverComponent> MoverQuery;
     protected EntityQuery<MapComponent> MapQuery;
     protected EntityQuery<MapGridComponent> MapGridQuery;
     protected EntityQuery<MovementSpeedModifierComponent> ModifierQuery;
     protected EntityQuery<PhysicsComponent> PhysicsQuery;
     protected EntityQuery<TransformComponent> XformQuery;
-    
+
     public override void Initialize()
     {
         base.Initialize();
@@ -34,7 +34,7 @@ public abstract partial class SharedMoverController : VirtualController
         XformQuery = GetEntityQuery<TransformComponent>();
         MapGridQuery = GetEntityQuery<MapGridComponent>();
         MapQuery = GetEntityQuery<MapComponent>();
-        
+
         InitializeInput();
     }
 
@@ -56,7 +56,7 @@ public abstract partial class SharedMoverController : VirtualController
 
         if (!XformQuery.TryComp(entity.Owner, out var xform))
             return;
-        
+
         // Update relative movement
         if (mover.LerpTarget < Timing.CurTime)
         {
@@ -78,7 +78,7 @@ public abstract partial class SharedMoverController : VirtualController
         float accel;
         Vector2 wishDir;
         var velocity = physicsComponent.LinearVelocity;
-        
+
         var walkSpeed = moveSpeedComponent?.CurrentWalkSpeed ?? MovementSpeedModifierComponent.DefaultBaseWalkSpeed;
         var sprintSpeed = moveSpeedComponent?.CurrentSprintSpeed ?? MovementSpeedModifierComponent.DefaultBaseSprintSpeed;
 
@@ -102,7 +102,7 @@ public abstract partial class SharedMoverController : VirtualController
         friction = Math.Max(friction, 0);
         var minimumFrictionSpeed = moveSpeedComponent?.MinimumFrictionSpeed ?? MovementSpeedModifierComponent.DefaultMinimumFrictionSpeed;
         Friction(minimumFrictionSpeed, frameTime, friction, ref velocity);
-        
+
         Accelerate(ref velocity, in wishDir, accel, frameTime);
 
         SetWishDir((uid, mover), wishDir);
@@ -221,7 +221,7 @@ public abstract partial class SharedMoverController : VirtualController
     }
 
     private bool _relativeMovement = false;
-    
+
     private Vector2 AssertValidWish(InputMoverComponent mover, float walkSpeed, float sprintSpeed)
     {
         var (walkDir, sprintDir) = GetVelocityInput(mover);

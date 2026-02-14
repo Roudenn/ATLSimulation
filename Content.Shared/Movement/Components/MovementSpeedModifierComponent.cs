@@ -13,14 +13,14 @@ namespace Content.Shared.Movement.Components
         #region defaults
 
         // weightless
-        public const float DefaultWeightlessFriction = 1f;
+        public const float DefaultWeightlessFriction = 3f;
         public const float DefaultWeightlessModifier = 0.7f;
-        public const float DefaultWeightlessAcceleration = 1f;
+        public const float DefaultWeightlessAcceleration = 6f;
 
         // friction
         public const float DefaultAcceleration = 20f;
-        public const float DefaultFriction = 2.5f;
-        public const float DefaultFrictionNoInput = 2.5f;
+        public const float DefaultFriction = 5.0f;
+        public const float DefaultFrictionNoInput = 5.0f;
         public const float DefaultMinimumFrictionSpeed = 0.005f;
 
         // movement
