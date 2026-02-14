@@ -16,8 +16,8 @@ public sealed partial class DefaultGameScreen : InGameScreen
         SetAnchorPreset(ViewportContainer, LayoutPreset.Wide);
         SetAnchorPreset(MainViewport, LayoutPreset.Wide);
 
-        Tabs.SetTabTitle(0, Loc.GetString("ui-viewport-header-statistics"));
-        Tabs.SetTabTitle(1, Loc.GetString("ui-viewport-header-visuals"));
-        Tabs.SetTabTitle(2, Loc.GetString("ui-viewport-header-simulation-options"));
+        Tabs.TabContainer.SetTabTitle(0, Loc.GetString("ui-viewport-header-statistics"));
+        Tabs.TabContainer.SetTabTitle(1, Loc.GetString("ui-viewport-header-visuals"));
+        Tabs.TabContainer.SetTabTitle(2, Loc.GetString("ui-viewport-header-simulation-options"));
     }
 }

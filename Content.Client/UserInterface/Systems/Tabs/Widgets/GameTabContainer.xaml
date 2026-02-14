@@ -1,0 +1,15 @@
+﻿<widgets:GameTabContainer xmlns="https://spacestation14.io"
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+           xmlns:widgets="clr-namespace:Content.Client.UserInterface.Systems.Tabs.Widgets"
+           xmlns:tabs="clr-namespace:Content.Client.UserInterface.Systems.Tabs"
+           Name = "MenuTabs"
+           Orientation="Horizontal"
+           HorizontalAlignment="Stretch"
+           VerticalAlignment="Stretch"
+           SeparationOverride="5">
+    <TabContainer Name="TabContainer" Access="Public" HorizontalExpand="True" VerticalExpand="True" >
+        <tabs:StatisticsTab Name="Statistics" Access="Public"/>
+        <tabs:VisualsTab Name="Visuals" Access="Public"/>
+        <tabs:SimulationOptionsTab Name="SimulationOptions" Access="Public"/>
+    </TabContainer>
+</widgets:GameTabContainer>

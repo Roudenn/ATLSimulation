@@ -3,8 +3,8 @@
     xmlns:screens="clr-namespace:Content.Client.UserInterface.Screens"
     xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls"
     xmlns:graphics="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
-    xmlns:tabs="clr-namespace:Content.Client.UserInterface.Systems.Tabs"
-    xmlns:widgets="clr-namespace:Content.Client.UserInterface.Systems.MenuBar.Widgets"
+    xmlns:topbar="clr-namespace:Content.Client.UserInterface.Systems.MenuBar.Widgets"
+    xmlns:tabs="clr-namespace:Content.Client.UserInterface.Systems.Tabs.Widgets"
     Name="DefaultHud"
     VerticalExpand="False"
     VerticalAlignment="Bottom"
@@ -18,12 +18,8 @@
                 <graphics:StyleBoxFlat BackgroundColor="#2B2C3B" />
             </PanelContainer.PanelOverride>
             <BoxContainer Orientation="Vertical" HorizontalExpand="True" SeparationOverride="10" Margin="10">
-                <widgets:GameTopMenuBar Name="TopBar" HorizontalExpand="True" Access="Public" />
-                <TabContainer Name="Tabs" VerticalExpand="True">
-                    <tabs:StatisticsTab Name="Statistics"/>
-                    <tabs:VisualsTab Name="Visuals"/>
-                    <tabs:SimulationOptionsTab Name="SimulationOptions"/>
-                </TabContainer>
+                <topbar:GameTopMenuBar Name="TopBar" Access="Public" />
+                <tabs:GameTabContainer Name="Tabs" VerticalExpand="True" HorizontalExpand="True" Access="Public" MinHeight="0" /> <!-- TODO remove the MinHeight -->
             </BoxContainer>
         </PanelContainer>
     </SplitContainer>

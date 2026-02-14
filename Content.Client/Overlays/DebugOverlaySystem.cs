@@ -1,0 +1,74 @@
+﻿using Content.Client.Subgrid;
+using Robust.Client.Graphics;
+using Robust.Client.Player;
+using Robust.Shared.Player;
+
+namespace Content.Client.Overlays;
+
+public sealed class DebugOverlaySystem : EntitySystem
+{
+    [Dependency] private readonly IEyeManager _eyeManager = default!;
+    [Dependency] private readonly IPlayerManager _player = default!;
+    [Dependency] private readonly IOverlayManager _overlayMan = default!;
+    [Dependency] private readonly SharedTransformSystem _xform = default!;
+
+    private SubGridChunkOverlay _subGridChunkOverlay = default!;
+
+    /// <inheritdoc/>
+    public override void Initialize()
+    {
+        SubscribeLocalEvent<DebugOverlayViewerComponent, ComponentInit>(OnInit);
+        SubscribeLocalEvent<DebugOverlayViewerComponent, ComponentShutdown>(OnShutdown);
+        SubscribeLocalEvent<DebugOverlayViewerComponent, LocalPlayerAttachedEvent>(OnPlayerAttached);
+        SubscribeLocalEvent<DebugOverlayViewerComponent, LocalPlayerDetachedEvent>(OnPlayerDetached);
+
+        _subGridChunkOverlay = new(EntityManager, _eyeManager, _xform);
+    }
+
+    public void UpdateOverlays(Entity<DebugOverlayViewerComponent?> ent)
+    {
+        if (!Resolve(ent.Owner, ref ent.Comp))
+            return;
+
+        RemoveOverlays();
+        AddOverlays(ent!);
+    }
+
+    private void OnPlayerAttached(Entity<DebugOverlayViewerComponent> ent, ref LocalPlayerAttachedEvent args)
+    {
+        AddOverlays(ent);
+    }
+
+    private void OnPlayerDetached(Entity<DebugOverlayViewerComponent> ent, ref LocalPlayerDetachedEvent args)
+    {
+        RemoveOverlays();
+    }
+
+    private void OnInit(Entity<DebugOverlayViewerComponent> ent, ref ComponentInit args)
+    {
+        if (_player.LocalEntity != ent)
+            return;
+
+        AddOverlays(ent);
+    }
+
+    private void OnShutdown(Entity<DebugOverlayViewerComponent> ent, ref ComponentShutdown args)
+    {
+        if (_player.LocalEntity != ent)
+            return;
+
+        RemoveOverlays();
+    }
+
+    private void AddOverlays(Entity<DebugOverlayViewerComponent> ent)
+    {
+        if (ent.Comp.SubGridChunkOverlay)
+            _overlayMan.AddOverlay(_subGridChunkOverlay);
+
+    }
+
+    private void RemoveOverlays()
+    {
+        _overlayMan.RemoveOverlay(_subGridChunkOverlay);
+    }
+}

@@ -18,3 +18,5 @@ ui-viewport-tabs-visuals-temperature-visibility = Temperature overlay
 ui-viewport-tabs-visuals-solids-heat-capacity = Heat capacity overlay
 ui-viewport-tabs-visuals-solids-conductivity = Heat conductivity overlay
 ui-viewport-tabs-visuals-solids-internal-energy = Internal energy overlay
+
+ui-viewport-tabs-visuals-debug-subgrid-chunks = Subgrid Chunk boundaries

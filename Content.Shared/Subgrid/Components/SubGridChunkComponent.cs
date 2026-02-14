@@ -7,9 +7,16 @@ namespace Content.Shared.Subgrid.Components;
 [RegisterComponent, NetworkedComponent, AutoGenerateComponentState(fieldDeltas: true)]
 public sealed partial class SubGridChunkComponent : Component
 {
-    [DataField, AutoNetworkedField] 
+    // TODO: remove this shitcode when a method to parent stuff to grids even when they are off grid gets added
+    [DataField]
+    public EntityUid ParentGrid;
+
+    [DataField]
+    public Vector2i ChunkIndices;
+
+    [DataField, AutoNetworkedField]
     public TileTemperature[] TemperatureMap;
-    
+
     [DataField, AutoNetworkedField]
     public TileAtmosphere[] AtmosphereMap;
 }

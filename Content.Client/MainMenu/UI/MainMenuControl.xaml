@@ -19,13 +19,15 @@
             <LineEdit Name="UsernameBox"
                       Access="Public"
                       PlaceHolder="{Loc 'main-menu-username-text'}"
-                      HorizontalExpand="True" />
+                      HorizontalExpand="True"
+                      MinWidth="100" />
             <Label Text="{Loc 'main-menu-address-label'}"/>
             <LineEdit Name="AddressBox"
                       Access="Public"
                       Text="localhost"
                       PlaceHolder="server address:port"
-                      HorizontalExpand="True" />
+                      HorizontalExpand="True"
+                      MinWidth="100" />
         </GridContainer>
         <Button Name="DirectConnectButton"
                 Access="Public"
