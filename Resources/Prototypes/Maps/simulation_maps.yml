@@ -1,0 +1,3 @@
+- type: simulationMap
+  id: Empty
+  path: null # Nothing to load

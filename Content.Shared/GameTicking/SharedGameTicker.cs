@@ -1,6 +1,6 @@
 ﻿using Robust.Shared.Serialization;
 
-namespace Content.Shared.GameTicker;
+namespace Content.Shared.GameTicking;
 
 /// <summary>
 /// This is a very simple version of SS14's GameTicker that provides some basic utilities without the lobby.

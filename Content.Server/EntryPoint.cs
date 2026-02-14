@@ -1,3 +1,4 @@
+using Content.Server.GameTicking;
 using Content.Server.IoC;
 using Content.Shared.GameCVars;
 using JetBrains.Annotations;
@@ -12,13 +13,14 @@ namespace Content.Server;
 public sealed class EntryPoint : GameServer
 {
     private const string ConfigPresetsDir = "/ConfigPresets/";
-    
+
     [Dependency] private readonly IComponentFactory _componentFactory = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
     [Dependency] private readonly ILogManager _log = default!;
     [Dependency] private readonly IResourceManager _res = default!;
-    
+    [Dependency] private readonly IEntitySystemManager _entSys = default!;
+
     public override void PreInit()
     {
         ServerContentIoC.Register(Dependencies);
@@ -29,26 +31,33 @@ public sealed class EntryPoint : GameServer
         base.Init();
         Dependencies.BuildGraph();
         Dependencies.InjectDependencies(this);
-        
+
         LoadConfigPresets(_cfg, _res, _log.GetSawmill("configpreset"));
-        
+
         _componentFactory.DoAutoRegistrations();
 
         foreach (var ignoreName in IgnoredComponents.List)
         {
             _componentFactory.RegisterIgnore(ignoreName);
         }
-        
+
         foreach (var ignoreName in IgnoredPrototypes.List)
         {
             _prototypeManager.RegisterIgnore(ignoreName);
         }
-            
+
         _componentFactory.GenerateNetIds();
 
         // DEVNOTE: This is generally where you'll be setting up the IoCManager further.
     }
-    
+
+    public override void PostInit()
+    {
+        base.PostInit();
+
+        _entSys.GetEntitySystem<GameTicker>().PostInitialize();
+    }
+
     private static void LoadConfigPresets(IConfigurationManager cfg, IResourceManager res, ISawmill sawmill)
     {
         var presets = cfg.GetCVar(GameConfigVars.ConfigPresets);
