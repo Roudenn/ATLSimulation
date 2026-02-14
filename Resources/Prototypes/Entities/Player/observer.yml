@@ -25,3 +25,5 @@
   - type: ContentEye
     maxZoom: 2,2
   - type: Observer
+  - type: InteractionOutline
+  - type: Examiner
