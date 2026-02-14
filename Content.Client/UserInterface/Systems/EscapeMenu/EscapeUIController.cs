@@ -1,7 +1,9 @@
 ﻿using Content.Client.Gameplay;
+using Content.Client.UserInterface.Controls;
 using JetBrains.Annotations;
 using Robust.Client.Console;
 using Robust.Client.UserInterface.Controllers;
+using Robust.Client.UserInterface.Controls;
 using Robust.Shared.Input;
 using Robust.Shared.Input.Binding;
 using Robust.Shared.Utility;
@@ -15,6 +17,32 @@ public sealed class EscapeUIController : UIController, IOnStateEntered<GameplayS
     [Dependency] private readonly OptionsUIController _options = default!;
 
     private Options.UI.EscapeMenu? _escapeWindow;
+
+    private MenuButton? EscapeButton => UIManager.GetActiveUIWidgetOrNull<MenuBar.Widgets.GameTopMenuBar>()?.EscapeButton;
+
+    public void UnloadButton()
+    {
+        if (EscapeButton == null)
+        {
+            return;
+        }
+
+        EscapeButton.Pressed = false;
+        EscapeButton.OnPressed -= EscapeButtonOnOnPressed;
+    }
+
+    public void LoadButton()
+    {
+        if (EscapeButton == null)
+        {
+            return;
+        }
+
+        EscapeButton.OnPressed += EscapeButtonOnOnPressed;
+    }
+
+    private void ActivateButton() => EscapeButton!.SetClickPressed(true);
+    private void DeactivateButton() => EscapeButton!.SetClickPressed(false);
 
     public void OnStateEntered(GameplayState state)
     {
@@ -39,7 +67,7 @@ public sealed class EscapeUIController : UIController, IOnStateEntered<GameplayS
             CloseEscapeWindow();
             _console.ExecuteCommand("quit");
         };
-        
+
         CommandBinds.Builder
             .Bind(EngineKeyFunctions.EscapeMenu,
                 InputCmdHandler.FromDelegate(_ => ToggleWindow()))
@@ -78,5 +106,10 @@ public sealed class EscapeUIController : UIController, IOnStateEntered<GameplayS
         {
             _escapeWindow.OpenCentered();
         }
+    }
+
+    private void EscapeButtonOnOnPressed(BaseButton.ButtonEventArgs obj)
+    {
+        ToggleWindow();
     }
 }

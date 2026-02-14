@@ -1,0 +1,46 @@
+﻿<widgets:GameTopMenuBar xmlns="https://spacestation14.io"
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+           xmlns:style="clr-namespace:Content.Client.Stylesheets"
+           xmlns:ic="clr-namespace:Robust.Shared.Input;assembly=Robust.Shared"
+           xmlns:is="clr-namespace:Content.Shared.Input;assembly=Content.Shared"
+           xmlns:xe="clr-namespace:Content.Client.UserInterface.XamlExtensions"
+           xmlns:ui="clr-namespace:Content.Client.UserInterface.Controls"
+           xmlns:widgets="clr-namespace:Content.Client.UserInterface.Systems.MenuBar.Widgets"
+           Name = "MenuButtons"
+           VerticalExpand="False"
+           Orientation="Horizontal"
+           HorizontalAlignment="Stretch"
+           VerticalAlignment="Top"
+           SeparationOverride="5"
+>
+    <ui:MenuButton
+        Name="EscapeButton"
+        Access="Internal"
+        Icon="{xe:Tex '/Textures/Interface/hamburger.svg.192dpi.png'}"
+        BoundKey = "{x:Static ic:EngineKeyFunctions.EscapeMenu}"
+        ToolTip="{Loc 'game-hud-open-escape-menu-button-tooltip'}"
+        MinSize="70 64"
+        HorizontalExpand="True"
+        AppendStyleClass="{x:Static style:StyleClass.ButtonOpenRight}"
+        />
+    <ui:MenuButton
+        Name="EntitySpawnButton"
+        Access="Internal"
+        Icon="{xe:Tex '/Textures/Interface/sandbox.svg.192dpi.png'}"
+        ToolTip="{Loc 'game-hud-open-guide-menu-button-tooltip'}"
+        BoundKey = "{x:Static is:ContentKeyFunctions.ToggleEntitySpawningWindow}"
+        MinSize="42 64"
+        HorizontalExpand="True"
+        AppendStyleClass="{x:Static style:StyleClass.ButtonSquare}"
+        />
+    <ui:MenuButton
+        Name="TilePlacementButton"
+        Access="Internal"
+        Icon="{xe:Tex '/Textures/Interface/sandbox.svg.192dpi.png'}"
+        ToolTip="{Loc 'game-hud-open-character-menu-button-tooltip'}"
+        BoundKey = "{x:Static is:ContentKeyFunctions.ToggleTileSpawningWindow}"
+        MinSize="42 64"
+        HorizontalExpand="True"
+        AppendStyleClass="{x:Static style:StyleClass.ButtonSquare}"
+        />
+</widgets:GameTopMenuBar>
