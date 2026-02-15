@@ -13,9 +13,11 @@ public sealed partial class SubGridSystem
     private void InitializeChunks()
     {
         SubscribeLocalEvent<GridInitializeEvent>(OnGridInit);
-        //SubscribeLocalEvent<SubGridComponent, ComponentInit>(OnInit);
-        SubscribeLocalEvent<SubGridComponent, TileChangedEvent>(OnChanged);
-        SubscribeLocalEvent<SubGridComponent, EntityTerminatingEvent>(OnTerminating);
+
+        SubscribeLocalEvent<SubGridComponent, TileChangedEvent>(OnGridChanged);
+        //SubscribeLocalEvent<SubGridComponent, MoveEvent>(OnGridMove); // TODO handle grid movement
+        // TODO handle grid splitting
+        SubscribeLocalEvent<SubGridComponent, EntityTerminatingEvent>(OnGridTerminating);
 
         SubscribeLocalEvent<SubGridChunkComponent, MapInitEvent>(OnChunkInit);
         SubscribeLocalEvent<SubGridChunkComponent, EntityTerminatingEvent>(OnChunkDeleted);
@@ -49,20 +51,7 @@ public sealed partial class SubGridSystem
         EnsureComp<SubGridComponent>(ev.EntityUid);
     }
 
-    private void OnTerminating(Entity<SubGridComponent> ent, ref EntityTerminatingEvent args)
-    {
-        foreach (var (_, uid) in ent.Comp.ChunkEntities)
-        {
-            QueueDel(uid);
-        }
-    }
-
-    /*private void OnInit(Entity<SubGridComponent> ent, ref ComponentInit args)
-    {
-        EnsureSubGrid(ent);
-    }*/
-
-    private void OnChanged(Entity<SubGridComponent> ent, ref TileChangedEvent args)
+    private void OnGridChanged(Entity<SubGridComponent> ent, ref TileChangedEvent args)
     {
         // TODO this doesn't support grid splitting
         foreach (var change in args.Changes)
@@ -71,6 +60,14 @@ public sealed partial class SubGridSystem
                 EnsureSubGridChunkWithNeighbours(ent, change.GridIndices);
             else if (change.NewTile.TypeId == 0) // Otherwise check the chunks to be removed
                 TryRemoveSubGridChunkWithNeighbours(ent, change.GridIndices);
+        }
+    }
+
+    private void OnGridTerminating(Entity<SubGridComponent> ent, ref EntityTerminatingEvent args)
+    {
+        foreach (var (_, uid) in ent.Comp.ChunkEntities)
+        {
+            QueueDel(uid);
         }
     }
 
