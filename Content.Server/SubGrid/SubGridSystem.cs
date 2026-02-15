@@ -29,7 +29,7 @@ public sealed partial class SubGridSystem : SharedSubGridSystem
         _mapGridQuery = GetEntityQuery<MapGridComponent>();
     }
 
-    public override void Update(float frameTime)
+    /*public override void Update(float frameTime)
     {
         base.Update(frameTime);
 
@@ -45,5 +45,5 @@ public sealed partial class SubGridSystem : SharedSubGridSystem
             // TODO add tick rate scaling
             //_atmos.ProcessAtmosGrid((uid, grid), frameTime);
         }
-    }
+    }*/
 }

@@ -67,7 +67,10 @@ public sealed partial class SubGridSystem
         // TODO this doesn't support grid splitting
         foreach (var change in args.Changes)
         {
-            EnsureSubGridChunk(ent, change.GridIndices, out _);
+            if (change.OldTile.TypeId == 0) // If space changed to something else, add chunks
+                EnsureSubGridChunkWithNeighbours(ent, change.GridIndices);
+            else if (change.NewTile.TypeId == 0) // Otherwise check the chunks to be removed
+                TryRemoveSubGridChunkWithNeighbours(ent, change.GridIndices);
         }
     }
 
@@ -98,10 +101,11 @@ public sealed partial class SubGridSystem
 
     private void OnChunkDeleted(Entity<SubGridChunkComponent> ent, ref EntityTerminatingEvent args)
     {
-        if (!_subGridQuery.TryComp(ent.Comp.ParentGrid, out var subGrid))
+        if (TerminatingOrDeleted(ent.Comp.ParentGrid)
+            || !_subGridQuery.TryComp(ent.Comp.ParentGrid, out var subGrid))
             return;
 
-        subGrid.ChunkEntities.Remove(GetChunkIndices(ent.Comp.ChunkIndices));
+        subGrid.ChunkEntities.Remove(ent.Comp.ChunkIndices);
     }
 
     /// <summary>
@@ -117,7 +121,7 @@ public sealed partial class SubGridSystem
         // TODO: this is slow, would be better to make larger tile steps.
         // This method shouldn't be called on runtime for now, since grid splitting is not supported yet.
 
-        if (!Resolve(grid.Owner, ref grid.Comp2))
+        if (!_mapGridQuery.Resolve(grid.Owner, ref grid.Comp2))
             return;
 
         // Go through all tiles to make sure that grid is fully covered.
@@ -130,10 +134,39 @@ public sealed partial class SubGridSystem
 
         foreach (var pos in positions)
         {
-            EnsureSubGridChunk(grid, pos, out _);
+            EnsureSubGridChunkWithNeighbours(grid, pos);
         }
 
         Log.Info($"Successfully initialized SubGrid on grid {ToPrettyString(grid.Owner)}. Total amount of chunks: {grid.Comp1.ChunkEntities.Count}");
+    }
+
+    /// <summary>
+    /// Ensures that a given tile position and also all neighbours in 8 directions
+    /// have an assigned subgrid chunk.
+    /// </summary>
+    /// <param name="grid"></param>
+    /// <param name="gridIndices"></param>
+    private void EnsureSubGridChunkWithNeighbours(Entity<SubGridComponent> grid, Vector2i gridIndices)
+    {
+        EnsureSubGridChunk(grid, gridIndices);
+
+        foreach (var dir in DirectionsWithDiagonals)
+        {
+            EnsureSubGridChunk(grid, gridIndices + dir);
+        }
+    }
+
+    /// <summary>
+    /// Ensures that a given tile position has an assigned subgrid chunk.
+    /// </summary>
+    /// <param name="grid"></param>
+    /// <param name="gridIndices"></param>
+    private void EnsureSubGridChunk(Entity<SubGridComponent> grid, Vector2i gridIndices)
+    {
+        if (grid.Comp.ChunkEntities.ContainsKey(GetChunkIndices(gridIndices)))
+            return;
+
+        SpawnSubGridChunk(grid, gridIndices);
     }
 
     /// <summary>
@@ -170,5 +203,45 @@ public sealed partial class SubGridSystem
         grid.Comp.ChunkEntities.Add(chunkComp.ChunkIndices, chunk);
         Log.Info($"Added chunk {ToPrettyString(chunk)} to grid {ToPrettyString(grid)} with chunkIndices {chunkComp.ChunkIndices}");
         return chunk;
+    }
+
+    private void TryRemoveSubGridChunkWithNeighbours(Entity<SubGridComponent, MapGridComponent?> grid, Vector2i gridIndices)
+    {
+        TryRemoveSubGridChunk(grid, gridIndices);
+
+        foreach (var dir in DirectionsWithDiagonals)
+        {
+            TryRemoveSubGridChunk(grid, gridIndices + dir);
+        }
+    }
+
+    /// <summary>
+    /// Checks if chunk at the given position can be safely removed,
+    /// as if it doesn't have any tiles inside, and it doesn't have any neighbouring tiles.
+    /// </summary>
+    /// <param name="grid"></param>
+    /// <param name="position"></param>
+    /// <returns></returns>
+    private bool TryRemoveSubGridChunk(Entity<SubGridComponent, MapGridComponent?> grid, Vector2 position)
+    {
+        if (!_mapGridQuery.Resolve(grid.Owner, ref grid.Comp2))
+            return false;
+
+        // Check 10x10 box around the center of the chunk for any tiles that are not empty.
+        var box = Box2.CenteredAround(GetChunkPosition(position),
+            new Vector2(SystemConstants.PvsChunkSize + 2, SystemConstants.PvsChunkSize + 2));
+
+        var tiles = _mapSystem.GetLocalTilesEnumerator(grid.Owner, grid.Comp2, box);
+        while (tiles.MoveNext(out _))
+        {
+            // Even a single iteration means that there are some tiles here, and the chunk should stay.
+            return false;
+        }
+
+        var indices = GetChunkIndices(position);
+        var chunk = grid.Comp1.ChunkEntities[indices];
+        QueueDel(chunk);
+        Log.Info($"Removing chunk {ToPrettyString(chunk)} at chunk indices {indices} on grid {ToPrettyString(grid)}");
+        return true;
     }
 }
