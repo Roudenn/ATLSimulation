@@ -12,25 +12,25 @@ public sealed partial class GasPrototype : IPrototype, IInheritingPrototype
     /// </summary>
     [DataField(required: true)]
     public float MolarMass;
-    
+
     /// <summary>
     /// Specific molar heat in J/(mol·K).
     /// </summary>
     [DataField(required: true)]
     public float SpecificMolarHeat;
-    
+
     /// <summary>
     /// Thermal conductivity in W/(m·K).
     /// </summary>
     [DataField(required: true)]
     public float ThermalConductivity;
-    
+
     /// <summary>
     /// Dynamic viscosity in µPa·s.
     /// </summary>
     [DataField(required: true)]
     public float Viscosity;
-    
+
     /// <summary>
     /// Color of this gas that is used in UIs.
     /// </summary>
@@ -42,11 +42,11 @@ public sealed partial class GasPrototype : IPrototype, IInheritingPrototype
     /// </summary>
     [DataField]
     public SpriteSpecifier? TileSprite;
-    
+
     // for now a byte because an array is used to store gases and anything more than 255 will allocate gazzilion memory
     [ViewVariables]
     public byte GasId { get; private set; }
-    
+
     [ViewVariables]
     public float PrandtlNumber => SpecificMolarHeat * Viscosity / (MolarMass * ThermalConductivity);
 
@@ -55,13 +55,13 @@ public sealed partial class GasPrototype : IPrototype, IInheritingPrototype
     /// </summary>
     [ViewVariables]
     public LocId Name => $"gas-name-{ID}";
-    
+
     /// <summary>
     /// The shortened name of the material that represents its chemical formula.
     /// </summary>
     [ViewVariables]
-    public LocId Abbreviation => "gas-abbreviation-" + ID.ToLower();
-    
+    public LocId Abbreviation => $"gas-abbreviation-{ID}";
+
     /// <inheritdoc/>
     [IdDataField]
     public string ID { get; private set; } = default!;
@@ -74,7 +74,7 @@ public sealed partial class GasPrototype : IPrototype, IInheritingPrototype
     [NeverPushInheritance]
     [AbstractDataField]
     public bool Abstract { get; private set; }
-    
+
     public void AssignGasId(byte id)
     {
         GasId = id;

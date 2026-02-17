@@ -12,10 +12,22 @@ public abstract partial class SharedSubGridSystem
     public int SubGridDivisions { get; private set; }
 
     /// <summary>
+    /// Height of a subgrid tile.
+    /// </summary>
+    [ViewVariables]
+    public float SubGridHeight { get; private set; }
+
+    /// <summary>
     /// Size of a single dimension of a subgrid box inside a single tile.
     /// </summary>
     [ViewVariables]
     public int SubGridTileSize { get; private set; }
+
+    /// <summary>
+    /// Volume of a single subgrid tile.
+    /// </summary>
+    [ViewVariables]
+    public float SubGridTileVolume { get; private set; }
 
     /// <summary>
     /// Size of a single dimension of a subgrid chunk's box.
@@ -31,6 +43,7 @@ public abstract partial class SharedSubGridSystem
 
     private void InitializeCVars()
     {
+        Subs.CVar(CfgManager, GameConfigVars.SubGridHeight, f => SubGridHeight = f);
         Subs.CVar(CfgManager, GameConfigVars.SubGridSize, OnSubGridSizeChanged);
     }
 
@@ -43,6 +56,7 @@ public abstract partial class SharedSubGridSystem
 
         SubGridDivisions = num;
         SubGridTileSize = 1 << num; // Equivalent to Math.Pow(2, num)
+        SubGridTileVolume = (1 / (1 << num)) * (1 / (1 << num)) * SubGridHeight;
         SubGridChunkSize = SystemConstants.PvsChunkSize * (1 << num);
         SubGridChunkArea = SystemConstants.PvsChunkSize * (1 << num) * SystemConstants.PvsChunkSize * (1 << num);
     }

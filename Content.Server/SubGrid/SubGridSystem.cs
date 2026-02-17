@@ -1,20 +1,30 @@
 ﻿using Content.Server.Atmospherics;
 using Content.Shared.Atmospherics;
+using Content.Shared.Atmospherics.Components;
+using Content.Shared.Materials;
 using Content.Shared.Subgrid.Components;
 using Content.Shared.Subgrid.Systems;
 using Content.Shared.Temperature;
+using Content.Shared.Temperature.Components;
+using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
+using Robust.Shared.Prototypes;
 
 namespace Content.Server.SubGrid;
 
 public sealed partial class SubGridSystem : SharedSubGridSystem
 {
+    [Dependency] private readonly ITileDefinitionManager _tileDefMan = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly SharedMapSystem _mapSystem = default!;
     [Dependency] private readonly SharedTransformSystem _xform = default!;
     [Dependency] private readonly AtmosphericsSystem _atmos = default!;
 
     private EntityQuery<SubGridComponent> _subGridQuery;
     private EntityQuery<MapGridComponent> _mapGridQuery;
+    private EntityQuery<GridAtmosphereComponent> _atmosGridQuery;
+    private EntityQuery<TemperatureContainerComponent> _temperatureQuery;
+    private EntityQuery<MaterialComponent> _materialQuery;
 
     private Dictionary<Vector2i, TileAtmosphere[]> AtmosphereCache = new(256);
     private Dictionary<Vector2i, TileTemperature[]> TemperatureCache = new(256);
@@ -27,6 +37,9 @@ public sealed partial class SubGridSystem : SharedSubGridSystem
 
         _subGridQuery = GetEntityQuery<SubGridComponent>();
         _mapGridQuery = GetEntityQuery<MapGridComponent>();
+        _atmosGridQuery = GetEntityQuery<GridAtmosphereComponent>();
+        _temperatureQuery = GetEntityQuery<TemperatureContainerComponent>();
+        _materialQuery = GetEntityQuery<MaterialComponent>();
     }
 
     /*public override void Update(float frameTime)

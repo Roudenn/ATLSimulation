@@ -8,7 +8,6 @@ namespace Content.Shared.Maps
     [Prototype("tile")]
     public sealed partial class ContentTileDefinition : IInheritingPrototype, ITileDefinition
     {
-        // ReSharper disable once InconsistentNaming
         public const string SpaceID = "Space";
 
         [ParentDataField(typeof(AbstractPrototypeIdArraySerializer<ContentTileDefinition>))]
@@ -25,7 +24,7 @@ namespace Content.Shared.Maps
 
         [DataField]
         public string Name { get; private set; } = "";
-        
+
         [DataField]
         public ResPath? Sprite { get; private set; }
 
@@ -33,8 +32,8 @@ namespace Content.Shared.Maps
         public Dictionary<Direction, ResPath> EdgeSprites { get; private set; } = new();
 
         [DataField]
-        public int EdgeSpritePriority { get; private set; } = 0;
-        
+        public int EdgeSpritePriority { get; private set; }
+
         /// <summary>
         /// Base friction modifier for this tile.
         /// </summary>
@@ -43,7 +42,7 @@ namespace Content.Shared.Maps
 
         [DataField]
         public byte Variants { get; set; } = 1;
-        
+
         [DataField]
         public bool MapAtmosphere { get; private set; }
 

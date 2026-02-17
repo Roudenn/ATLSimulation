@@ -10,14 +10,34 @@ public partial struct TileTemperature : IRobustCloneable<TileTemperature>, ISubG
     /// <summary>
     /// The main container of this temperature tile.
     /// </summary>
-    [DataField] 
+    [DataField]
     public HeatContainer Container;
-    
+
+    /// <summary>
+    /// The main container of this temperature tile.
+    /// </summary>
+    [DataField]
+    public HeatContainer ArchivedContainer;
+
+    public TileTemperature(float heatCapacity, float temperature)
+    {
+        var container = new HeatContainer(heatCapacity, temperature);
+        Container = container;
+        ArchivedContainer = container;
+    }
+
+    public TileTemperature(HeatContainer container)
+    {
+        Container = container;
+        ArchivedContainer = container;
+    }
+
     private TileTemperature(TileTemperature c)
     {
         Container = c.Container;
+        ArchivedContainer = c.ArchivedContainer;
     }
-    
+
     public TileTemperature Clone()
     {
         return new TileTemperature(this);

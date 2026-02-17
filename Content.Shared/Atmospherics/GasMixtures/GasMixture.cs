@@ -17,60 +17,61 @@ public partial struct GasMixture : IRobustCloneable<GasMixture>
     /// </summary>
     [DataField(customTypeSerializer: typeof(GasArraySerializer))]
     public float[] Moles;
-    
+
     /// <summary>
     /// Percentages of all moles in the gas mixture.
     /// Basically just <see cref="Moles"/> divided by <see cref="TotalMoles"/>
     /// </summary>
     [ViewVariables]
     public float[] MolesRatio;
-    
+
     /// <summary>
     /// Heat container of the gas mixture.
     /// </summary>
     [DataField]
     public HeatContainer HeatContainer;
-    
+
     /// <summary>
     /// Volume of the mixture's container.
     /// </summary>
     [DataField]
     public float Volume = 2500f;
-    
+
     /// <summary>
     /// Total amount of moles of a gas mixture.
     /// Calculated dynamically when moles are added to the mixture.
     /// </summary>
     [ViewVariables]
     public float TotalMoles;
-    
+
     [ViewVariables]
     public float Pressure;
-    
+
     /// <summary>
     /// If true, any attempts to modify the mixture will be cancelled.
     /// Immutable fixtures are the main reason why first law of thermodynamics is technically violated.
     /// </summary>
     [DataField]
     public bool Immutable;
-    
+
     /// <summary>
     /// If true, the tile is considered to be spaced, allowing it to have special properties.
     /// </summary>
     [DataField]
     public bool IsSpace;
-    
+
     /// <summary>
     /// Constructs a new gas mixture without any gas.
     /// </summary>
-    public GasMixture(GasPrototypeManager manager, float volume, float temperature)
+    public GasMixture(GasPrototypeManager manager, float volume, float temperature, bool immutable = false)
     {
         Moles = new float[manager.ArraySize];
         MolesRatio = new float[manager.ArraySize];
         Volume = volume;
         HeatContainer = new HeatContainer(SystemConstants.MinimumHeatCapacity, temperature);
+        Immutable = immutable;
     }
-    
+
     /// <summary>
     /// Constructs a new gas mixture out of an array of moles and a heat container.
     /// </summary>
@@ -84,7 +85,7 @@ public partial struct GasMixture : IRobustCloneable<GasMixture>
         Volume = volume;
         HeatContainer = container;
     }
-    
+
     /// <summary>
     /// Constructs a new gas mixture based on the array of moles.
     /// </summary>
@@ -95,7 +96,7 @@ public partial struct GasMixture : IRobustCloneable<GasMixture>
         Volume = volume;
         HeatContainer = new HeatContainer(this.GetHeatCapacityQuery(ref system.GasBuffer, ref system.GasSpecificHeats), temperature);
     }
-    
+
     public GasMixture(GasMixture g)
     {
         Moles = g.Moles;
@@ -105,7 +106,7 @@ public partial struct GasMixture : IRobustCloneable<GasMixture>
         Immutable = g.Immutable;
         IsSpace = g.IsSpace;
     }
-    
+
     public GasMixture Clone()
     {
         return new GasMixture(this);

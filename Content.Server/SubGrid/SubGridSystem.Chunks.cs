@@ -1,7 +1,9 @@
 ﻿using System.Numerics;
 using Content.Shared.Atmospherics;
 using Content.Shared.Constants;
+using Content.Shared.Maps;
 using Content.Shared.Subgrid.Components;
+using Content.Shared.Temperature;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Utility;
@@ -22,26 +24,6 @@ public sealed partial class SubGridSystem
         SubscribeLocalEvent<SubGridChunkComponent, MapInitEvent>(OnChunkInit);
         SubscribeLocalEvent<SubGridChunkComponent, EntityTerminatingEvent>(OnChunkDeleted);
     }
-
-    /// <summary>
-    /// Converts normal position into chunk indices.
-    /// </summary>
-    /// <param name="coordinates"></param>
-    /// <returns></returns>
-    public static Vector2i GetChunkIndices(Vector2 coordinates)
-    {
-        // Negative coordinates should have offset by 1 because of how coordinates work.
-        var x = (int) MathF.Round((coordinates.X >= 0 ? coordinates.X : coordinates.X + 1) / SystemConstants.PvsChunkSize, MidpointRounding.AwayFromZero);
-        var y = (int)MathF.Round((coordinates.Y >= 0 ? coordinates.Y : coordinates.Y + 1) / SystemConstants.PvsChunkSize, MidpointRounding.AwayFromZero);
-        return new Vector2i(x, y);
-    }
-
-    /// <summary>
-    /// Rounds normal position to the nearest chunk position.
-    /// </summary>
-    /// <returns></returns>
-    public static Vector2 GetChunkPosition(Vector2 coordinates)
-        => GetChunkIndices(coordinates) * SystemConstants.PvsChunkSize;
 
     private void OnGridInit(GridInitializeEvent ev)
     {
@@ -79,22 +61,89 @@ public sealed partial class SubGridSystem
             return;
         }
 
-        //InitializeChunkAtmos((ent.Owner, ent.Comp, xform), (xform.GridUid.Value, mapGridComp));
+        InitializeChunkAtmos((ent.Owner, ent.Comp), (ent.Comp.ParentGrid, mapGridComp));
+        InitializeChunkTemperature((ent.Owner, ent.Comp), (ent.Comp.ParentGrid, mapGridComp));
     }
 
-    /*private void InitializeChunkAtmos(Entity<SubGridChunkComponent, TransformComponent> ent, Entity<MapGridComponent> grid)
+    private void InitializeChunkAtmos(Entity<SubGridChunkComponent> ent, Entity<MapGridComponent> grid)
     {
-        var xform = ent.Comp2;
+        var mixture = _atmosGridQuery.CompOrNull(grid.Owner)?.Mixture ?? _atmos.GetSpaceMixture();
+        DebugTools.Assert(mixture.Immutable);
 
         var atmos = new TileAtmosphere[SubGridChunkArea];
-        var chunkArea = Box2.CenteredAround(ent., new Vector2(SystemConstants.PvsChunkSize, SystemConstants.PvsChunkSize));
+        var chunkPos = ChunkIndicesToPosition(ent.Comp.ChunkIndices);
+        var chunkArea = Box2.CenteredAround(chunkPos, ChunkBoxVector);
 
-        for (var i = 0; i < atmos.Length; i++)
+        var tiles = _mapSystem.GetLocalTilesEnumerator(grid.Owner, grid.Comp, chunkArea);
+
+        while (tiles.MoveNext(out var tile))
         {
-            var subTile = atmos[i];
+            // TODO This can be made better, probably by taking a similar method to grid fixtures
 
+            var tileBox = new Box2i(tile.GridIndices, tile.GridIndices + Vector2i.One);
+            var subTiles = GetAreaTileIndexesLocal(ent.Comp.ChunkIndices, tileBox);
+            foreach (var index in subTiles)
+            {
+                atmos[index] = new TileAtmosphere(mixture);
+            }
+
+            // At last, the tile has to check if it is located near space, and add a boundary layer of atmosphere tiles.
+            foreach (var dir in DirectionsWithDiagonals)
+            {
+                var tileRef = _mapSystem.GetTileRef(grid.Owner, grid.Comp, tile.GridIndices + dir);
+                var tileData = (ContentTileDefinition) _tileDefMan[tileRef.Tile.TypeId];
+                if (!tileData.MapAtmosphere)
+                    continue;
+
+                // TODO generate boundary tiles here
+            }
         }
-    }*/
+
+        ent.Comp.AtmosphereMap = atmos;
+    }
+
+    private void InitializeChunkTemperature(Entity<SubGridChunkComponent> ent, Entity<MapGridComponent> grid)
+    {
+        var temperatureMap = new TileTemperature[SubGridChunkArea];
+        var chunkPos = ChunkIndicesToPosition(ent.Comp.ChunkIndices);
+        var chunkArea = Box2.CenteredAround(chunkPos, ChunkBoxVector);
+
+        var tiles = _mapSystem.GetLocalTilesEnumerator(grid.Owner, grid.Comp, chunkArea);
+
+        while (tiles.MoveNext(out var tile))
+        {
+            // TODO This can be made better, probably by taking a similar method to grid fixtures
+
+            float? heatCapacity = null;
+            float? temperature = null;
+
+            // Try to get the anchored wall entity on this tile
+            var ents = _mapSystem.GetAnchoredEntitiesEnumerator(grid.Owner, grid.Comp, tile.GridIndices);
+            while (ents.MoveNext(out var anchored))
+            {
+                if (!_temperatureQuery.TryComp(anchored, out var tempContainer)
+                    || !_materialQuery.TryComp(anchored, out var materialComp))
+                    continue;
+
+                var material = _proto.Index(materialComp.Material);
+                temperature = tempContainer.StartingTemperature;
+                heatCapacity = material.SpecificHeatCapacity * SubGridTileVolume * material.Density;
+                break;
+            }
+
+            if (heatCapacity == null || temperature == null)
+                continue;
+
+            var tileBox = new Box2i(tile.GridIndices, tile.GridIndices + Vector2i.One);
+            var subTiles = GetAreaTileIndexesLocal(ent.Comp.ChunkIndices, tileBox);
+            foreach (var index in subTiles)
+            {
+                temperatureMap[index] = new TileTemperature(heatCapacity.Value, temperature.Value);
+            }
+        }
+
+        ent.Comp.TemperatureMap = temperatureMap;
+    }
 
     private void OnChunkDeleted(Entity<SubGridChunkComponent> ent, ref EntityTerminatingEvent args)
     {
