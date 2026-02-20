@@ -7,6 +7,7 @@ using Content.Client.Screenshot;
 using Content.Client.Stylesheets;
 using Content.Client.Viewport;
 using JetBrains.Annotations;
+using Robust.Client;
 using Robust.Client.Graphics;
 using Robust.Client.Input;
 using Robust.Client.State;
@@ -21,6 +22,7 @@ namespace Content.Client;
 [UsedImplicitly]
 public sealed class EntryPoint : GameClient
 {
+    [Dependency] private readonly IBaseClient _baseClient = default!;
     [Dependency] private readonly IConfigurationManager _configManager = default!;
     [Dependency] private readonly IStateManager _stateManager = default!;
     [Dependency] private readonly ILightManager _lightManager = default!;
@@ -91,6 +93,20 @@ public sealed class EntryPoint : GameClient
         // Disable engine-default viewport since we use our own custom viewport control.
         _userInterfaceManager.MainViewport.Visible = false;
 
+        _baseClient.RunLevelChanged += (_, args) =>
+        {
+            if (args.NewLevel == ClientRunLevel.Initialize)
+            {
+                SwitchToDefaultState(args.OldLevel == ClientRunLevel.Connected ||
+                                     args.OldLevel == ClientRunLevel.InGame);
+            }
+        };
+
+        SwitchToDefaultState();
+    }
+
+    private void SwitchToDefaultState(bool disconnected = false)
+    {
         _stateManager.RequestStateChange<MainScreen>();
     }
 }
