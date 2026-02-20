@@ -1,0 +1,27 @@
+﻿- type: gas
+  id: Nitrogen
+  molarMass: 28
+  specificMolarHeat: 29.1
+  thermalConductivity: 0.026
+  viscosity: 17.8
+
+- type: gas
+  id: Oxygen
+  molarMass: 32
+  specificMolarHeat: 29.4
+  thermalConductivity: 0.026
+  viscosity: 20.2
+
+- type: gas
+  id: Fluorine
+  molarMass: 38
+  specificMolarHeat: 31.3
+  thermalConductivity: 0.027
+  viscosity: 18.5
+
+- type: gas
+  id: Chlorine
+  molarMass: 71
+  specificMolarHeat: 34
+  thermalConductivity: 0.009
+  viscosity: 12.9

@@ -1,0 +1,48 @@
+- type: gas
+  id: Helium
+  molarMass: 4
+  specificMolarHeat: 20.8
+  thermalConductivity: 0.153
+  viscosity: 19.85
+
+- type: gas
+  id: Neon
+  molarMass: 20
+  specificMolarHeat: 20.8
+  thermalConductivity: 0.049
+  viscosity: 31.8
+
+- type: gas
+  id: Hydrogen
+  molarMass: 2
+  specificMolarHeat: 28.8
+  thermalConductivity: 0.18
+  viscosity: 8.9
+
+- type: gas
+  id: Argon
+  molarMass: 40
+  specificMolarHeat: 20.8
+  thermalConductivity: 0.018
+  viscosity: 22.5
+
+- type: gas
+  id: Krypton
+  molarMass: 84
+  specificMolarHeat: 20.8
+  thermalConductivity: 0.0095
+  viscosity: 24
+
+- type: gas
+  id: Xenon
+  molarMass: 131
+  specificMolarHeat: 20.8
+  thermalConductivity: 0.0055
+  viscosity: 23
+
+- type: gas
+  id: Radon
+  molarMass: 222
+  specificMolarHeat: 20.8
+  thermalConductivity: 0.0036
+  viscosity: 23

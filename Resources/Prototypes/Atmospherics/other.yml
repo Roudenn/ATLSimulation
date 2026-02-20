@@ -1,9 +1,7 @@
-# Unsorted category for all remaining gases.
-
 - type: gas
   id: Ammonia
   molarMass: 17
-  specificMolarHeat: 35.1
+  specificMolarHeat: 80.1
   thermalConductivity: 0.025
   viscosity: 9.8
 
@@ -12,4 +10,4 @@
   molarMass: 16
   specificMolarHeat: 35.7
   thermalConductivity: 0.034
-  viscosity: 11
+  viscosity: 11.13
