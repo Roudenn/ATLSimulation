@@ -80,7 +80,7 @@ public sealed partial class SubGridSystem
         {
             // TODO This can be made better, probably by taking a similar method to grid fixtures
 
-            var tileBox = new Box2i(tile.GridIndices, tile.GridIndices + Vector2i.One);
+            var tileBox = new Box2i(tile.GridIndices, (Vector2i) (tile.GridIndices + grid.Comp.TileSizeVector));
             var subTiles = GetAreaTileIndexesLocal(ent.Comp.ChunkIndices, tileBox);
             foreach (var index in subTiles)
             {
@@ -134,7 +134,7 @@ public sealed partial class SubGridSystem
             if (heatCapacity == null || temperature == null)
                 continue;
 
-            var tileBox = new Box2i(tile.GridIndices, tile.GridIndices + Vector2i.One);
+            var tileBox = new Box2i(tile.GridIndices, (Vector2i) (tile.GridIndices + grid.Comp.TileSizeVector));
             var subTiles = GetAreaTileIndexesLocal(ent.Comp.ChunkIndices, tileBox);
             foreach (var index in subTiles)
             {
@@ -148,7 +148,7 @@ public sealed partial class SubGridSystem
     private void OnChunkDeleted(Entity<SubGridChunkComponent> ent, ref EntityTerminatingEvent args)
     {
         if (TerminatingOrDeleted(ent.Comp.ParentGrid)
-            || !_subGridQuery.TryComp(ent.Comp.ParentGrid, out var subGrid))
+            || !SubGridQuery.TryComp(ent.Comp.ParentGrid, out var subGrid))
             return;
 
         subGrid.ChunkEntities.Remove(ent.Comp.ChunkIndices);

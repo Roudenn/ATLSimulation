@@ -15,6 +15,13 @@ public abstract partial class SharedAtmosphericsSystem
     }
 
     [PublicAPI]
+    public float AdjustMoles(ref GasMixture m, ProtoId<GasPrototype> proto, float amount)
+    {
+        var gasId = _protoMan.Index(proto).GasId;
+        return m.AdjustMoles(gasId, amount);
+    }
+
+    [PublicAPI]
     public float GetMoles(ref GasMixture m, ProtoId<GasPrototype> proto)
     {
         var gasId = _protoMan.Index(proto).GasId;

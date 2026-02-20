@@ -7,6 +7,7 @@ namespace Content.Client.UserInterface.Systems.Tabs;
 [UsedImplicitly]
 public sealed class TabsUIController : UIController
 {
+    [Dependency] private readonly StatisticsTabUIController _statistics = default!;
     [Dependency] private readonly VisualsTabUIController _visuals = default!;
 
     //private StatisticsTab? StatisticsTab => UIManager.GetActiveUIWidgetOrNull<GameTabContainer>()?.Statistics;
@@ -23,11 +24,13 @@ public sealed class TabsUIController : UIController
 
     public void LoadButtons()
     {
+        _statistics.LoadButton();
         _visuals.LoadButton();
     }
 
     public void UnloadButtons()
     {
+        _statistics.UnloadButton();
         _visuals.UnloadButton();
     }
 }

@@ -1,12 +1,17 @@
 ﻿<visuals:StatisticsTab xmlns="https://spacestation14.io"
-          xmlns:visuals="clr-namespace:Content.Client.UserInterface.Systems.Tabs">
+          xmlns:visuals="clr-namespace:Content.Client.UserInterface.Systems.Tabs"
+          xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls">
     <BoxContainer Orientation="Vertical">
         <ScrollContainer VerticalExpand="True">
             <BoxContainer Orientation="Vertical" Margin="8 8 8 8">
                 <Label Text="{Loc 'ui-viewport-header-statistics'}" StyleClasses="LabelHeading"/>
+                <!-- TODO show some stats here -->
 
                 <!-- Atmosphere -->
                 <Label Text="{Loc 'ui-viewport-header-atmosphere'}" StyleClasses="LabelKeyText"/>
+
+                <Button Text="{Loc 'ui-viewport-'}"/>
+                <controls:GasInspectControl Visible="False"/>
 
                 <!-- Temperature -->
                 <Label Text="{Loc 'ui-viewport-header-temperature'}" StyleClasses="LabelKeyText"/>

@@ -4,6 +4,7 @@ using Content.Shared.Atmospherics;
 using Content.Shared.Constants;
 using Content.Shared.Subgrid.Components;
 using Content.Shared.Temperature;
+using Robust.Shared.Map;
 using Robust.Shared.Utility;
 
 namespace Content.Shared.Subgrid.Systems;
@@ -33,7 +34,7 @@ public abstract partial class SharedSubGridSystem
     public static Vector2 ChunkIndicesToPosition(Vector2i indices)
         => indices * SystemConstants.PvsChunkSize;
 
-    public static Vector2 ChunkBoxVector = new Vector2(SystemConstants.PvsChunkSize, SystemConstants.PvsChunkSize);
+    public static Vector2 ChunkBoxVector = new(SystemConstants.PvsChunkSize, SystemConstants.PvsChunkSize);
 
     /// <summary>
     /// Converts an (x,y) vector into an index inside a chunk.
@@ -52,11 +53,51 @@ public abstract partial class SharedSubGridSystem
         return x + (y << (SubGridDivisions + 3));
     }
 
+    public Vector2i IndexToVector(int index)
+    {
+        var x = index & (SubGridChunkSize - 1);
+        var y = index >> (SubGridDivisions + 3);
+        return new Vector2i(x, y);
+    }
+
+    public bool TryGetChunk(
+        Entity<SubGridComponent?> grid,
+        TileRef tile,
+        [NotNullWhen(true)] out Entity<SubGridChunkComponent>? chunk)
+    {
+        return TryGetChunk(grid, tile.GridIndices, out chunk);
+    }
+
+    public bool TryGetChunk(
+        Entity<SubGridComponent?> grid,
+        EntityCoordinates coords,
+        [NotNullWhen(true)] out Entity<SubGridChunkComponent>? chunk)
+    {
+        return TryGetChunk(grid, coords.Position, out chunk);
+    }
+
+    public bool TryGetChunk(
+        Entity<SubGridComponent?> grid,
+        Vector2 position,
+        [NotNullWhen(true)] out Entity<SubGridChunkComponent>? chunk)
+    {
+        chunk = null;
+        if (!SubGridQuery.Resolve(grid.Owner, ref grid.Comp))
+            return false;
+
+        var ent = grid.Comp.ChunkEntities[GetChunkIndices(position)];
+        if (!ChunkQuery.TryComp(ent, out var subGridChunk))
+            return false;
+
+        chunk = (ent, subGridChunk);
+        return true;
+    }
+
     public void ResolveAtmosphereChunkMap(Entity<SubGridComponent> grid, ref Dictionary<Vector2i, TileAtmosphere[]> map)
     {
         foreach (var (chunkPos, chunk) in grid.Comp.ChunkEntities)
         {
-            var chunkComp = _chunkQuery.Comp(chunk);
+            var chunkComp = ChunkQuery.Comp(chunk);
             map.Add(chunkPos, chunkComp.AtmosphereMap);
         }
     }
@@ -65,7 +106,7 @@ public abstract partial class SharedSubGridSystem
     {
         foreach (var (chunkPos, chunk) in grid.Comp.ChunkEntities)
         {
-            var chunkComp = _chunkQuery.Comp(chunk);
+            var chunkComp = ChunkQuery.Comp(chunk);
             map.Add(chunkPos, chunkComp.TemperatureMap);
         }
     }
@@ -152,19 +193,14 @@ public abstract partial class SharedSubGridSystem
     /// <returns></returns>
     public int GetTileRelativeLocal(int index, Vector2i dir)
     {
-        var x = index & (SubGridChunkSize - 1);
-        var y = index >> (SubGridDivisions + 3);
-        var tx = x + dir.X;
-        var ty = y + dir.Y;
-        return VectorToIndex(tx, ty);
+        return GetTileRelativeLocal(index, dir.X, dir.Y);
     }
 
     public int GetTileRelativeLocal(int index, int dx, int dy)
     {
-        var x = index & (SubGridChunkSize - 1);
-        var y = index >> (SubGridDivisions + 3);
-        var tx = x + dx;
-        var ty = y + dy;
+        var pos = IndexToVector(index);
+        var tx = pos.X + dx;
+        var ty = pos.Y + dy;
         return VectorToIndex(tx, ty);
     }
 

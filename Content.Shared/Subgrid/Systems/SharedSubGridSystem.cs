@@ -1,6 +1,4 @@
-﻿using Content.Shared.Constants;
-using Content.Shared.GameCVars;
-using Content.Shared.Subgrid.Components;
+﻿using Content.Shared.Subgrid.Components;
 using Robust.Shared.Configuration;
 
 namespace Content.Shared.Subgrid.Systems;
@@ -8,15 +6,19 @@ namespace Content.Shared.Subgrid.Systems;
 public abstract partial class SharedSubGridSystem : EntitySystem
 {
     [Dependency] protected readonly IConfigurationManager CfgManager = default!;
+    [Dependency] protected readonly SharedTransformSystem Xform = default!;
 
-    private EntityQuery<SubGridChunkComponent> _chunkQuery;
+    protected EntityQuery<SubGridComponent> SubGridQuery;
+    protected EntityQuery<SubGridChunkComponent> ChunkQuery;
 
     /// <inheritdoc/>
     public override void Initialize()
     {
         InitializeCVars();
+        InitializeUI();
 
-        _chunkQuery = GetEntityQuery<SubGridChunkComponent>();
+        SubGridQuery = GetEntityQuery<SubGridComponent>();
+        ChunkQuery = GetEntityQuery<SubGridChunkComponent>();
     }
 
     public static readonly Vector2i[] Directions = new[]

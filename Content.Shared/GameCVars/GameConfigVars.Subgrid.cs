@@ -12,5 +12,5 @@ public sealed partial class GameConfigVars
     /// Used for calculating the volume of a subgrid tile.
     /// </summary>
     public static readonly CVarDef<float> SubGridHeight =
-        CVarDef.Create("subgrid.size", 2.5f, CVar.SERVER | CVar.REPLICATED | CVar.ARCHIVE);
+        CVarDef.Create("subgrid.height", 2.5f, CVar.SERVER | CVar.REPLICATED | CVar.ARCHIVE);
 }

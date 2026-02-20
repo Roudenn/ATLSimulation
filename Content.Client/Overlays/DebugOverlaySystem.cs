@@ -1,4 +1,5 @@
 ﻿using Content.Client.Subgrid;
+using Content.Shared.Subgrid.Systems;
 using Robust.Client.Graphics;
 using Robust.Client.Player;
 using Robust.Shared.Player;
@@ -11,6 +12,7 @@ public sealed class DebugOverlaySystem : EntitySystem
     [Dependency] private readonly IPlayerManager _player = default!;
     [Dependency] private readonly IOverlayManager _overlayMan = default!;
     [Dependency] private readonly SharedTransformSystem _xform = default!;
+    [Dependency] private readonly SharedSubGridSystem _subGrid = default!;
 
     private SubGridChunkOverlay _subGridChunkOverlay = default!;
 
@@ -22,7 +24,7 @@ public sealed class DebugOverlaySystem : EntitySystem
         SubscribeLocalEvent<DebugOverlayViewerComponent, LocalPlayerAttachedEvent>(OnPlayerAttached);
         SubscribeLocalEvent<DebugOverlayViewerComponent, LocalPlayerDetachedEvent>(OnPlayerDetached);
 
-        _subGridChunkOverlay = new(EntityManager, _eyeManager, _xform);
+        _subGridChunkOverlay = new(EntityManager, _eyeManager, _xform, _subGrid);
     }
 
     public void UpdateOverlays(Entity<DebugOverlayViewerComponent?> ent)
