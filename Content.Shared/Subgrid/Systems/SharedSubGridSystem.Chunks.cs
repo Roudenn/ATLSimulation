@@ -198,10 +198,7 @@ public abstract partial class SharedSubGridSystem
         var localPos = IndexToVector(index) / (float) SubGridTileSize;
         // Set the position to be centered around the chunk origin
         var relative = localPos - HalfChunkSizeVector;
-        // Rotate it by 90 degrees to convert into X+ right and Y+ up coordinates
-        var rotated = new Vector2(relative.Y, -relative.X);
-
-        return ChunkIndicesToPosition(chunkIndices) + rotated;
+        return ChunkIndicesToPosition(chunkIndices) + relative;
     }
 
     /// <summary>
@@ -242,11 +239,18 @@ public abstract partial class SharedSubGridSystem
     {
         // Position relative to the center of the chunk
         var relative = position - GetChunkPosition(position);
-        // Rotate it by 90 degrees to convert into X+ right and Y+ down coordinates
-        var rotated = new Vector2(-relative.Y, relative.X);
         // Move the origin of the vector to the top-left corner of the chunk
-        return rotated + HalfChunkSizeVector;
+        return relative + HalfChunkSizeVector;
     }
+
+    public Vector2 GetRelativeChunkPosition(Vector2 position, Vector2i chunkIndices)
+    {
+        // Position relative to the center of the chunk
+        var relative = position - chunkIndices * SystemConstants.PvsChunkSize;
+        // Move the origin of the vector to the top-left corner of the chunk
+        return relative + HalfChunkSizeVector;
+    }
+
 
     public int GetTileAtRelativePosition(Vector2 relativePos)
     {
@@ -259,10 +263,10 @@ public abstract partial class SharedSubGridSystem
     ///
     /// </summary>
     /// <returns></returns>
-    public int[] GetAreaTileIndexesAtTile(Vector2i gridIndices, Vector2 tileSizeVector)
+    public int[] GetAreaTileIndexesAtTile(Vector2i chunkIndices, Vector2i gridIndices, Vector2 tileSizeVector)
     {
-        var vec1 = GetRelativeChunkPosition(gridIndices);
-        var vec2 = GetRelativeChunkPosition(gridIndices + tileSizeVector);
+        var vec1 = GetRelativeChunkPosition(gridIndices, chunkIndices);
+        var vec2 = GetRelativeChunkPosition(gridIndices + tileSizeVector, chunkIndices);
         return GetAreaTileIndexesLocalRelative(vec1, vec2);
     }
 

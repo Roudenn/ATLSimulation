@@ -27,7 +27,7 @@ public sealed partial class AtmosphericsSystem : SharedAtmosphericsSystem
             || !_subGrid.TryGetChunk(grid, tile, out var chunk))
             return;
 
-        var indexes = _subGrid.GetAreaTileIndexesAtTile(tile.GridIndices, grid.Comp2.TileSizeVector);
+        var indexes = _subGrid.GetAreaTileIndexesAtTile(chunk.Value.Comp.ChunkIndices, tile.GridIndices, grid.Comp2.TileSizeVector);
         energy /= indexes.Length;
 
         foreach (var index in indexes)
@@ -42,7 +42,7 @@ public sealed partial class AtmosphericsSystem : SharedAtmosphericsSystem
             || !_subGrid.TryGetChunk(grid, tile, out var chunk))
             return;
 
-        var indexes = _subGrid.GetAreaTileIndexesAtTile(tile.GridIndices, grid.Comp2.TileSizeVector);
+        var indexes = _subGrid.GetAreaTileIndexesAtTile(chunk.Value.Comp.ChunkIndices, tile.GridIndices, grid.Comp2.TileSizeVector);
         moles /= indexes.Length;
 
         foreach (var index in indexes)
@@ -57,7 +57,7 @@ public sealed partial class AtmosphericsSystem : SharedAtmosphericsSystem
             || !_subGrid.TryGetChunk(grid, tile, out var chunk))
             return;
 
-        var indexes = _subGrid.GetAreaTileIndexesAtTile(tile.GridIndices, grid.Comp2.TileSizeVector);
+        var indexes = _subGrid.GetAreaTileIndexesAtTile(chunk.Value.Comp.ChunkIndices, tile.GridIndices, grid.Comp2.TileSizeVector);
         foreach (var index in indexes)
         {
             chunk.Value.Comp.AtmosphereMap[index].Mixture.SetVolume(volume);

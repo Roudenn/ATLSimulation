@@ -33,6 +33,7 @@ public sealed class SubGridTileOverlay : Overlay
         var viewport = _eyeManager.GetWorldViewport();
         var boxVector = new Vector2i(SystemConstants.PvsChunkSize, SystemConstants.PvsChunkSize);
         var query = _entityManager.EntityQueryEnumerator<SubGridChunkComponent, TransformComponent>();
+        var tileWorldSize = new Vector2(1f / _subGrid.SubGridTileSize);
         while (query.MoveNext(out var uid, out var subgrid, out var xform))
         {
             var worldPos = _xform.GetMapCoordinates(uid, xform);
@@ -48,7 +49,7 @@ public sealed class SubGridTileOverlay : Overlay
 
                 var pos = _subGrid.GetPositionFromIndex(subgrid.ChunkIndices, i);
                 var worldTilePos = _xform.ToMapCoordinates(new EntityCoordinates(subgrid.ParentGrid, pos));
-                var box = Box2.CenteredAround(worldTilePos.Position, new Vector2(1f / _subGrid.SubGridTileSize));
+                var box = Box2.CenteredAround(worldTilePos.Position + tileWorldSize / 2, tileWorldSize);
                 args.WorldHandle.DrawRect(box, Color.Aquamarine.WithAlpha(0.5f), false);
             }
 
@@ -59,7 +60,8 @@ public sealed class SubGridTileOverlay : Overlay
                     continue;
 
                 var pos = _subGrid.GetPositionFromIndex(subgrid.ChunkIndices, i);
-                var box = Box2.CenteredAround(pos, new Vector2(1f / _subGrid.SubGridTileSize));
+                var worldTilePos = _xform.ToMapCoordinates(new EntityCoordinates(subgrid.ParentGrid, pos));
+                var box = Box2.CenteredAround(worldTilePos.Position + tileWorldSize / 2, tileWorldSize);
                 args.WorldHandle.DrawRect(box, Color.Orange.WithAlpha(0.5f), false);
             }
         }

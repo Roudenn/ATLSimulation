@@ -46,7 +46,8 @@ public sealed partial class SubGridSystem
                 if (!TryGetChunk(ent.AsNullable(), change.GridIndices, out var chunk))
                     continue;
 
-                InitializeAtmosAtTile(args.Entity, change.GridIndices, ref chunk.Value.Comp.AtmosphereMap);
+                InitializeAtmosAtTile(args.Entity, change.GridIndices, ref chunk.Value.Comp.AtmosphereMap, chunk.Value.Comp.ChunkIndices);
+                Dirty(chunk.Value); // TODO optimization
             }
             else if (change.NewTile.TypeId == 0)
             {
@@ -54,6 +55,8 @@ public sealed partial class SubGridSystem
                 TryRemoveSubGridChunkWithNeighbours(ent, change.GridIndices);
             }
         }
+
+        Dirty(ent); // TODO optimization
     }
 
     private void OnGridTerminating(Entity<SubGridComponent> ent, ref EntityTerminatingEvent args)
@@ -87,18 +90,23 @@ public sealed partial class SubGridSystem
 
         while (tiles.MoveNext(out var tile))
         {
-            InitializeAtmosAtTile(grid, tile.GridIndices, ref atmos, true);
+            InitializeAtmosAtTile(grid, tile.GridIndices, ref atmos, ent.Comp.ChunkIndices,true);
         }
 
         ent.Comp.AtmosphereMap = atmos;
     }
 
-    private void InitializeAtmosAtTile(Entity<MapGridComponent> grid, Vector2i gridIndices, ref TileAtmosphere[] atmos, bool gridMixture = false)
+    private void InitializeAtmosAtTile(
+        Entity<MapGridComponent> grid,
+        Vector2i gridIndices,
+        ref TileAtmosphere[] atmos,
+        Vector2i chunkIndices,
+        bool gridMixture = false)
     {
         // TODO add airtight stuff
         var mixture = gridMixture ? _atmos.GetGridMixture(grid.Owner) : _atmos.GetSpaceMixture();
 
-        var subTiles = GetAreaTileIndexesAtTile(gridIndices, grid.Comp.TileSizeVector);
+        var subTiles = GetAreaTileIndexesAtTile(chunkIndices, gridIndices, grid.Comp.TileSizeVector);
         foreach (var index in subTiles)
         {
             atmos[index] = new TileAtmosphere(mixture, true);
@@ -148,7 +156,7 @@ public sealed partial class SubGridSystem
             if (heatCapacity == null || temperature == null)
                 continue;
 
-            var subTiles = GetAreaTileIndexesAtTile(tile.GridIndices, grid.Comp.TileSizeVector);
+            var subTiles = GetAreaTileIndexesAtTile(ent.Comp.ChunkIndices, tile.GridIndices, grid.Comp.TileSizeVector);
             foreach (var index in subTiles)
             {
                 temperatureMap[index] = new TileTemperature(heatCapacity.Value, temperature.Value, true);
@@ -243,13 +251,24 @@ public sealed partial class SubGridSystem
         chunk = SpawnSubGridChunk(grid, gridIndices);
     }
 
+    private void EnsureSubGridChunk(Entity<SubGridComponent> grid, Vector2i gridIndices, out Entity<SubGridChunkComponent> chunk)
+    {
+        if (grid.Comp.ChunkEntities.TryGetValue(GetChunkIndices(gridIndices), out var chunkUid))
+        {
+            chunk = (chunkUid, ChunkQuery.Comp(chunkUid));
+            return;
+        }
+
+        chunk = SpawnSubGridChunk(grid, gridIndices);
+    }
+
     /// <summary>
     /// Spawns a subgrid chunk entity on a grid at a specified position, aligned to chunk indices.
     /// </summary>
     /// <param name="grid">The relative grid.</param>
     /// <param name="gridIndices">The grid indices that are inside the chunk.</param>
     /// <returns>The spawned subgrid chunk.</returns>
-    private EntityUid SpawnSubGridChunk(Entity<SubGridComponent> grid, Vector2i gridIndices)
+    private Entity<SubGridChunkComponent> SpawnSubGridChunk(Entity<SubGridComponent> grid, Vector2i gridIndices)
     {
         var pos = GetChunkPosition(gridIndices);
         var chunk = Spawn(null, new EntityCoordinates(grid, pos));
@@ -264,7 +283,7 @@ public sealed partial class SubGridSystem
 
         grid.Comp.ChunkEntities.Add(chunkComp.ChunkIndices, chunk);
         Log.Info($"Added chunk {ToPrettyString(chunk)} to grid {ToPrettyString(grid)} with chunkIndices {chunkComp.ChunkIndices}");
-        return chunk;
+        return (chunk, chunkComp);
     }
 
     private void TryRemoveSubGridChunkWithNeighbours(Entity<SubGridComponent, MapGridComponent?> grid, Vector2i gridIndices)
