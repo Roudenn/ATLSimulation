@@ -19,11 +19,20 @@ public partial struct TileTemperature : IRobustCloneable<TileTemperature>, ISubG
     [DataField]
     public HeatContainer ArchivedContainer;
 
-    public TileTemperature(float heatCapacity, float temperature)
+    [DataField]
+    public bool Initialized { get; set; }
+
+    [ViewVariables]
+    public int CurrentTick { get; set; }
+
+    [ViewVariables]
+    public int LastTick { get; set; }
+
+    public TileTemperature(float heatCapacity, float temperature, bool initialized = false)
     {
-        var container = new HeatContainer(heatCapacity, temperature);
-        Container = container;
-        ArchivedContainer = container;
+        Container = new HeatContainer(heatCapacity, temperature);
+        ArchivedContainer = new HeatContainer(heatCapacity, temperature);
+        Initialized = initialized;
     }
 
     public TileTemperature(HeatContainer container)

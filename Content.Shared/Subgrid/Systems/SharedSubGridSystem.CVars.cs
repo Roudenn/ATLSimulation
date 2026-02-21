@@ -21,7 +21,7 @@ public abstract partial class SharedSubGridSystem
     /// Size of a single dimension of a subgrid box inside a single tile.
     /// </summary>
     [ViewVariables]
-    public int SubGridTileSize { get; private set; }
+    public int SubGridTileSize { get; private set; } = 1;
 
     /// <summary>
     /// Volume of a single subgrid tile.
@@ -43,8 +43,14 @@ public abstract partial class SharedSubGridSystem
 
     private void InitializeCVars()
     {
-        Subs.CVar(CfgManager, GameConfigVars.SubGridHeight, f => SubGridHeight = f);
-        Subs.CVar(CfgManager, GameConfigVars.SubGridSize, OnSubGridSizeChanged);
+        Subs.CVar(CfgManager, GameConfigVars.SubGridHeight, OnHeightChanged, true);
+        Subs.CVar(CfgManager, GameConfigVars.SubGridSize, OnSubGridSizeChanged, true);
+    }
+
+    private void OnHeightChanged(float f)
+    {
+        SubGridHeight = f;
+        UpdateVolumeValue();
     }
 
     private void OnSubGridSizeChanged(int num)
@@ -56,8 +62,13 @@ public abstract partial class SharedSubGridSystem
 
         SubGridDivisions = num;
         SubGridTileSize = 1 << num; // Equivalent to Math.Pow(2, num)
-        SubGridTileVolume = (1 / (1 << num)) * (1 / (1 << num)) * SubGridHeight;
         SubGridChunkSize = SystemConstants.PvsChunkSize * (1 << num);
         SubGridChunkArea = SystemConstants.PvsChunkSize * (1 << num) * SystemConstants.PvsChunkSize * (1 << num);
+        UpdateVolumeValue();
+    }
+
+    private void UpdateVolumeValue()
+    {
+        SubGridTileVolume = (1f / SubGridTileSize) * (1f / SubGridTileSize) * SubGridHeight;
     }
 }

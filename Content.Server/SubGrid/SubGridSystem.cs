@@ -16,11 +16,9 @@ public sealed partial class SubGridSystem : SharedSubGridSystem
 {
     [Dependency] private readonly ITileDefinitionManager _tileDefMan = default!;
     [Dependency] private readonly IPrototypeManager _proto = default!;
-    [Dependency] private readonly SharedMapSystem _mapSystem = default!;
+
     [Dependency] private readonly AtmosphericsSystem _atmos = default!;
 
-    private EntityQuery<MapGridComponent> _mapGridQuery;
-    private EntityQuery<GridAtmosphereComponent> _atmosGridQuery;
     private EntityQuery<TemperatureContainerComponent> _temperatureQuery;
     private EntityQuery<MaterialComponent> _materialQuery;
 
@@ -30,8 +28,7 @@ public sealed partial class SubGridSystem : SharedSubGridSystem
 
         InitializeChunks();
 
-        _mapGridQuery = GetEntityQuery<MapGridComponent>();
-        _atmosGridQuery = GetEntityQuery<GridAtmosphereComponent>();
+
         _temperatureQuery = GetEntityQuery<TemperatureContainerComponent>();
         _materialQuery = GetEntityQuery<MaterialComponent>();
     }

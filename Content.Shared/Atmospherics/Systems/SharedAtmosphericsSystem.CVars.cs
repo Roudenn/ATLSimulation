@@ -9,6 +9,6 @@ public abstract partial class SharedAtmosphericsSystem
 
     private void InitializeCVars()
     {
-        Subs.CVar(_config, GameConfigVars.AtmosEnabled, b => AtmosEnabled = b);
+        Subs.CVar(_config, GameConfigVars.AtmosEnabled, b => AtmosEnabled = b, true);
     }
 }

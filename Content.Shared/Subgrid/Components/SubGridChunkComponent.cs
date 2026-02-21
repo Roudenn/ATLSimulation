@@ -8,10 +8,10 @@ namespace Content.Shared.Subgrid.Components;
 public sealed partial class SubGridChunkComponent : Component
 {
     // TODO: remove this shitcode when a method to parent stuff to grids even when they are off grid gets added
-    [DataField]
+    [DataField, AutoNetworkedField]
     public EntityUid ParentGrid;
 
-    [DataField]
+    [DataField, AutoNetworkedField]
     public Vector2i ChunkIndices;
 
     [DataField, AutoNetworkedField]

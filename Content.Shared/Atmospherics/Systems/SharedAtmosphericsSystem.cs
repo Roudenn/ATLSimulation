@@ -1,4 +1,5 @@
-﻿using Content.Shared.Subgrid.Systems;
+﻿using Content.Shared.Atmospherics.Components;
+using Content.Shared.Subgrid.Systems;
 using Robust.Shared.Configuration;
 using Robust.Shared.Prototypes;
 
@@ -12,10 +13,14 @@ public abstract partial class SharedAtmosphericsSystem : EntitySystem
     [Dependency] private readonly GasPrototypeManager _gasManager = default!;
     [Dependency] private readonly SharedSubGridSystem _subGrid = default!;
 
+    private EntityQuery<GridAtmosphereComponent> _atmosGridQuery;
+
     public override void Initialize()
     {
         base.Initialize();
         InitializeCVars();
         InitializeGases();
+
+        _atmosGridQuery = GetEntityQuery<GridAtmosphereComponent>();
     }
 }

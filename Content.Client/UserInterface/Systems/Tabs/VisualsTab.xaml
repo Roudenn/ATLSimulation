@@ -20,7 +20,9 @@
                 <CheckBox Name="SolidsInternalEnergyCheckBox" Text="{Loc 'ui-viewport-tabs-visuals-solids-internal-energy'}" Access="Public"/>
 
                 <!-- Debug -->
+                <Label Text="{Loc 'ui-viewport-header-debug'}" StyleClasses="LabelKeyText"/>
                 <CheckBox Name="DebugSubGridChunksCheckBox" Text="{Loc 'ui-viewport-tabs-visuals-debug-subgrid-chunks'}" Access="Public"/>
+                <CheckBox Name="DebugSubGridTilesCheckBox" Text="{Loc 'ui-viewport-tabs-visuals-debug-subgrid-tiles'}" Access="Public"/>
             </BoxContainer>
         </ScrollContainer>
     </BoxContainer>

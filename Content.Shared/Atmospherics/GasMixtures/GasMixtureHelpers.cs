@@ -1,5 +1,6 @@
 ﻿using Content.Shared.Atmospherics.Systems;
 using Content.Shared.Constants;
+using Content.Shared.Temperature.HeatContainers;
 using JetBrains.Annotations;
 
 namespace Content.Shared.Atmospherics.GasMixtures;
@@ -17,21 +18,30 @@ public static partial class GasMixtureHelpers
     {
         return m.Moles[gasId];
     }
-    
+
     [PublicAPI]
     public static float[] GetMolesRatioQuery(this ref GasMixture m)
     {
         NumericsHelpers.Divide(m.Moles, GetTotalMolesQuery(ref m), m.MolesRatio);
         return m.MolesRatio;
     }
-    
+
     [PublicAPI]
     public static float GetTotalMolesQuery(this ref GasMixture m)
     {
         m.TotalMoles = NumericsHelpers.HorizontalAdd(m.Moles);
         return m.TotalMoles;
     }
-    
+
+    [PublicAPI]
+    public static void AddHeat(this ref GasMixture m, float energy)
+    {
+        if (m.Immutable)
+            return;
+
+        m.HeatContainer.AddHeat(energy);
+    }
+
     /// <summary>
     /// Adds or removes moles of a gas inside the gas mixture, depending on the sign of the <see cref="moles"/> parameter.
     /// </summary>
@@ -44,9 +54,9 @@ public static partial class GasMixtureHelpers
     {
         if (m.Immutable)
             return 0f;
-        
+
         // Ensure that if the gas
-        
+
         m.Moles[gasId] += moles;
         m.TotalMoles += moles;
         return moles;
@@ -61,7 +71,7 @@ public static partial class GasMixtureHelpers
     {
         m.Immutable = true;
     }
-    
+
     /// <summary>
     /// Sets new volume for this gas mixture.
     /// </summary>
@@ -86,7 +96,7 @@ public static partial class GasMixtureHelpers
         m.Pressure = m.TotalMoles * m.HeatContainer.Temperature * PhysicalConstants.R / m.Volume;
         return m.Pressure;
     }
-    
+
     [PublicAPI]
     public static float GetPressureQuery(this ref GasMixture m)
         => m.TotalMoles * m.HeatContainer.Temperature * PhysicalConstants.R / m.Volume;

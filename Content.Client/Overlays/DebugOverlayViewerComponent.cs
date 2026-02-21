@@ -8,4 +8,7 @@ public sealed partial class DebugOverlayViewerComponent : Component
 {
     [DataField]
     public bool SubGridChunkOverlay;
+
+    [DataField]
+    public bool SubGridTilesOverlay;
 }

@@ -4,7 +4,7 @@ using Content.Shared.Subgrid.Systems;
 using Robust.Client.Graphics;
 using Robust.Shared.Enums;
 
-namespace Content.Client.Subgrid;
+namespace Content.Client.Subgrid.Overlays;
 
 /// <summary>
 /// Simply draws all boundaries of all subgrid chunks on the screen.

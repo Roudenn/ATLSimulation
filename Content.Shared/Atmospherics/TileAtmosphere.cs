@@ -31,17 +31,21 @@ public partial struct TileAtmosphere : IRobustCloneable<TileAtmosphere>, ISubGri
     [DataField]
     public bool MapAtmosphere;
 
-    public TileAtmosphere(GasMixture mixture)
-    {
-        Mixture = mixture;
-        ArchivedMixture = mixture;
-    }
+    [DataField]
+    public bool Initialized { get; set; }
 
-    public TileAtmosphere(GasMixture mixture, bool mapAtmosphere)
+    [ViewVariables]
+    public int CurrentTick { get; set; }
+
+    [ViewVariables]
+    public int LastTick { get; set; }
+
+    public TileAtmosphere(GasMixture mixture, bool initialized = false)
     {
         Mixture = mixture;
         ArchivedMixture = mixture;
-        MapAtmosphere = mapAtmosphere;
+        MapAtmosphere = mixture.Immutable;
+        Initialized = initialized;
     }
 
     private TileAtmosphere(TileAtmosphere c)

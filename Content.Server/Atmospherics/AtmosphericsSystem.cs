@@ -21,14 +21,28 @@ public sealed partial class AtmosphericsSystem : SharedAtmosphericsSystem
         _mapGridQuery = GetEntityQuery<MapGridComponent>();
     }
 
+    public override void AddHeatArea(Entity<SubGridComponent?, MapGridComponent?> grid, TileRef tile, float energy)
+    {
+        if (!_mapGridQuery.Resolve(grid.Owner, ref grid.Comp2)
+            || !_subGrid.TryGetChunk(grid, tile, out var chunk))
+            return;
+
+        var indexes = _subGrid.GetAreaTileIndexesAtTile(tile.GridIndices, grid.Comp2.TileSizeVector);
+        energy /= indexes.Length;
+
+        foreach (var index in indexes)
+        {
+            AddHeat(ref chunk.Value.Comp.AtmosphereMap[index].Mixture, energy);
+        }
+    }
+
     public override void AdjustMolesArea(Entity<SubGridComponent?, MapGridComponent?> grid, TileRef tile, ProtoId<GasPrototype> gas, float moles)
     {
         if (!_mapGridQuery.Resolve(grid.Owner, ref grid.Comp2)
             || !_subGrid.TryGetChunk(grid, tile, out var chunk))
             return;
 
-        var box = new Box2(tile.GridIndices, tile.GridIndices + grid.Comp2.TileSizeVector);
-        var indexes = _subGrid.GetAreaTileIndexesLocal(chunk.Value.Comp.ChunkIndices, box);
+        var indexes = _subGrid.GetAreaTileIndexesAtTile(tile.GridIndices, grid.Comp2.TileSizeVector);
         moles /= indexes.Length;
 
         foreach (var index in indexes)
@@ -43,9 +57,7 @@ public sealed partial class AtmosphericsSystem : SharedAtmosphericsSystem
             || !_subGrid.TryGetChunk(grid, tile, out var chunk))
             return;
 
-        var box = new Box2(tile.GridIndices, (Vector2i) (tile.GridIndices + grid.Comp2.TileSizeVector));
-        var indexes = _subGrid.GetAreaTileIndexesLocal(chunk.Value.Comp.ChunkIndices, box);
-
+        var indexes = _subGrid.GetAreaTileIndexesAtTile(tile.GridIndices, grid.Comp2.TileSizeVector);
         foreach (var index in indexes)
         {
             chunk.Value.Comp.AtmosphereMap[index].Mixture.SetVolume(volume);

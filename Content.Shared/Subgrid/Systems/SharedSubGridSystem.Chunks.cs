@@ -34,7 +34,9 @@ public abstract partial class SharedSubGridSystem
     public static Vector2 ChunkIndicesToPosition(Vector2i indices)
         => indices * SystemConstants.PvsChunkSize;
 
-    public static Vector2 ChunkBoxVector = new(SystemConstants.PvsChunkSize, SystemConstants.PvsChunkSize);
+    public static readonly Vector2 ChunkSizeVector = new(SystemConstants.PvsChunkSize, SystemConstants.PvsChunkSize);
+
+    public static readonly Vector2 HalfChunkSizeVector = new(4f, 4f);
 
     /// <summary>
     /// Converts an (x,y) vector into an index inside a chunk.
@@ -185,17 +187,39 @@ public abstract partial class SharedSubGridSystem
     }
 
     /// <summary>
+    /// Converts local tile index into the MapGrid position.
+    /// </summary>
+    /// <param name="chunkIndices"></param>
+    /// <param name="index"></param>
+    /// <returns></returns>
+    public Vector2 GetPositionFromIndex(Vector2i chunkIndices, int index)
+    {
+        // Convert the position to world units
+        var localPos = IndexToVector(index) / (float) SubGridTileSize;
+        // Set the position to be centered around the chunk origin
+        var relative = localPos - HalfChunkSizeVector;
+        // Rotate it by 90 degrees to convert into X+ right and Y+ up coordinates
+        var rotated = new Vector2(relative.Y, -relative.X);
+
+        return ChunkIndicesToPosition(chunkIndices) + rotated;
+    }
+
+    /// <summary>
     /// A version of <see cref="GetTileRelative"/> that assumes
     /// that the target tile is located inside the same chunk.
     /// </summary>
-    /// <param name="index"></param>
-    /// <param name="dir"></param>
-    /// <returns></returns>
+    /// <remarks>
+    /// Use <see cref="GetTileRelative"/> unless you are sure that the target has to be in the same chunk!
+    /// </remarks>
+    /// <param name="index">Index of the current tile.</param>
+    /// <param name="dir">Direction</param>
+    /// <returns>Index of the target tile.</returns>
     public int GetTileRelativeLocal(int index, Vector2i dir)
     {
         return GetTileRelativeLocal(index, dir.X, dir.Y);
     }
 
+    /// <inheritdoc cref="GetTileRelativeLocal(int, Vector2i)"/>
     public int GetTileRelativeLocal(int index, int dx, int dy)
     {
         var pos = IndexToVector(index);
@@ -204,62 +228,67 @@ public abstract partial class SharedSubGridSystem
         return VectorToIndex(tx, ty);
     }
 
-    public int GetTileAtPosition(Vector2i chunkIndices, Vector2 position)
+    /// <summary>
+    /// Gets index of a tile on a specified MapGrid position.
+    /// </summary>
+    /// <param name="position">MapGrid position of a target tile.</param>
+    /// <returns>Index of the closest subgrid tile to the target position.</returns>
+    public int GetTileAtPosition(Vector2 position)
     {
-        var chunkPos = ChunkIndicesToPosition(chunkIndices);
-        var delta = chunkPos - position;
-        DebugTools.Assert(delta.X >= 0);
-        DebugTools.Assert(delta.Y >= 0);
-        return GetTileAtPositionRelative(delta + new Vector2(-4f, 4f)); // Aligns the position to the chunks corner
+        return GetTileAtRelativePosition(GetRelativeChunkPosition(position));
     }
 
-    public int GetTileAtPositionRelative(Vector2 relativePos)
+    public Vector2 GetRelativeChunkPosition(Vector2 position)
     {
-        // Scale the position according to the chunk size
-        relativePos *= SubGridTileSize;
-        // Round to the nearest position
-        var roundedPos = (Vector2i) relativePos.Rounded();
+        // Position relative to the center of the chunk
+        var relative = position - GetChunkPosition(position);
+        // Rotate it by 90 degrees to convert into X+ right and Y+ down coordinates
+        var rotated = new Vector2(-relative.Y, relative.X);
+        // Move the origin of the vector to the top-left corner of the chunk
+        return rotated + HalfChunkSizeVector;
+    }
+
+    public int GetTileAtRelativePosition(Vector2 relativePos)
+    {
+        // Scale the position according to the chunk size and round it
+        var roundedPos = (Vector2i) (relativePos * SubGridChunkSize).Rounded();
         return VectorToIndex(roundedPos);
     }
 
     /// <summary>
     ///
     /// </summary>
-    /// <remarks>
-    /// This method assumes that the box is located strictly inside the chunk.
-    /// </remarks>
-    /// <param name="chunkIndices"></param>
-    /// <param name="localBox"></param>
     /// <returns></returns>
-    public int[] GetAreaTileIndexesLocal(Vector2i chunkIndices, Box2 localBox)
+    public int[] GetAreaTileIndexesAtTile(Vector2i gridIndices, Vector2 tileSizeVector)
     {
-        var chunkPos = ChunkIndicesToPosition(chunkIndices);
-        var box = localBox.Translated(chunkPos + new Vector2(-4f, 4f));
-        DebugTools.Assert(box.TopLeft.X == 0);
-        DebugTools.Assert(box.TopLeft.Y == 0);
-        return GetAreaTileIndexesLocalRelative(box);
+        var vec1 = GetRelativeChunkPosition(gridIndices);
+        var vec2 = GetRelativeChunkPosition(gridIndices + tileSizeVector);
+        return GetAreaTileIndexesLocalRelative(vec1, vec2);
     }
 
     /// <summary>
     ///
     /// </summary>
-    /// <param name="chunkIndices"></param>
-    /// <param name="relativeBox"></param>
     /// <remarks>
     /// This method assumes that the box is located strictly inside the chunk.
     /// </remarks>
     /// <returns>An array of indexes in that box area.</returns>
-    public int[] GetAreaTileIndexesLocalRelative(Box2 relativeBox)
+    public int[] GetAreaTileIndexesLocalRelative(Vector2 topLeft, Vector2 bottomRight)
     {
-        var box = (Box2i) relativeBox.Scale(SubGridTileSize).Rounded(0);
-        var arr = new int[box.Width * box.Height];
+        var topLeftRelative = (Vector2i) (topLeft * SubGridTileSize).Rounded();
+        var bottomRightRelative = (Vector2i) (bottomRight * SubGridTileSize).Rounded();
+        var width = Math.Abs(topLeftRelative.X - bottomRightRelative.X);
+        var height = Math.Abs(bottomRightRelative.Y - topLeftRelative.Y);
 
-        var corner = VectorToIndex(box.TopLeft);
-        for (int i = 0; i < box.Width; i++)
+        var arr = new int[width * height];
+        var corner = VectorToIndex(topLeftRelative);
+        var count = 0; // probably could be better than another counter but idc
+        for (int i = 0; i < height; i++)
         {
-            for (int j = 0; j < box.Height; j++)
+            for (int j = 0; j < width; j++)
             {
-                arr[i + j] = GetTileRelativeLocal(corner, i, j);
+                arr[count] = GetTileRelativeLocal(corner, j, i);
+                count++;
             }
         }
 

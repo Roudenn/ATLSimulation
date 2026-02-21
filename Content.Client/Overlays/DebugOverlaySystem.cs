@@ -1,4 +1,4 @@
-﻿using Content.Client.Subgrid;
+﻿using Content.Client.Subgrid.Overlays;
 using Content.Shared.Subgrid.Systems;
 using Robust.Client.Graphics;
 using Robust.Client.Player;
@@ -15,6 +15,8 @@ public sealed class DebugOverlaySystem : EntitySystem
     [Dependency] private readonly SharedSubGridSystem _subGrid = default!;
 
     private SubGridChunkOverlay _subGridChunkOverlay = default!;
+    private SubGridTileOverlay _subGridTileOverlay = default!;
+
 
     /// <inheritdoc/>
     public override void Initialize()
@@ -25,6 +27,7 @@ public sealed class DebugOverlaySystem : EntitySystem
         SubscribeLocalEvent<DebugOverlayViewerComponent, LocalPlayerDetachedEvent>(OnPlayerDetached);
 
         _subGridChunkOverlay = new(EntityManager, _eyeManager, _xform, _subGrid);
+        _subGridTileOverlay = new(EntityManager, _eyeManager, _xform, _subGrid);
     }
 
     public void UpdateOverlays(Entity<DebugOverlayViewerComponent?> ent)
@@ -66,11 +69,13 @@ public sealed class DebugOverlaySystem : EntitySystem
     {
         if (ent.Comp.SubGridChunkOverlay)
             _overlayMan.AddOverlay(_subGridChunkOverlay);
-
+        if (ent.Comp.SubGridTilesOverlay)
+            _overlayMan.AddOverlay(_subGridTileOverlay);
     }
 
     private void RemoveOverlays()
     {
         _overlayMan.RemoveOverlay(_subGridChunkOverlay);
+        _overlayMan.RemoveOverlay(_subGridTileOverlay);
     }
 }

@@ -20,3 +20,4 @@ ui-viewport-tabs-visuals-solids-conductivity = Heat conductivity overlay
 ui-viewport-tabs-visuals-solids-internal-energy = Internal energy overlay
 
 ui-viewport-tabs-visuals-debug-subgrid-chunks = Subgrid Chunk boundaries
+ui-viewport-tabs-visuals-debug-subgrid-tiles = Subgrid Tile boundaries

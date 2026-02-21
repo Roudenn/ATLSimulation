@@ -1,5 +1,7 @@
-﻿using Content.Shared.Subgrid.Components;
+﻿using Content.Shared.Atmospherics.Systems;
+using Content.Shared.Subgrid.Components;
 using Robust.Shared.Configuration;
+using Robust.Shared.Map.Components;
 
 namespace Content.Shared.Subgrid.Systems;
 
@@ -7,7 +9,11 @@ public abstract partial class SharedSubGridSystem : EntitySystem
 {
     [Dependency] protected readonly IConfigurationManager CfgManager = default!;
     [Dependency] protected readonly SharedTransformSystem Xform = default!;
+    [Dependency] protected readonly SharedMapSystem MapSystem = default!;
 
+    [Dependency] private readonly SharedAtmosphericsSystem _atmospherics = default!;
+
+    protected EntityQuery<MapGridComponent> MapGridQuery;
     protected EntityQuery<SubGridComponent> SubGridQuery;
     protected EntityQuery<SubGridChunkComponent> ChunkQuery;
 
@@ -17,6 +23,7 @@ public abstract partial class SharedSubGridSystem : EntitySystem
         InitializeCVars();
         InitializeUI();
 
+        MapGridQuery = GetEntityQuery<MapGridComponent>();
         SubGridQuery = GetEntityQuery<SubGridComponent>();
         ChunkQuery = GetEntityQuery<SubGridChunkComponent>();
     }

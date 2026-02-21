@@ -2,6 +2,7 @@
 using Content.Shared.Constants;
 using JetBrains.Annotations;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Utility;
 
 namespace Content.Shared.Atmospherics.Systems;
 
@@ -9,16 +10,30 @@ namespace Content.Shared.Atmospherics.Systems;
 public abstract partial class SharedAtmosphericsSystem
 {
     [PublicAPI]
+    public GasMixture GetGridMixture(EntityUid grid)
+    {
+        var mixture = _atmosGridQuery.CompOrNull(grid)?.Mixture ?? GetSpaceMixture();
+        DebugTools.Assert(mixture.Immutable);
+        return mixture;
+    }
+
+    [PublicAPI]
     public GasMixture GetSpaceMixture()
     {
         return new GasMixture(_gasManager, _subGrid.SubGridTileVolume, PhysicalConstants.TCMB, true);
     }
 
     [PublicAPI]
-    public float AdjustMoles(ref GasMixture m, ProtoId<GasPrototype> proto, float amount)
+    public void AddHeat(ref GasMixture m, float amount)
+    {
+        m.AddHeat(amount);
+    }
+
+    [PublicAPI]
+    public float AdjustMoles(ref GasMixture m, ProtoId<GasPrototype> proto, float moles)
     {
         var gasId = _protoMan.Index(proto).GasId;
-        return m.AdjustMoles(gasId, amount);
+        return m.AdjustMoles(gasId, moles);
     }
 
     [PublicAPI]

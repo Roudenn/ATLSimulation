@@ -24,6 +24,7 @@ public sealed class VisualsTabUIController : UIController
             return;
 
         VisualsTab.DebugSubGridChunksCheckBox.OnPressed += DebugSubGridChunksOnPressed;
+        VisualsTab.DebugSubGridTilesCheckBox.OnPressed += DebugSubGridTilesOnPressed;
     }
 
     public void UnloadButton()
@@ -32,7 +33,9 @@ public sealed class VisualsTabUIController : UIController
             return;
 
         VisualsTab.DebugSubGridChunksCheckBox.Pressed = false;
+        VisualsTab.DebugSubGridTilesCheckBox.Pressed = false;
         VisualsTab.DebugSubGridChunksCheckBox.OnPressed -= DebugSubGridChunksOnPressed;
+        VisualsTab.DebugSubGridTilesCheckBox.OnPressed -= DebugSubGridTilesOnPressed;
     }
 
     private void DebugSubGridChunksOnPressed(BaseButton.ButtonEventArgs args)
@@ -41,6 +44,15 @@ public sealed class VisualsTabUIController : UIController
             return;
 
         ent.Value.Comp.SubGridChunkOverlay = args.Button.Pressed;
+        _debugOverlay.UpdateOverlays(ent.Value.AsNullable());
+    }
+
+    private void DebugSubGridTilesOnPressed(BaseButton.ButtonEventArgs args)
+    {
+        if (!TryGetViewerEnt(out var ent))
+            return;
+
+        ent.Value.Comp.SubGridTilesOverlay = args.Button.Pressed;
         _debugOverlay.UpdateOverlays(ent.Value.AsNullable());
     }
 
