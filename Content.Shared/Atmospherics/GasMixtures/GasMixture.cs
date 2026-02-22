@@ -68,7 +68,7 @@ public partial struct GasMixture : IRobustCloneable<GasMixture>
         Moles = new float[manager.ArraySize];
         MolesRatio = new float[manager.ArraySize];
         Volume = volume;
-        HeatContainer = new HeatContainer(SystemConstants.MinimumHeatCapacity, temperature);
+        HeatContainer = new HeatContainer(SystemConstants.MinimumHeatCapacity, temperature, 0f);
         Immutable = immutable;
     }
 
@@ -94,7 +94,7 @@ public partial struct GasMixture : IRobustCloneable<GasMixture>
         Moles = moles;
         MolesRatio = this.GetMolesRatioQuery();
         Volume = volume;
-        HeatContainer = new HeatContainer(this.GetHeatCapacityQuery(ref system.GasBuffer, ref system.GasSpecificHeats), temperature);
+        HeatContainer = system.CreateGasHeatContainer(ref this, temperature);
     }
 
     public GasMixture(GasMixture g)

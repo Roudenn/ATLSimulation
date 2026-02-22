@@ -28,10 +28,10 @@ public partial struct TileTemperature : IRobustCloneable<TileTemperature>, ISubG
     [ViewVariables]
     public int LastTick { get; set; }
 
-    public TileTemperature(float heatCapacity, float temperature, bool initialized = false)
+    public TileTemperature(float heatCapacity, float temperature, float thermalConductance, bool initialized = false)
     {
-        Container = new HeatContainer(heatCapacity, temperature);
-        ArchivedContainer = new HeatContainer(heatCapacity, temperature);
+        Container = new HeatContainer(heatCapacity, temperature, thermalConductance);
+        ArchivedContainer = new HeatContainer(heatCapacity, temperature, thermalConductance);
         Initialized = initialized;
     }
 

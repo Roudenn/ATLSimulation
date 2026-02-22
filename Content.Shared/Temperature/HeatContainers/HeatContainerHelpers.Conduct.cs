@@ -26,9 +26,9 @@ public static partial class HeatContainerHelpers
     /// integration steps with adaptive step size.
     /// </remarks>
     [PublicAPI]
-    public static float ConductHeat(this ref HeatContainer c, float temp, float deltaTime, float g)
+    public static float ConductHeat(this ref HeatContainer c, float temp, float g, float deltaTime)
     {
-        var dQ = c.ConductHeatQuery(temp, deltaTime, g);
+        var dQ = c.ConductHeatQuery(temp, g, deltaTime);
         c.AddHeat(dQ);
         return dQ;
     }
@@ -44,7 +44,6 @@ public static partial class HeatContainerHelpers
     /// This value should be small such that deltaTime &lt;&lt; C / g where C is the heat capacity of the containers.
     /// If you need to simulate a larger time step split it into several smaller ones.
     /// </param>
-    /// <param name="g">The thermal conductance in watt per kelvin. This describes how well heat flows between the bodies.</param>
     /// <returns>The amount of heat in joules that is exchanged between the bodies.</returns>
     /// <example>A positive value indicates heat transfer from a hot cB to a cold cA.</example>
     /// <remarks>
@@ -55,9 +54,9 @@ public static partial class HeatContainerHelpers
     /// integration steps with adaptive step size.
     /// </remarks>
     [PublicAPI]
-    public static float ConductHeat(this ref HeatContainer cA, ref HeatContainer cB, float deltaTime, float g)
+    public static float ConductHeat(this ref HeatContainer cA, ref HeatContainer cB, float deltaTime)
     {
-        var dQ = ConductHeatQuery(ref cA, cB.Temperature, deltaTime, g);
+        var dQ = ConductHeatQuery(ref cA, cB.Temperature, cB.ThermalConductance, deltaTime);
         cA.AddHeat(dQ);
         cB.AddHeat(-dQ);
         return dQ;
@@ -85,9 +84,11 @@ public static partial class HeatContainerHelpers
     /// integration steps with adaptive step size.
     /// </remarks>
     [PublicAPI]
-    public static float ConductHeatQuery(this ref HeatContainer c, float temp, float deltaTime, float g)
+    public static float ConductHeatQuery(this ref HeatContainer c, float temp, float g, float deltaTime)
     {
-        var dQ = g * (temp - c.Temperature) * deltaTime;
+        // Harmonic mean is used to cap thermal conductance towards the lower number.
+        var averageG = 2 * c.ThermalConductance * g / (c.ThermalConductance + g);
+        var dQ = averageG * (temp - c.Temperature) * deltaTime;
         var dQMax = Math.Abs(ConductHeatToTempQuery(ref c, temp));
 
         // Clamp the transferred heat amount in case we are overshooting the equilibrium temperature because our time step was too large.
@@ -105,7 +106,6 @@ public static partial class HeatContainerHelpers
     /// This value should be small such that deltaTime &lt;&lt; C / g where C is the heat capacity of the container.
     /// If you need to simulate a larger time step split it into several smaller ones.
     /// </param>
-    /// <param name="g">The thermal conductance in watt per kelvin. This describes how well heat flows between the bodies.</param>
     /// <returns>The amount of heat in joules that would be exchanged between the bodies.</returns>
     /// <example>A positive value indicates heat transfer from a hot c2 to a cold c1.</example>
     /// <remarks>
@@ -116,9 +116,9 @@ public static partial class HeatContainerHelpers
     /// integration steps with adaptive step size.
     /// </remarks>
     [PublicAPI]
-    public static float ConductHeatQuery(this ref HeatContainer c1, ref HeatContainer c2, float deltaTime, float g)
+    public static float ConductHeatQuery(this ref HeatContainer c1, ref HeatContainer c2, float deltaTime)
     {
-        return ConductHeatQuery(ref c1, c2.Temperature, deltaTime, g);
+        return ConductHeatQuery(ref c1, c2.Temperature, c2.ThermalConductance, deltaTime);
     }
 
     /// <summary>

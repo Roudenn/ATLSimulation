@@ -21,7 +21,13 @@ public abstract partial class SharedSubGridSystem
     /// Size of a single dimension of a subgrid box inside a single tile.
     /// </summary>
     [ViewVariables]
-    public int SubGridTileSize { get; private set; } = 1;
+    public int SubGridTileSize { get; private set; }
+
+    /// <summary>
+    /// Real size of a single subgrid tile in world units (meters).
+    /// </summary>
+    [ViewVariables]
+    public float SubGridWorldSize { get; private set; } = 1f;
 
     /// <summary>
     /// Volume of a single subgrid tile.
@@ -62,6 +68,7 @@ public abstract partial class SharedSubGridSystem
 
         SubGridDivisions = num;
         SubGridTileSize = 1 << num; // Equivalent to Math.Pow(2, num)
+        SubGridWorldSize = 1 / (float) (1 << num);
         SubGridChunkSize = SystemConstants.PvsChunkSize * (1 << num);
         SubGridChunkArea = SystemConstants.PvsChunkSize * (1 << num) * SystemConstants.PvsChunkSize * (1 << num);
         UpdateVolumeValue();
@@ -69,6 +76,6 @@ public abstract partial class SharedSubGridSystem
 
     private void UpdateVolumeValue()
     {
-        SubGridTileVolume = (1f / SubGridTileSize) * (1f / SubGridTileSize) * SubGridHeight;
+        SubGridTileVolume = SubGridWorldSize * SubGridWorldSize * SubGridHeight;
     }
 }

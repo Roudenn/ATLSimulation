@@ -147,6 +147,7 @@ public sealed partial class SubGridSystem
 
             float? heatCapacity = null;
             float? temperature = null;
+            float? conductance = null;
 
             // Try to get the anchored wall entity on this tile
             var ents = MapSystem.GetAnchoredEntitiesEnumerator(grid.Owner, grid.Comp, tile.GridIndices);
@@ -159,16 +160,19 @@ public sealed partial class SubGridSystem
                 var material = _proto.Index(materialComp.Material);
                 temperature = tempContainer.StartingTemperature;
                 heatCapacity = material.SpecificHeatCapacity * SubGridTileVolume * material.Density;
+                conductance = material.ThermalConductivity * SubGridWorldSize;
                 break;
             }
 
-            if (heatCapacity == null || temperature == null)
+            if (heatCapacity == null
+                || temperature == null
+                || conductance == null)
                 continue;
 
             var subTiles = GetAreaTileIndexesAtTile(ent.Comp.ChunkIndices, tile.GridIndices, grid.Comp.TileSizeVector);
             foreach (var index in subTiles)
             {
-                temperatureMap[index] = new TileTemperature(heatCapacity.Value, temperature.Value, true);
+                temperatureMap[index] = new TileTemperature(heatCapacity.Value, temperature.Value, conductance.Value,true);
             }
         }
 

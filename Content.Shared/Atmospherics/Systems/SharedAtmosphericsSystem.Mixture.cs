@@ -1,5 +1,6 @@
 ﻿using Content.Shared.Atmospherics.GasMixtures;
 using Content.Shared.Constants;
+using Content.Shared.Temperature.HeatContainers;
 using JetBrains.Annotations;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
@@ -66,4 +67,13 @@ public abstract partial class SharedAtmosphericsSystem
     [PublicAPI]
     public float GetViscosity(ref GasMixture m)
         => m.GetViscosityQuery(ref GasBuffer, ref GasBuffer2, ref GasMolarMassesSquareRoots, ref GasViscosities);
+
+    /// <summary>
+    /// Creates a heat container based on a gas mixture with given temperature.
+    /// </summary>
+    [PublicAPI]
+    public HeatContainer CreateGasHeatContainer(ref GasMixture m, float temperature = PhysicalConstants.ROOM_TEMPERATURE)
+    {
+        return new HeatContainer(GetHeatCapacity(ref m), temperature, GetThermalConductivity(ref m));
+    }
 }

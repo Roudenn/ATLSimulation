@@ -29,6 +29,14 @@ public partial struct HeatContainer : IRobustCloneable<HeatContainer>
     public float Temperature = PhysicalConstants.ROOM_TEMPERATURE; // room temperature
 
     /// <summary>
+    /// The thermal conductance in watt per kelvin.
+    /// This describes how well heat flows between the bodies.
+    /// Higher values mean container gives away heat faster.
+    /// </summary>
+    [DataField]
+    public float ThermalConductance = 1f; // because i want so
+
+    /// <summary>
     /// The current temperature of the container in Celsius.
     /// Ideal if you just need to read the temperature for UI.
     /// Do not perform computations in Celsius/set this value, use Kelvin instead.
@@ -42,10 +50,11 @@ public partial struct HeatContainer : IRobustCloneable<HeatContainer>
     [ViewVariables]
     public float InternalEnergy => Temperature * HeatCapacity;
 
-    public HeatContainer(float heatCapacity, float temperature)
+    public HeatContainer(float heatCapacity, float temperature, float thermalConductance)
     {
         HeatCapacity = heatCapacity;
         Temperature = temperature;
+        ThermalConductance = thermalConductance;
     }
 
     /// <summary>
