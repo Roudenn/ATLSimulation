@@ -1,2 +1,5 @@
 - type: tag
   id: Wall
+
+- type: tag
+  id: HideContextMenu

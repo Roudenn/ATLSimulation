@@ -2,8 +2,4 @@
   id: Space
   name: tiles-space
   friction: 0
-  isSubfloor: true
-  isSpace: true
-  sturdy: false
-  thermalConductivity: 0.4
-  heatCapacity: 700000
+  mapAtmosphere: true
