@@ -18,6 +18,6 @@ public sealed partial class DefaultGameScreen : InGameScreen
 
         Tabs.TabContainer.SetTabTitle(0, Loc.GetString("ui-viewport-header-statistics"));
         Tabs.TabContainer.SetTabTitle(1, Loc.GetString("ui-viewport-header-visuals"));
-        Tabs.TabContainer.SetTabTitle(2, Loc.GetString("ui-viewport-header-simulation-options"));
+        Tabs.TabContainer.SetTabTitle(2, Loc.GetString("ui-viewport-header-simulation"));
     }
 }

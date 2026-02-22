@@ -17,6 +17,7 @@ public sealed partial class SubGridSystem
         SubscribeLocalEvent<GridInitializeEvent>(OnGridInit);
 
         SubscribeLocalEvent<SubGridComponent, TileChangedEvent>(OnGridChanged);
+        SubscribeLocalEvent<SubGridComponent, MapInitEvent>(OnMapInit);
         //SubscribeLocalEvent<SubGridComponent, MoveEvent>(OnGridMove); // TODO handle grid movement
         // TODO handle grid splitting
         SubscribeLocalEvent<SubGridComponent, EntityTerminatingEvent>(OnGridTerminating);
@@ -33,8 +34,16 @@ public sealed partial class SubGridSystem
         EnsureComp<SubGridComponent>(ev.EntityUid);
     }
 
+    private void OnMapInit(Entity<SubGridComponent> ent, ref MapInitEvent args)
+    {
+        EnsureSubGrid(ent);
+    }
+
     private void OnGridChanged(Entity<SubGridComponent> ent, ref TileChangedEvent args)
     {
+        if (Paused(ent.Owner))
+            return; // We don't care about it until we are initialized
+
         // TODO this doesn't support grid splitting
         foreach (var change in args.Changes)
         {

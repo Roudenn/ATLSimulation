@@ -1,3 +1,27 @@
 - type: simulationMap
   id: Empty
   path: null # Nothing to load
+
+- type: simulationMap
+  id: SimpleBox
+  path: /Maps/simple_box.yml
+
+- type: simulationMap
+  id: TwoRooms
+  path: /Maps/two_rooms.yml
+
+- type: simulationMap
+  id: RoomGrid
+  path: /Maps/room_grid.yml
+
+- type: simulationMap
+  id: LargeField
+  path: /Maps/large_field.yml
+
+- type: simulationMap
+  id: Maze
+  path: /Maps/maze.yml
+
+#- type: simulationMap
+#  id: Thermos
+#  path: /Maps/thermos.yml

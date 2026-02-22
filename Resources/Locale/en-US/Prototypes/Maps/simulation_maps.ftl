@@ -1,2 +1,14 @@
 map-Empty = Empty
-    .desc = An empty map without any presetted objects.
+    .desc = An empty map without any objects.
+map-SimpleBox = Simple box
+    .desc = A single empty tile surrounded by walls.
+map-TwoRooms = Two rooms
+    .desc = Two rooms connected by a single empty tile between them.
+map-RoomGrid = Room grid
+    .desc = A 3x3 grid of rooms that share their walls between eachother.
+map-LargeField = Large room
+    .desc = A large empty 10x10 room.
+map-Maze = Maze
+    .desc = An empty pathway that has an exit to space.
+map-Thermos = Thermos
+    .desc = A room surrounded by vacuum.

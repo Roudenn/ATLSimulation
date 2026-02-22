@@ -10,7 +10,7 @@
                 <!-- Atmosphere -->
                 <Label Text="{Loc 'ui-viewport-header-atmosphere'}" StyleClasses="LabelKeyText"/>
 
-                <Button Text="{Loc 'ui-viewport-'}"/>
+
                 <controls:GasInspectControl Visible="False"/>
 
                 <!-- Temperature -->

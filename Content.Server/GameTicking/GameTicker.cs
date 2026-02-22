@@ -1,12 +1,17 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Numerics;
 using Content.Shared.GameTicking;
-using Content.Shared.Mapping.Components;
+using Content.Shared.Maps;
 using Robust.Server.Player;
+using Robust.Shared.EntitySerialization;
+using Robust.Shared.EntitySerialization.Systems;
 using Robust.Shared.Enums;
 using Robust.Shared.Map;
+using Robust.Shared.Map.Components;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Random;
 using Robust.Shared.Timing;
 
 namespace Content.Server.GameTicking;
@@ -15,12 +20,15 @@ namespace Content.Server.GameTicking;
 public sealed class GameTicker : SharedGameTicker
 {
     [ViewVariables]
-    public bool DummyTicker { get; private set; } = false;
+    public string? CurrentSimulationMap = "Empty";
 
     public static readonly EntProtoId ObserverEntity = "MobObserver";
 
     [Dependency] private readonly IPlayerManager _playerManager = default!;
+    [Dependency] private readonly IPrototypeManager _protoMan = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly SharedMapSystem _mapSystem = default!;
+    [Dependency] private readonly MapLoaderSystem _mapLoader = default!;
 
     public override void Initialize()
     {
@@ -94,11 +102,28 @@ public sealed class GameTicker : SharedGameTicker
 
     private EntityUid CreateMainMap()
     {
-        // TODO map selection code
-        var newMap = _mapSystem.CreateMap();
-        EnsureComp<SimulationMapComponent>(newMap);
-        Log.Info($"Created main simulation map {ToPrettyString(newMap)}");
-        return newMap;
+        var mapProto = SelectMap();
+        if (mapProto.Path == null
+            || !_mapLoader.TryLoadMap(mapProto.Path.Value, out var map, out _, new DeserializationOptions() { InitializeMaps = true}))
+        {
+            var newMap = _mapSystem.CreateMap(); // Fallback
+            map = (newMap, Comp<MapComponent>(newMap));
+        }
+
+        EnsureComp<SimulationMapComponent>(map.Value);
+        Log.Info($"Created main simulation map {ToPrettyString(map.Value)}");
+        return map.Value.Owner;
+    }
+
+    private SimulationMapPrototype SelectMap()
+    {
+        if (CurrentSimulationMap != null)
+            return _protoMan.Index<SimulationMapPrototype>(CurrentSimulationMap);
+
+        var maps = _protoMan.EnumeratePrototypes<SimulationMapPrototype>().ToList();
+        var map = _random.Pick(maps);
+        CurrentSimulationMap = map.ID;
+        return map;
     }
 
     private void SpawnAllPlayers()

@@ -36,7 +36,7 @@ public sealed class GasArraySerializer : ITypeSerializer<float[], SequenceDataNo
     {
         var gasMan = dependencies.Resolve<GasPrototypeManager>();
         var list = instanceProvider != null ? instanceProvider() : new float[gasMan.Count];
-        
+
         for (var i = 0; i < node.Sequence.Count; i++)
         {
             list[i] = serializationManager.Read<float>(node.Sequence[i], hookCtx, context);
@@ -52,7 +52,7 @@ public sealed class GasArraySerializer : ITypeSerializer<float[], SequenceDataNo
     {
         var gasMan = dependencies.Resolve<GasPrototypeManager>();
         var dict = new Dictionary<ValidationNode, ValidationNode>();
-        
+
         foreach (var (key, value) in node.Children)
         {
             ValidationNode keyNode = gasMan.TryGetDefinition(key, out _)
@@ -100,6 +100,9 @@ public sealed class GasArraySerializer : ITypeSerializer<float[], SequenceDataNo
 
         for (var i = 0; i < gasMan.Count; i++)
         {
+            if (value[i] == 0f)
+                continue; // Skip empty entries, they don't matter.
+
             var gas = gasMan[i];
             mapping.Add(gas.ID, serializationManager.WriteValue(value[i], alwaysWrite, context));
         }

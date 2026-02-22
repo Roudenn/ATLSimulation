@@ -1,9 +1,11 @@
 # Headers
 ui-viewport-header-statistics = Statistics
 ui-viewport-header-visuals = Visuals
-ui-viewport-header-simulation-options = Options
+ui-viewport-header-simulation = Simulation
 ui-viewport-header-atmosphere = Atmosphere
 ui-viewport-header-temperature = Temperature
+ui-viewport-header-debug = Debug
+ui-viewport-header-simulation-maps = Maps
 
 # Statistics tab
 ui-viewport-tabs-statistics-simulation-time = Simulation time
@@ -21,3 +23,7 @@ ui-viewport-tabs-visuals-solids-internal-energy = Internal energy overlay
 
 ui-viewport-tabs-visuals-debug-subgrid-chunks = Subgrid Chunk boundaries
 ui-viewport-tabs-visuals-debug-subgrid-tiles = Subgrid Tile boundaries
+
+# Simulation tab
+ui-viewport-submit-map = Submit Map
+ui-viewport-restart = Restart Simulation

@@ -1,7 +1,7 @@
 ﻿using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
 
-namespace Content.Shared.GameTicking;
+namespace Content.Shared.Maps;
 
 /// <summary>
 /// Represents a selectable simulation map.

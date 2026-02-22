@@ -43,3 +43,6 @@
     key: walls
     base: reinf_over
   - type: Appearance
+  - type: Material
+    material: StainlessSteel
+  - type: TemperatureContainer

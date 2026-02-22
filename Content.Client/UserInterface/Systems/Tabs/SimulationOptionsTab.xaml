@@ -3,7 +3,16 @@
     <BoxContainer Orientation="Vertical">
         <ScrollContainer VerticalExpand="True">
             <BoxContainer Orientation="Vertical" Margin="8 8 8 8">
-                <Label Text="{Loc 'ui-viewport-header-simulation-options'}" StyleClasses="LabelHeading"/>
+                <!-- Maps -->
+                <Label Text="{Loc 'ui-viewport-header-simulation-maps'}" StyleClasses="LabelHeading"/>
+                <ItemList Name="Maps"
+                          MinHeight="160"
+                          HorizontalExpand="True"
+                          SelectMode="Single"/>
+                <Button Name="SelectMapButton" Text="{Loc 'ui-viewport-submit-map'}"/>
+                <Button Name="RestartButton" Text="{Loc 'ui-viewport-restart'}"/>
+
+                <Label Text="{Loc 'ui-viewport-header-simulation'}" StyleClasses="LabelHeading"/>
 
                 <!-- TODO: CLIENT->SERVER OPTIONS -->
 

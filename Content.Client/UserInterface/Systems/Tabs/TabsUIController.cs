@@ -9,9 +9,7 @@ public sealed class TabsUIController : UIController
 {
     [Dependency] private readonly StatisticsTabUIController _statistics = default!;
     [Dependency] private readonly VisualsTabUIController _visuals = default!;
-
-    //private StatisticsTab? StatisticsTab => UIManager.GetActiveUIWidgetOrNull<GameTabContainer>()?.Statistics;
-    //private SimulationOptionsTab? SimulationOptionsTab => UIManager.GetActiveUIWidgetOrNull<GameTabContainer>()?.SimulationOptions;
+    [Dependency] private readonly SimulationTabUIController _simulation = default!;
 
     public override void Initialize()
     {
@@ -26,11 +24,13 @@ public sealed class TabsUIController : UIController
     {
         _statistics.LoadButton();
         _visuals.LoadButton();
+        _simulation.LoadButton();
     }
 
     public void UnloadButtons()
     {
         _statistics.UnloadButton();
         _visuals.UnloadButton();
+        _simulation.UnloadButton();
     }
 }

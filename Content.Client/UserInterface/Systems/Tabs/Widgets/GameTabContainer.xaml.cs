@@ -2,14 +2,13 @@
 using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.XAML;
 
-namespace Content.Client.UserInterface.Systems.Tabs.Widgets
+namespace Content.Client.UserInterface.Systems.Tabs.Widgets;
+
+[GenerateTypedNameReferences]
+public sealed partial class GameTabContainer : UIWidget
 {
-    [GenerateTypedNameReferences]
-    public sealed partial class GameTabContainer : UIWidget
+    public GameTabContainer()
     {
-        public GameTabContainer()
-        {
-            RobustXamlLoader.Load(this);
-        }
+        RobustXamlLoader.Load(this);
     }
 }
