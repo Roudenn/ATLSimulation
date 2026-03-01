@@ -210,14 +210,14 @@ public abstract partial class SharedSubGridSystem
     {
         // Position relative to the center of the chunk
         var relative = position - chunkIndices * SystemConstants.PvsChunkSize;
-        // Move the origin of the vector to the top-left corner of the chunk
+        // Move the origin of the vector to the bottom-left corner of the chunk
         return relative + HalfChunkSizeVector;
     }
 
     public int GetTileAtRelativePosition(Vector2 relativePos)
     {
         // Scale the position according to the chunk size and round it
-        var roundedPos = (Vector2i) (relativePos * SubGridChunkSize).Rounded();
+        var roundedPos = (Vector2i) (relativePos * SubGridTileSize).Rounded();
         return VectorToIndex(roundedPos);
     }
 
@@ -232,23 +232,23 @@ public abstract partial class SharedSubGridSystem
     {
         var vec1 = GetRelativeChunkPosition(gridIndices, chunkIndices);
         var vec2 = GetRelativeChunkPosition(gridIndices + tileSizeVector, chunkIndices);
-        return GetAreaTileIndexesWorld(vec1, vec2);
+        return GetAreaTileIndexesRelativeChunk(vec1, vec2);
     }
 
     /// <summary>
-    /// Gets all tile indexes between two grid positions.
+    /// Gets all tile indexes between two relative chunk positions.
     /// </summary>
     /// <remarks>
     /// This method assumes that both positions are located strictly inside the same chunk.
     /// </remarks>
-    /// <param name="topLeft">Bottom left coordinates.</param>
-    /// <param name="bottomRight">Top right coordinates.</param>
+    /// <param name="bottomLeft">Bottom left coordinates.</param>
+    /// <param name="topRight">Top right coordinates.</param>
     /// <returns>An array that contains the found indexes, stored left to right, top to bottom.</returns>
     // TODO make a version of this method that supports coordinates in multiple chunks at once
-    public int[] GetAreaTileIndexesWorld(Vector2 topLeft, Vector2 bottomRight)
+    public int[] GetAreaTileIndexesRelativeChunk(Vector2 bottomLeft, Vector2 topRight)
     {
-        var bottomLeftIndex = (Vector2i) (topLeft * SubGridTileSize).Rounded();
-        var topRightIndex = (Vector2i) (bottomRight * SubGridTileSize).Rounded();
+        var bottomLeftIndex = (Vector2i) (bottomLeft * SubGridTileSize).Rounded();
+        var topRightIndex = (Vector2i) (topRight * SubGridTileSize).Rounded();
         return GetAreaTileIndexes(bottomLeftIndex, topRightIndex);
     }
 
@@ -279,5 +279,21 @@ public abstract partial class SharedSubGridSystem
         }
 
         return arr;
+    }
+
+    /// <summary>
+    /// Gets corner indexes of o
+    /// </summary>
+    /// <param name="chunkIndices"></param>
+    /// <param name="gridIndices"></param>
+    /// <param name="tileSizeVector"></param>
+    /// <returns></returns>
+    public Box2i GetTileCornerIndexes(Vector2i chunkIndices, Vector2i gridIndices, Vector2 tileSizeVector)
+    {
+        var vec1 = GetRelativeChunkPosition(gridIndices, chunkIndices);
+        var vec2 = GetRelativeChunkPosition(gridIndices + tileSizeVector, chunkIndices);
+        var bottomLeftIndex = (Vector2i) (vec1 * SubGridTileSize).Rounded() - Vector2i.One;
+        var topRightIndex = (Vector2i) (vec2 * SubGridTileSize).Rounded() - Vector2i.One;
+        return new Box2i(bottomLeftIndex, topRightIndex);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Content.Shared.Atmospherics;
 using Content.Shared.Temperature;
 using Robust.Shared.GameStates;
+using Robust.Shared.Utility;
 
 namespace Content.Shared.Subgrid.Components;
 

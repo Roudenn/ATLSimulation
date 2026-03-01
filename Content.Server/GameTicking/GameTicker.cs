@@ -21,7 +21,7 @@ namespace Content.Server.GameTicking;
 public sealed class GameTicker : SharedGameTicker
 {
     [ViewVariables]
-    public string? CurrentSimulationMap = "Empty";
+    public string? CurrentSimulationMap = "LargeField";
 
     public static readonly EntProtoId ObserverEntity = "MobObserver";
 
@@ -40,6 +40,7 @@ public sealed class GameTicker : SharedGameTicker
 
     public void PostInitialize()
     {
+
         RestartSimulationMap();
     }
 
