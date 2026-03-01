@@ -5,7 +5,7 @@ using Robust.Shared.Serialization;
 namespace Content.Shared.Temperature;
 
 [DataDefinition, Serializable, NetSerializable]
-public partial struct TileTemperature : IRobustCloneable<TileTemperature>, ISubGridTile
+public partial struct TileHeat : IRobustCloneable<TileHeat>, ISubGridTile
 {
     /// <summary>
     /// The main container of this temperature tile.
@@ -19,36 +19,40 @@ public partial struct TileTemperature : IRobustCloneable<TileTemperature>, ISubG
     [DataField]
     public HeatContainer ArchivedContainer;
 
-    [DataField]
-    public bool Initialized { get; set; }
-
     [ViewVariables]
     public int CurrentTick { get; set; }
 
     [ViewVariables]
     public int LastTick { get; set; }
 
-    public TileTemperature(float heatCapacity, float temperature, float thermalConductance, bool initialized = false)
+    /// <summary>
+    /// This is basically a hack that allows to distinct default
+    /// uninitialized values in an array of structs from initialized tiles.
+    /// False for "empty" subtiles and true for subtiles that can be generally used.
+    /// </summary>
+    [ViewVariables]
+    public bool Initialized { get; set; } = true;
+
+    public TileHeat(float heatCapacity, float temperature, float thermalConductance)
     {
         Container = new HeatContainer(heatCapacity, temperature, thermalConductance);
         ArchivedContainer = new HeatContainer(heatCapacity, temperature, thermalConductance);
-        Initialized = initialized;
     }
 
-    public TileTemperature(HeatContainer container)
+    public TileHeat(HeatContainer container)
     {
         Container = container;
         ArchivedContainer = container;
     }
 
-    private TileTemperature(TileTemperature c)
+    private TileHeat(TileHeat c)
     {
         Container = c.Container;
         ArchivedContainer = c.ArchivedContainer;
     }
 
-    public TileTemperature Clone()
+    public TileHeat Clone()
     {
-        return new TileTemperature(this);
+        return new TileHeat(this);
     }
 }

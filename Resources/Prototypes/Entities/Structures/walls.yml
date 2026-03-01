@@ -45,4 +45,4 @@
   - type: Appearance
   - type: Material
     material: StainlessSteel
-  - type: TemperatureContainer
+  - type: HeatContainer

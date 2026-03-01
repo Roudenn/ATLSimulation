@@ -1,4 +1,5 @@
 ﻿using Content.Server.Atmospherics;
+using Content.Server.Statistics;
 using Content.Shared.Atmospherics;
 using Content.Shared.Atmospherics.Components;
 using Content.Shared.Materials;
@@ -19,7 +20,7 @@ public sealed partial class SubGridSystem : SharedSubGridSystem
 
     [Dependency] private readonly AtmosphericsSystem _atmos = default!;
 
-    private EntityQuery<TemperatureContainerComponent> _temperatureQuery;
+    private EntityQuery<HeatContainerComponent> _temperatureQuery;
     private EntityQuery<MaterialComponent> _materialQuery;
 
     public override void Initialize()
@@ -28,9 +29,40 @@ public sealed partial class SubGridSystem : SharedSubGridSystem
 
         InitializeChunks();
 
-
-        _temperatureQuery = GetEntityQuery<TemperatureContainerComponent>();
+        SubscribeLocalEvent<GetStatisticsEvent>(OnGetStats);
+        _temperatureQuery = GetEntityQuery<HeatContainerComponent>();
         _materialQuery = GetEntityQuery<MaterialComponent>();
+    }
+
+    private void OnGetStats(ref GetStatisticsEvent ev)
+    {
+        var chunkCount = 0;
+        var tileCount = 0;
+
+        var chunkQuery = EntityQueryEnumerator<SubGridChunkComponent>();
+        while (chunkQuery.MoveNext(out var chunkComp))
+        {
+            chunkCount++;
+            // TODO implement a better way to count active tiles
+            foreach (var atmosTile in chunkComp.AtmosphereMap)
+            {
+                if (!atmosTile.Initialized)
+                    continue;
+
+                tileCount++;
+            }
+
+            foreach (var temperatureTile in chunkComp.TemperatureMap)
+            {
+                if (!temperatureTile.Initialized)
+                    continue;
+
+                tileCount++;
+            }
+        }
+
+        ev.Stats.ChunkCount = chunkCount;
+        ev.Stats.TileCount = tileCount;
     }
 
     /*public override void Update(float frameTime)

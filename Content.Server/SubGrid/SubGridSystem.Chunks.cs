@@ -91,7 +91,7 @@ public sealed partial class SubGridSystem
 
     private void InitializeChunkAtmos(Entity<SubGridChunkComponent> ent, Entity<MapGridComponent> grid)
     {
-        var atmos = new TileAtmosphere[SubGridChunkArea];
+        var atmos = new TileAtmos[SubGridChunkArea];
         var chunkPos = ChunkIndicesToPosition(ent.Comp.ChunkIndices);
         var chunkArea = Box2.CenteredAround(chunkPos, ChunkSizeVector);
 
@@ -99,7 +99,7 @@ public sealed partial class SubGridSystem
 
         while (tiles.MoveNext(out var tile))
         {
-            InitializeAtmosAtTile(grid, tile.GridIndices, ref atmos, ent.Comp.ChunkIndices,true);
+            InitializeAtmosAtTile(grid, tile.GridIndices, ref atmos, ent.Comp.ChunkIndices, true);
         }
 
         ent.Comp.AtmosphereMap = atmos;
@@ -108,7 +108,7 @@ public sealed partial class SubGridSystem
     private void InitializeAtmosAtTile(
         Entity<MapGridComponent> grid,
         Vector2i gridIndices,
-        ref TileAtmosphere[] atmos,
+        ref TileAtmos[] atmos,
         Vector2i chunkIndices,
         bool gridMixture = false)
     {
@@ -118,7 +118,7 @@ public sealed partial class SubGridSystem
         var subTiles = GetAreaTileIndexesAtTile(chunkIndices, gridIndices, grid.Comp.TileSizeVector);
         foreach (var index in subTiles)
         {
-            atmos[index] = new TileAtmosphere(mixture, true);
+            atmos[index] = new TileAtmos(mixture);
         }
 
         // At last, the tile has to check if it is located near space, and add a boundary layer of atmosphere tiles.
@@ -135,7 +135,7 @@ public sealed partial class SubGridSystem
 
     private void InitializeChunkTemperature(Entity<SubGridChunkComponent> ent, Entity<MapGridComponent> grid)
     {
-        var temperatureMap = new TileTemperature[SubGridChunkArea];
+        var temperatureMap = new TileHeat[SubGridChunkArea];
         var chunkPos = ChunkIndicesToPosition(ent.Comp.ChunkIndices);
         var chunkArea = Box2.CenteredAround(chunkPos, ChunkSizeVector);
 
@@ -143,40 +143,47 @@ public sealed partial class SubGridSystem
 
         while (tiles.MoveNext(out var tile))
         {
-            // TODO This can be made better, probably by taking a similar method to grid fixtures
-
-            float? heatCapacity = null;
-            float? temperature = null;
-            float? conductance = null;
-
-            // Try to get the anchored wall entity on this tile
-            var ents = MapSystem.GetAnchoredEntitiesEnumerator(grid.Owner, grid.Comp, tile.GridIndices);
-            while (ents.MoveNext(out var anchored))
-            {
-                if (!_temperatureQuery.TryComp(anchored, out var tempContainer)
-                    || !_materialQuery.TryComp(anchored, out var materialComp))
-                    continue;
-
-                var material = _proto.Index(materialComp.Material);
-                temperature = tempContainer.StartingTemperature;
-                heatCapacity = material.SpecificHeatCapacity * SubGridTileVolume * material.Density;
-                conductance = material.ThermalConductivity * SubGridWorldSize;
-                break;
-            }
-
-            if (heatCapacity == null
-                || temperature == null
-                || conductance == null)
-                continue;
-
-            var subTiles = GetAreaTileIndexesAtTile(ent.Comp.ChunkIndices, tile.GridIndices, grid.Comp.TileSizeVector);
-            foreach (var index in subTiles)
-            {
-                temperatureMap[index] = new TileTemperature(heatCapacity.Value, temperature.Value, conductance.Value,true);
-            }
+            InitializeTemperatureAtTile(grid, tile.GridIndices, ref temperatureMap, ent.Comp.ChunkIndices);
         }
 
         ent.Comp.TemperatureMap = temperatureMap;
+    }
+
+    private void InitializeTemperatureAtTile(
+        Entity<MapGridComponent> grid,
+        Vector2i gridIndices,
+        ref TileHeat[] temperatures,
+        Vector2i chunkIndices)
+    {
+        float? heatCapacity = null;
+        float? temperature = null;
+        float? conductance = null;
+
+        // Try to get the anchored wall entity on this tile
+        var ents = MapSystem.GetAnchoredEntitiesEnumerator(grid.Owner, grid.Comp, gridIndices);
+        while (ents.MoveNext(out var anchored))
+        {
+            if (!_temperatureQuery.TryComp(anchored, out var tempContainer)
+                || !_materialQuery.TryComp(anchored, out var materialComp))
+                continue;
+
+            var material = _proto.Index(materialComp.Material);
+            temperature = tempContainer.StartingTemperature;
+            heatCapacity = material.SpecificHeatCapacity * SubGridTileVolume * material.Density;
+            conductance = material.ThermalConductivity * SubGridWorldSize;
+            break;
+        }
+
+        if (heatCapacity == null
+            || temperature == null
+            || conductance == null)
+            return;
+
+        var subTiles = GetAreaTileIndexesAtTile(chunkIndices, gridIndices, grid.Comp.TileSizeVector);
+        foreach (var index in subTiles)
+        {
+            temperatures[index] = new TileHeat(heatCapacity.Value, temperature.Value, conductance.Value);
+        }
     }
 
     private void OnChunkDeleted(Entity<SubGridChunkComponent> ent, ref EntityTerminatingEvent args)

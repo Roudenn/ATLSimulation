@@ -1,44 +1,32 @@
-﻿using Robust.Shared.Serialization;
+﻿using Content.Shared.Temperature.HeatContainers;
 
 namespace Content.Shared.Atmospherics;
 
 /// <summary>
 /// Contains information on a gas mix entry, turns into a tab in the UI
 /// </summary>
-[Serializable, NetSerializable]
-public struct GasMixEntry
+public struct GasMixEntry(
+    float volume,
+    float pressure,
+    HeatContainer heatContainer,
+    GasEntry[]? gases = null)
 {
-    /// <summary>
-    /// Name of the tab in the UI
-    /// </summary>
-    public readonly string Name;
-
-    public readonly float Volume;
-    public readonly float Pressure;
-    public readonly float Temperature;
-    public readonly GasEntry[]? Gases;
-
-    public GasMixEntry(string name, float volume, float pressure, float temperature, GasEntry[]? gases = null)
-    {
-        Name = name;
-        Volume = volume;
-        Pressure = pressure;
-        Temperature = temperature;
-        Gases = gases;
-    }
+    public readonly float Volume = volume;
+    public readonly float Pressure = pressure;
+    public readonly GasEntry[]? Gases = gases;
+    public readonly HeatContainer HeatContainer = heatContainer;
 }
 
 /// <summary>
 /// Individual gas entry data for populating the UI
 /// </summary>
-[Serializable, NetSerializable]
 public struct GasEntry
 {
-    public readonly string Name;
+    public readonly LocId Name;
     public readonly float Amount;
-    public readonly string Color;
+    public readonly Color Color;
 
-    public GasEntry(string name, float amount, string color)
+    public GasEntry(LocId name, float amount, Color color)
     {
         Name = name;
         Amount = amount;

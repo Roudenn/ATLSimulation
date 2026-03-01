@@ -38,7 +38,7 @@ public sealed partial class GasPrototype : IPrototype, IInheritingPrototype
     public Color Color = Color.White;
 
     /// <summary>
-    /// Sprite of this gas when it's placed inside <see cref="TileAtmosphere"/>.
+    /// Sprite of this gas when it's placed inside <see cref="TileAtmos"/>.
     /// </summary>
     [DataField]
     public SpriteSpecifier? TileSprite;

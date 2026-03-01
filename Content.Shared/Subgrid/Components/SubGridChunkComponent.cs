@@ -15,8 +15,8 @@ public sealed partial class SubGridChunkComponent : Component
     public Vector2i ChunkIndices;
 
     [DataField, AutoNetworkedField]
-    public TileTemperature[] TemperatureMap;
+    public TileHeat[] TemperatureMap;
 
     [DataField, AutoNetworkedField]
-    public TileAtmosphere[] AtmosphereMap;
+    public TileAtmos[] AtmosphereMap;
 }

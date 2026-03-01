@@ -1,4 +1,6 @@
 ﻿using Content.Shared.Atmospherics;
+using Content.Shared.Atmospherics.GasMixtures;
+using Content.Shared.Temperature.HeatContainers;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
 
@@ -32,3 +34,17 @@ public sealed class SubGridSetVolumeMessage(NetEntity targetGrid, Vector2i tileI
     public Vector2i TileIndices { get; } = tileIndices;
     public float Volume { get; } = volume;
 }
+
+[ByRefEvent]
+public record struct InspectSubGridAtmosphereTile(
+    GasMixture? GasMixture,
+    EntityUid Grid,
+    Vector2i ChunkIndices,
+    int Index);
+
+[ByRefEvent]
+public record struct InspectSubGridHeatTile(
+    HeatContainer? HeatContainer,
+    EntityUid Grid,
+    Vector2i ChunkIndices,
+    int Index);

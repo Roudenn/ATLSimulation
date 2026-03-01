@@ -21,7 +21,7 @@ public abstract partial class SharedAtmosphericsSystem
     [PublicAPI]
     public GasMixture GetSpaceMixture()
     {
-        return new GasMixture(_gasManager, _subGrid.SubGridTileVolume, PhysicalConstants.TCMB, true);
+        return new GasMixture(GasManager, _subGrid.SubGridTileVolume, PhysicalConstants.TCMB, true);
     }
 
     [PublicAPI]

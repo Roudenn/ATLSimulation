@@ -10,7 +10,6 @@ public abstract partial class SharedSubGridSystem : EntitySystem
     [Dependency] protected readonly IConfigurationManager CfgManager = default!;
     [Dependency] protected readonly SharedTransformSystem Xform = default!;
     [Dependency] protected readonly SharedMapSystem MapSystem = default!;
-
     [Dependency] private readonly SharedAtmosphericsSystem _atmospherics = default!;
 
     protected EntityQuery<MapGridComponent> MapGridQuery;
@@ -20,6 +19,7 @@ public abstract partial class SharedSubGridSystem : EntitySystem
     /// <inheritdoc/>
     public override void Initialize()
     {
+        base.Initialize();
         InitializeCVars();
         InitializeUI();
 

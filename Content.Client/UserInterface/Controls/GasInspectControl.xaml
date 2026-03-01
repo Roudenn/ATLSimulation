@@ -1,11 +1,26 @@
 <BoxContainer xmlns="https://spacestation14.io"
+              xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls"
+              xmlns:graphics="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
               MinSize="270 420"
               SetSize="360 420">
     <BoxContainer Orientation="Vertical" Margin="5 5 5 5">
-        <BoxContainer Name="CTopBox" Orientation="Horizontal"/>
-        <!-- Gas Mix Data, Populated by function -->
         <ScrollContainer VerticalExpand="True">
-            <BoxContainer Name="CEnvironmentMix" Orientation="Vertical" VerticalExpand="True" Margin="1 1 1 1" MinSize="315 150" Align="Center">
+            <BoxContainer Name="CEnvironmentMix"
+                Orientation="Vertical"
+                VerticalExpand="True"
+                Margin="1 1 1 1"
+                MinSize="315 150"
+                Align="Center">
+                <PanelContainer VerticalExpand = "True" HorizontalExpand="True" Margin="4">
+                    <PanelContainer.PanelOverride>
+                        <graphics:StyleBoxFlat BorderColor="#4f4f4f" BorderThickness="1" />
+                    </PanelContainer.PanelOverride>
+                    <controls:HeatInspectControl Name="HeatInspect"/>
+
+                    <!-- The rest is filled by the Populate function to the DataContainer -->
+                    <BoxContainer Name="DataContainer" Orientation="Vertical" VerticalExpand="True" Margin="4"/>
+
+                </PanelContainer>
             </BoxContainer>
         </ScrollContainer>
     </BoxContainer>

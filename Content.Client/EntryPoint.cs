@@ -6,6 +6,7 @@ using Content.Client.Parallax.Managers;
 using Content.Client.Screenshot;
 using Content.Client.Stylesheets;
 using Content.Client.Viewport;
+using Content.Shared.Localizations;
 using JetBrains.Annotations;
 using Robust.Client;
 using Robust.Client.Graphics;
@@ -35,11 +36,13 @@ public sealed class EntryPoint : GameClient
     [Dependency] private readonly FullscreenHook _fullscreenHook = default!;
     [Dependency] private readonly ViewportManager _viewportManager = default!;
     [Dependency] private readonly IStylesheetManager _stylesheetManager = default!;
+    [Dependency] private readonly ContentLocalizationManager _loc = default!;
 
     public override void PreInit()
     {
         ClientContentIoC.Register(Dependencies);
-        Dependencies.Resolve<IConfigurationManager>().OverrideDefault(CVars.XamlHotReloadMarkerName, "ATLSimulation.slnx"); // Meh.
+        // TODO This is bad but I need that hot reloading
+        Dependencies.Resolve<IConfigurationManager>().OverrideDefault(CVars.XamlHotReloadMarkerName, "ATLSimulation.slnx");
     }
 
     public override void Init()
@@ -47,6 +50,7 @@ public sealed class EntryPoint : GameClient
         Dependencies.BuildGraph();
         Dependencies.InjectDependencies(this);
 
+        _loc.Initialize();
         _componentFactory.DoAutoRegistrations();
         _componentFactory.IgnoreMissingComponents();
 

@@ -1,21 +1,19 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
-using Content.Shared.Atmospherics;
 using Content.Shared.Constants;
 using Content.Shared.Subgrid.Components;
-using Content.Shared.Temperature;
 using Robust.Shared.Map;
-using Robust.Shared.Utility;
+using Robust.Shared.Map.Components;
 
 namespace Content.Shared.Subgrid.Systems;
 
 public abstract partial class SharedSubGridSystem
 {
     /// <summary>
-    /// Converts normal position into chunk indices.
+    /// Converts Grid position into chunk indices.
     /// </summary>
-    /// <param name="coordinates"></param>
-    /// <returns></returns>
+    /// <param name="coordinates">Grid position that we are trying to find the chunk indices for.</param>
+    /// <returns>Nearest chunk indices to the given coordinates.</returns>
     public static Vector2i GetChunkIndices(Vector2 coordinates)
     {
         // Negative coordinates should have offset by 1 because of how coordinates work.
@@ -27,41 +25,60 @@ public abstract partial class SharedSubGridSystem
     /// <summary>
     /// Rounds normal position to the nearest chunk position.
     /// </summary>
-    /// <returns></returns>
+    /// <param name="coordinates">Grid position that we are trying to find the chunk position for.</param>
+    /// <returns>Nearest chunk position to the given coordinates.</returns>
     public static Vector2 GetChunkPosition(Vector2 coordinates)
         => GetChunkIndices(coordinates) * SystemConstants.PvsChunkSize;
 
     public static Vector2 ChunkIndicesToPosition(Vector2i indices)
         => indices * SystemConstants.PvsChunkSize;
 
+    /// <summary>
+    /// A vector that has a length and width equal to the subgrid chunk size.
+    /// </summary>
     public static readonly Vector2 ChunkSizeVector = new(SystemConstants.PvsChunkSize, SystemConstants.PvsChunkSize);
 
+    /// <summary>
+    /// Half of the <see cref="ChunkSizeVector"/>.
+    /// </summary>
     public static readonly Vector2 HalfChunkSizeVector = new(4f, 4f);
 
-    /// <summary>
-    /// Converts an (x,y) vector into an index inside a chunk.
-    /// </summary>
-    /// <param name="relativePos"></param>
-    /// <returns></returns>
+    /// <inheritdoc cref="VectorToIndex(int, int)"/>
     public int VectorToIndex(Vector2i relativePos)
     {
         return VectorToIndex(relativePos.X, relativePos.Y);
     }
 
+    /// <summary>
+    /// Converts an (x,y) vector into an index inside a chunk.
+    /// </summary>
+    /// <returns>
+    /// An index in a 1D array of the chunk that represents a tile at a given (x, y) local position.
+    /// </returns>
     public int VectorToIndex(int x, int y)
     {
-        DebugTools.Assert(x <= SubGridTileSize);
-        DebugTools.Assert(y <= SubGridTileSize);
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(x, SubGridChunkSize);
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(y, SubGridChunkSize);
         return x + (y << (SubGridDivisions + 3));
     }
 
+    /// <summary>
+    /// Converts an index into a (x,y) local position inside a chunk.
+    /// </summary>
+    /// <param name="index">An index of an element of a 1D array of a subgrid chunk.</param>
+    /// <returns>An (x,y) vector local position of that tile inside a chunk.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// If index is greater than or equal to the total amount of subgrid tiles in a single chunk (the index is out-of-bounds)
+    /// </exception>
     public Vector2i IndexToVector(int index)
     {
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(index, SubGridChunkArea);
         var x = index & (SubGridChunkSize - 1);
         var y = index >> (SubGridDivisions + 3);
         return new Vector2i(x, y);
     }
 
+    /// <inheritdoc cref='TryGetChunk(Entity{SubGridComponent?}, Vector2, out Entity{SubGridChunkComponent}?)'/>
     public bool TryGetChunk(
         Entity<SubGridComponent?> grid,
         TileRef tile,
@@ -70,6 +87,7 @@ public abstract partial class SharedSubGridSystem
         return TryGetChunk(grid, tile.GridIndices, out chunk);
     }
 
+    /// <inheritdoc cref='TryGetChunk(Entity{SubGridComponent?}, Vector2, out Entity{SubGridChunkComponent}?)'/>
     public bool TryGetChunk(
         Entity<SubGridComponent?> grid,
         EntityCoordinates coords,
@@ -78,94 +96,39 @@ public abstract partial class SharedSubGridSystem
         return TryGetChunk(grid, coords.Position, out chunk);
     }
 
+    /// <summary>
+    /// A helper method that tries to get a subgrid chunk at a given grid at specific coordinates.
+    /// </summary>
+    /// <param name="grid">A grid to find the subgrid chunk on.</param>
+    /// <param name="position">Grid position to try to find the nearest chunk for.</param>
+    /// <param name="chunk">The found subgrid chunk that is nearest to the given position.</param>
+    /// <returns>True if the chunk was found.</returns>
     public bool TryGetChunk(
         Entity<SubGridComponent?> grid,
         Vector2 position,
         [NotNullWhen(true)] out Entity<SubGridChunkComponent>? chunk)
     {
         chunk = null;
-        if (!SubGridQuery.Resolve(grid.Owner, ref grid.Comp))
-            return false;
-
-        var ent = grid.Comp.ChunkEntities[GetChunkIndices(position)];
-        if (!ChunkQuery.TryComp(ent, out var subGridChunk))
+        if (!SubGridQuery.Resolve(grid.Owner, ref grid.Comp)
+            || !grid.Comp.ChunkEntities.TryGetValue(GetChunkIndices(position), out var ent)
+            || !ChunkQuery.TryComp(ent, out var subGridChunk))
             return false;
 
         chunk = (ent, subGridChunk);
         return true;
     }
 
-    public void ResolveAtmosphereChunkMap(Entity<SubGridComponent> grid, ref Dictionary<Vector2i, TileAtmosphere[]> map)
-    {
-        foreach (var (chunkPos, chunk) in grid.Comp.ChunkEntities)
-        {
-            var chunkComp = ChunkQuery.Comp(chunk);
-            map.Add(chunkPos, chunkComp.AtmosphereMap);
-        }
-    }
-
-    public void ResolveTemperatureChunkMap(Entity<SubGridComponent> grid, ref Dictionary<Vector2i, TileTemperature[]> map)
-    {
-        foreach (var (chunkPos, chunk) in grid.Comp.ChunkEntities)
-        {
-            var chunkComp = ChunkQuery.Comp(chunk);
-            map.Add(chunkPos, chunkComp.TemperatureMap);
-        }
-    }
-
-    public bool TryGetAtmosphereTileRelative(
-        Dictionary<Vector2i, TileAtmosphere[]> chunks,
-        Vector2i chunkPos,
-        int index,
-        Vector2i dir,
-        [NotNullWhen(true)] out TileAtmosphere? found)
-    {
-        found = null;
-
-        var (targetChunk, targetLocalIndex) = GetTileRelative(chunkPos, index, dir);
-
-        if (!chunks.TryGetValue(targetChunk, out var chunk))
-            return false;
-
-        found = chunk[targetLocalIndex];
-        return true;
-    }
-
-    public bool TryGetTemperatureTileRelative(
-        Dictionary<Vector2i, TileTemperature[]> chunks,
-        Vector2i chunkPos,
-        int index,
-        Vector2i dir,
-        [NotNullWhen(true)] out TileTemperature? found)
-    {
-        found = null;
-
-        var (targetChunk, targetLocalIndex) = GetTileRelative(chunkPos, index, dir);
-
-        if (!chunks.TryGetValue(targetChunk, out var chunk))
-            return false;
-
-        found = chunk[targetLocalIndex];
-        return true;
-    }
-
     /// <summary>
     /// Finds relative position of a chunk and an index inside that chunk
     /// relative to some another index inside the given chunk.
-    ///
-    /// Basically a helper method to be able to move inside 1D array in 2 dimensions.
+    /// A helper method that allows to move inside 1D array as if it was a 2D array.
     /// </summary>
-    /// <param name="chunkPos">Relative chunk position.</param>
-    /// <param name="index">Index of a tile inside the chunk at <see cref="chunkPos"/>.</param>
-    /// <param name="dir">The relative position of a target tile from <see cref="chunkPos"/> and <see cref="index"/>.</param>
+    /// <param name="chunkIndices">Relative chunk position.</param>
+    /// <param name="index">Index of a tile inside the chunk at <see cref="chunkIndices"/>.</param>
+    /// <param name="dir">The relative position of a target tile from <see cref="chunkIndices"/> and <see cref="index"/>.</param>
     /// <returns></returns>
-    public (Vector2i, int) GetTileRelative(Vector2i chunkPos, int index, Vector2i dir)
+    public (Vector2i, int) GetTileRelative(Vector2i chunkIndices, int index, Vector2i dir)
     {
-        // Each subgrid chunk takes up at least 8x8 tiles.
-        // Then, each tile can be divided further by at maximum 5 times,
-        // making each tile contain 32x32 subtiles,
-        // and each chunk will contain 256x256 subtiles in total.
-
         var x = index & (SubGridChunkSize - 1); // same as (index % ChunkSize)
         var y = index >> (SubGridDivisions + 3); // 3 because of the minimal chunk size being 8
 
@@ -174,8 +137,8 @@ public abstract partial class SharedSubGridSystem
         var ty = y + dir.Y;
 
         // Get the target chunk that should contain the new index
-        var targetChunkX = chunkPos.X + (tx >> (SubGridDivisions + 3));
-        var targetChunkY = chunkPos.Y + (ty >> (SubGridDivisions + 3));
+        var targetChunkX = chunkIndices.X + (tx >> (SubGridDivisions + 3));
+        var targetChunkY = chunkIndices.Y + (ty >> (SubGridDivisions + 3));
 
         // Calculate the new local index:
         // 1) Wrap the coordinate by using &
@@ -187,10 +150,10 @@ public abstract partial class SharedSubGridSystem
     }
 
     /// <summary>
-    /// Converts local tile index into the MapGrid position.
+    /// Converts local tile index into the grid position.
     /// </summary>
-    /// <param name="chunkIndices"></param>
-    /// <param name="index"></param>
+    /// <param name="chunkIndices">Chunk indices of a chunk that an index is stored in.</param>
+    /// <param name="index">Index of a tile that we are trying to get a position for.</param>
     /// <returns></returns>
     public Vector2 GetPositionFromIndex(Vector2i chunkIndices, int index)
     {
@@ -226,9 +189,9 @@ public abstract partial class SharedSubGridSystem
     }
 
     /// <summary>
-    /// Gets index of a tile on a specified MapGrid position.
+    /// Gets an index of a tile on a specified grid position.
     /// </summary>
-    /// <param name="position">MapGrid position of a target tile.</param>
+    /// <param name="position">Grid position of a target tile.</param>
     /// <returns>Index of the closest subgrid tile to the target position.</returns>
     public int GetTileAtPosition(Vector2 position)
     {
@@ -251,7 +214,6 @@ public abstract partial class SharedSubGridSystem
         return relative + HalfChunkSizeVector;
     }
 
-
     public int GetTileAtRelativePosition(Vector2 relativePos)
     {
         // Scale the position according to the chunk size and round it
@@ -260,32 +222,52 @@ public abstract partial class SharedSubGridSystem
     }
 
     /// <summary>
-    ///
+    /// Gets all tile indexes at specified grid indices.
     /// </summary>
-    /// <returns></returns>
+    /// <param name="chunkIndices">Chunk indices to find the indexes in.</param>
+    /// <param name="gridIndices">Grid indices of a target tile.</param>
+    /// <param name="tileSizeVector">Tile size vector, usually obtained from the <see cref="MapGridComponent"/>.</param>
+    /// <returns>An array that contains the found indexes, stored left to right, top to bottom.</returns>
     public int[] GetAreaTileIndexesAtTile(Vector2i chunkIndices, Vector2i gridIndices, Vector2 tileSizeVector)
     {
         var vec1 = GetRelativeChunkPosition(gridIndices, chunkIndices);
         var vec2 = GetRelativeChunkPosition(gridIndices + tileSizeVector, chunkIndices);
-        return GetAreaTileIndexesLocalRelative(vec1, vec2);
+        return GetAreaTileIndexesWorld(vec1, vec2);
     }
 
     /// <summary>
-    ///
+    /// Gets all tile indexes between two grid positions.
     /// </summary>
     /// <remarks>
-    /// This method assumes that the box is located strictly inside the chunk.
+    /// This method assumes that both positions are located strictly inside the same chunk.
     /// </remarks>
-    /// <returns>An array of indexes in that box area.</returns>
-    public int[] GetAreaTileIndexesLocalRelative(Vector2 topLeft, Vector2 bottomRight)
+    /// <param name="topLeft">Bottom left coordinates.</param>
+    /// <param name="bottomRight">Top right coordinates.</param>
+    /// <returns>An array that contains the found indexes, stored left to right, top to bottom.</returns>
+    // TODO make a version of this method that supports coordinates in multiple chunks at once
+    public int[] GetAreaTileIndexesWorld(Vector2 topLeft, Vector2 bottomRight)
     {
-        var topLeftRelative = (Vector2i) (topLeft * SubGridTileSize).Rounded();
-        var bottomRightRelative = (Vector2i) (bottomRight * SubGridTileSize).Rounded();
-        var width = Math.Abs(topLeftRelative.X - bottomRightRelative.X);
-        var height = Math.Abs(bottomRightRelative.Y - topLeftRelative.Y);
+        var bottomLeftIndex = (Vector2i) (topLeft * SubGridTileSize).Rounded();
+        var topRightIndex = (Vector2i) (bottomRight * SubGridTileSize).Rounded();
+        return GetAreaTileIndexes(bottomLeftIndex, topRightIndex);
+    }
+
+    /// <summary>
+    /// Gets all tile indexes between two points inside the chunk 1D array.
+    /// </summary>
+    /// <remarks>
+    /// This method assumes that both points are located strictly inside the same chunk.
+    /// </remarks>
+    /// <param name="bottomLeftIndex">Bottom left point.</param>
+    /// <param name="topRightIndex">Top right point.</param>
+    /// <returns>An array that contains the found indexes, stored left to right, top to bottom.</returns>
+    public int[] GetAreaTileIndexes(Vector2i bottomLeftIndex, Vector2i topRightIndex)
+    {
+        var width = Math.Abs(bottomLeftIndex.X - topRightIndex.X);
+        var height = Math.Abs(topRightIndex.Y - bottomLeftIndex.Y);
 
         var arr = new int[width * height];
-        var corner = VectorToIndex(topLeftRelative);
+        var corner = VectorToIndex(bottomLeftIndex);
         var count = 0; // probably could be better than another counter but idc
         for (int i = 0; i < height; i++)
         {

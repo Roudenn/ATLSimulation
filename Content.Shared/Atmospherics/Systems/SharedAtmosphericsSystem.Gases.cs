@@ -33,17 +33,17 @@ public abstract partial class SharedAtmosphericsSystem
 
     private void InitializeGases()
     {
-        Array.Resize(ref GasBuffer, _gasManager.ArraySize);
-        Array.Resize(ref GasBuffer2, _gasManager.ArraySize);
-        Array.Resize(ref GasSpecificHeats, _gasManager.ArraySize);
-        Array.Resize(ref GasMolarMasses, _gasManager.ArraySize);
-        Array.Resize(ref GasViscosities, _gasManager.ArraySize);
-        Array.Resize(ref GasThermalConductivities, _gasManager.ArraySize);
-        Array.Resize(ref GasMolarMassesSquareRoots, _gasManager.ArraySize);
-        Array.Resize(ref GasPrandtlNumbersCubicRoots, _gasManager.ArraySize);
-        for (var i = 0; i < _gasManager.Count; i++)
+        Array.Resize(ref GasBuffer, GasManager.ArraySize);
+        Array.Resize(ref GasBuffer2, GasManager.ArraySize);
+        Array.Resize(ref GasSpecificHeats, GasManager.ArraySize);
+        Array.Resize(ref GasMolarMasses, GasManager.ArraySize);
+        Array.Resize(ref GasViscosities, GasManager.ArraySize);
+        Array.Resize(ref GasThermalConductivities, GasManager.ArraySize);
+        Array.Resize(ref GasMolarMassesSquareRoots, GasManager.ArraySize);
+        Array.Resize(ref GasPrandtlNumbersCubicRoots, GasManager.ArraySize);
+        for (var i = 0; i < GasManager.Count; i++)
         {
-            var gas = _gasManager[i];
+            var gas = GasManager[i];
 
             // Resolved prototype values
             GasSpecificHeats[i] = gas.SpecificMolarHeat;

@@ -1,6 +1,7 @@
 using Content.Server.GameTicking;
 using Content.Server.IoC;
 using Content.Shared.GameCVars;
+using Content.Shared.Localizations;
 using JetBrains.Annotations;
 using Robust.Shared.Configuration;
 using Robust.Shared.ContentPack;
@@ -20,6 +21,7 @@ public sealed class EntryPoint : GameServer
     [Dependency] private readonly ILogManager _log = default!;
     [Dependency] private readonly IResourceManager _res = default!;
     [Dependency] private readonly IEntitySystemManager _entSys = default!;
+    [Dependency] private readonly ContentLocalizationManager _loc = default!;
 
     public override void PreInit()
     {
@@ -31,6 +33,8 @@ public sealed class EntryPoint : GameServer
         base.Init();
         Dependencies.BuildGraph();
         Dependencies.InjectDependencies(this);
+
+        _loc.Initialize();
 
         LoadConfigPresets(_cfg, _res, _log.GetSawmill("configpreset"));
 
@@ -47,8 +51,6 @@ public sealed class EntryPoint : GameServer
         }
 
         _componentFactory.GenerateNetIds();
-
-        // DEVNOTE: This is generally where you'll be setting up the IoCManager further.
     }
 
     public override void PostInit()

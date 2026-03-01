@@ -10,7 +10,7 @@ public abstract partial class SharedAtmosphericsSystem : EntitySystem
     // TODO port stuff needed from the server system to here
     [Dependency] private readonly IPrototypeManager _protoMan = default!;
     [Dependency] private readonly IConfigurationManager _config = default!;
-    [Dependency] private readonly GasPrototypeManager _gasManager = default!;
+    [Dependency] protected readonly GasPrototypeManager GasManager = default!;
     [Dependency] private readonly SharedSubGridSystem _subGrid = default!;
 
     private EntityQuery<GridAtmosphereComponent> _atmosGridQuery;

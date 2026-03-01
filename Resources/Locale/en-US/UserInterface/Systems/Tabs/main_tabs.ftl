@@ -6,10 +6,13 @@ ui-viewport-header-atmosphere = Atmosphere
 ui-viewport-header-temperature = Temperature
 ui-viewport-header-debug = Debug
 ui-viewport-header-simulation-maps = Maps
+ui-viewport-header-inspect-tools = Inspect info
 
 # Statistics tab
-ui-viewport-tabs-statistics-simulation-time = Simulation time
-ui-viewport-tabs-statistics-server-tickrate = Server tickrate
+ui-viewport-tabs-statistics-simulation-time = Simulation time: { $value }
+ui-viewport-tabs-statistics-current-map = Current map: { $value }
+ui-viewport-tabs-statistics-chunk-count = Chunk count: { $value }
+ui-viewport-tabs-statistics-tile-count = Tile count: { $value }
 
 # Visuals tab
 ui-viewport-tabs-visuals-atmosphere-visibility = Gas visibility

@@ -1,9 +1,6 @@
-using System.Globalization;
 using Content.Shared.Atmospherics;
 using Content.Shared.Maps;
 using JetBrains.Annotations;
-using Robust.Shared;
-using Robust.Shared.Configuration;
 using Robust.Shared.ContentPack;
 using Robust.Shared.Map;
 using Robust.Shared.Prototypes;
@@ -16,22 +13,10 @@ public sealed class EntryPoint : GameShared
 {
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly ITileDefinitionManager _tileDefinitionManager = default!;
-    [Dependency] private readonly ILocalizationManager _localeManager = default!;
-    //[Dependency] private readonly IConfigurationManager _configManager = default!;
-
-    // IoC services shared between the client and the server go here...
-
-    // See line 24. Controls the default game culture and language.
-    // Robust calls this culture, but you might find it more fitting to call it the game
-    // language. Robust doesn't support changing this mid-game. Load your config file early
-    // if you want that.
-    private const string Culture = "en-US";
 
     public override void PreInit()
     {
         Dependencies.InjectDependencies(this);
-
-        _localeManager.LoadCulture(new CultureInfo(Culture));
     }
 
     public override void PostInit()

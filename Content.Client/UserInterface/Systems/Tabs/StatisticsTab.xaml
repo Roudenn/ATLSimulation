@@ -4,17 +4,15 @@
     <BoxContainer Orientation="Vertical">
         <ScrollContainer VerticalExpand="True">
             <BoxContainer Orientation="Vertical" Margin="8 8 8 8">
+                <!-- Main info -->
                 <Label Text="{Loc 'ui-viewport-header-statistics'}" StyleClasses="LabelHeading"/>
-                <!-- TODO show some stats here -->
+                <BoxContainer Name="MainInfoContainer" Orientation="Vertical" Access="Public"/>
+                <controls:StripeBack/>
 
-                <!-- Atmosphere -->
-                <Label Text="{Loc 'ui-viewport-header-atmosphere'}" StyleClasses="LabelKeyText"/>
-
-
-                <controls:GasInspectControl Visible="False"/>
-
-                <!-- Temperature -->
-                <Label Text="{Loc 'ui-viewport-header-temperature'}" StyleClasses="LabelKeyText"/>
+                <!-- Inspect tools -->
+                <Label Text="{Loc 'ui-viewport-header-inspect-tools'}" StyleClasses="LabelHeading"/>
+                <controls:GasInspectControl Name="GasInspector" Visible="False" Access="Public"/>
+                <controls:HeatInspectControl Name="HeatInspector" Visible="False" Access="Public"/>
             </BoxContainer>
         </ScrollContainer>
     </BoxContainer>

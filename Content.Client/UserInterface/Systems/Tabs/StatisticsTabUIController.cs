@@ -1,8 +1,8 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using Content.Client.Overlays;
+﻿using Content.Client.Atmospherics;
 using Content.Client.UserInterface.Systems.Tabs.Widgets;
+using Content.Shared.Statistics;
+using Content.Shared.Subgrid;
 using JetBrains.Annotations;
-using Robust.Client.Player;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controllers;
 using Robust.Client.UserInterface.Controls;
@@ -12,15 +12,17 @@ namespace Content.Client.UserInterface.Systems.Tabs;
 [UsedImplicitly]
 public sealed class StatisticsTabUIController : UIController
 {
-    [Dependency] private readonly IPlayerManager _playerMan = default!;
-    [Dependency] private readonly IEntityManager _entMan = default!;
-    [UISystemDependency] private readonly DebugOverlaySystem _debugOverlay = default!;
+    [Dependency] private readonly ILocalizationManager _locale = default!;
+    [UISystemDependency] private readonly AtmosphericsSystem _atmos = default!;
 
     private StatisticsTab? StatisticsTab => UIManager.GetActiveUIWidgetOrNull<GameTabContainer>()?.Statistics;
 
     public override void Initialize()
     {
         base.Initialize();
+        SubscribeNetworkEvent<StatisticsMessage>(OnGetStats);
+        SubscribeLocalEvent<InspectSubGridAtmosphereTile>(OnInspectAtmos);
+        SubscribeLocalEvent<InspectSubGridHeatTile>(OnInspectTemperature);
     }
 
     public void LoadButton()
@@ -28,7 +30,7 @@ public sealed class StatisticsTabUIController : UIController
         if (StatisticsTab == null)
             return;
 
-        //StatisticsTab.DebugSubGridChunksCheckBox.OnPressed += DebugSubGridChunksOnPressed;
+        PopulateStats(null);
     }
 
     public void UnloadButton()
@@ -40,24 +42,57 @@ public sealed class StatisticsTabUIController : UIController
         //StatisticsTab.DebugSubGridChunksCheckBox.OnPressed -= DebugSubGridChunksOnPressed;
     }
 
-    private void DebugSubGridChunksOnPressed(BaseButton.ButtonEventArgs args)
+    private void OnGetStats(StatisticsMessage msg, EntitySessionEventArgs ev)
     {
-        if (!TryGetViewerEnt(out var ent))
-            return;
-
-        ent.Value.Comp.SubGridChunkOverlay = args.Button.Pressed;
-        _debugOverlay.UpdateOverlays(ent.Value.AsNullable());
+        PopulateStats(msg);
     }
 
-    private bool TryGetViewerEnt([NotNullWhen(true)] out Entity<DebugOverlayViewerComponent>? ent)
+    private void PopulateStats(StatisticsMessage? msg)
     {
-        ent = null;
-        var uid = _playerMan.LocalEntity;
+        // I HATE UI CODE I HATE UI CODE I HATE UI CODE I HATE UI CODE I HATE UI CODE I HATE UI CODE I HATE UI CODE I HATE UI CODE I HATE UI CODE I HATE UI CODE I HATE UI CODE I HATE UI CODE I HATE UI CODE I HATE UI CODE I HATE UI CODE I HATE UI CODE I HATE UI CODE I HATE UI CODE I HATE UI CODE I HATE UI CODE I HATE UI CODE I HATE UI CODE I HATE UI CODE I HATE UI CODE I HATE UI CODE
+        var mapLabel = new RichTextLabel
+        {
+            Text = _locale.GetString("ui-viewport-tabs-statistics-current-map",
+                ("value", msg?.Stats.CurrentMap ?? "Unknown"))
+        };
+        StatisticsTab?.MainInfoContainer.AddChild(mapLabel);
 
-        if (!_entMan.TryGetComponent<DebugOverlayViewerComponent>(uid, out var debugOverlay))
-            return false;
+        var chunkLabel = new RichTextLabel
+        {
+            Text = _locale.GetString("ui-viewport-tabs-statistics-chunk-count",
+                ("value", msg?.Stats.ChunkCount.ToString() ?? "Unknown"))
+        };
+        StatisticsTab?.MainInfoContainer.AddChild(chunkLabel);
 
-        ent = (uid.Value, debugOverlay);
-        return true;
+        var tileLabel = new RichTextLabel
+        {
+            Text = _locale.GetString("ui-viewport-tabs-statistics-tile-count",
+                ("value", msg?.Stats.TileCount.ToString() ?? "Unknown"))
+        };
+        StatisticsTab?.MainInfoContainer.AddChild(tileLabel);
+    }
+
+    private void OnInspectAtmos(ref InspectSubGridAtmosphereTile args)
+    {
+        var argsGasMixture = args.GasMixture;
+        if (argsGasMixture == null
+            || StatisticsTab == null)
+            return;
+
+        var entry = _atmos.GenerateGaxMixEntry(argsGasMixture.Value);
+        StatisticsTab.GasInspector.Populate(entry);
+        StatisticsTab.GasInspector.Visible = true;
+        StatisticsTab.HeatInspector.Visible = false;
+    }
+
+    private void OnInspectTemperature(ref InspectSubGridHeatTile args)
+    {
+        if (args.HeatContainer == null
+            || StatisticsTab == null)
+            return;
+
+        StatisticsTab.HeatInspector.Populate(args.HeatContainer.Value);
+        StatisticsTab.HeatInspector.Visible = true;
+        StatisticsTab.GasInspector.Visible = false;
     }
 }

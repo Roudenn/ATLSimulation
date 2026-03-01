@@ -5,7 +5,7 @@ using Robust.Shared.Serialization;
 namespace Content.Shared.Atmospherics;
 
 [DataDefinition, Serializable, NetSerializable]
-public partial struct TileAtmosphere : IRobustCloneable<TileAtmosphere>, ISubGridTile
+public partial struct TileAtmos : IRobustCloneable<TileAtmos>, ISubGridTile
 {
     /// <summary>
     /// The gas mixture that is contained on this subtile.
@@ -31,8 +31,8 @@ public partial struct TileAtmosphere : IRobustCloneable<TileAtmosphere>, ISubGri
     [DataField]
     public bool MapAtmosphere;
 
-    [DataField]
-    public bool Initialized { get; set; }
+    [ViewVariables]
+    public bool Initialized { get; set; } = true;
 
     [ViewVariables]
     public int CurrentTick { get; set; }
@@ -40,23 +40,22 @@ public partial struct TileAtmosphere : IRobustCloneable<TileAtmosphere>, ISubGri
     [ViewVariables]
     public int LastTick { get; set; }
 
-    public TileAtmosphere(GasMixture mixture, bool initialized = false)
+    public TileAtmos(GasMixture mixture)
     {
         Mixture = mixture;
         ArchivedMixture = mixture;
         MapAtmosphere = mixture.Immutable;
-        Initialized = initialized;
     }
 
-    private TileAtmosphere(TileAtmosphere c)
+    private TileAtmos(TileAtmos c)
     {
         Mixture = c.Mixture;
         ArchivedMixture = c.ArchivedMixture;
         MapAtmosphere = c.MapAtmosphere;
     }
 
-    public TileAtmosphere Clone()
+    public TileAtmos Clone()
     {
-        return new TileAtmosphere(this);
+        return new TileAtmos(this);
     }
 }

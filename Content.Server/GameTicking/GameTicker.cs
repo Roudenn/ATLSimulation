@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Numerics;
+using Content.Server.Statistics;
 using Content.Shared.GameTicking;
 using Content.Shared.Maps;
 using Robust.Server.Player;
@@ -34,11 +35,17 @@ public sealed class GameTicker : SharedGameTicker
     {
         base.Initialize();
         _playerManager.PlayerStatusChanged += PlayerStatusChanged;
+        SubscribeLocalEvent<GetStatisticsEvent>(OnGetStats);
     }
 
     public void PostInitialize()
     {
         RestartSimulationMap();
+    }
+
+    private void OnGetStats(ref GetStatisticsEvent ev)
+    {
+        ev.Stats.CurrentMap = CurrentSimulationMap ?? "Empty";
     }
 
     public void PlayerJoinGame(ICommonSession session)
