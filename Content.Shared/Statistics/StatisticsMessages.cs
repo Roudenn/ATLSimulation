@@ -42,4 +42,14 @@ public struct SimulationStats(
     {
         return HashCode.Combine(CurrentMap, TileCount, ChunkCount);
     }
+
+    public static bool operator ==(SimulationStats left, SimulationStats right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(SimulationStats left, SimulationStats right)
+    {
+        return !(left == right);
+    }
 }

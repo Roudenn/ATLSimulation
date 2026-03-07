@@ -34,7 +34,7 @@ public sealed partial class GasPrototype : IPrototype, IInheritingPrototype
     /// <summary>
     /// Color of this gas that is used in UIs.
     /// </summary>
-    [DataField]
+    [DataField(required: true)]
     public Color Color = Color.White;
 
     /// <summary>
@@ -43,7 +43,7 @@ public sealed partial class GasPrototype : IPrototype, IInheritingPrototype
     [DataField]
     public SpriteSpecifier? TileSprite;
 
-    // for now a byte because an array is used to store gases and anything more than 255 will allocate gazzilion memory
+    // for now a byte because an array is used to store gases in mixtures
     [ViewVariables]
     public byte GasId { get; private set; }
 

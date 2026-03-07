@@ -4,6 +4,7 @@
   specificMolarHeat: 20.8
   thermalConductivity: 0.153
   viscosity: 19.85
+  color: "#f1abab"
 
 - type: gas
   id: Neon
@@ -11,6 +12,7 @@
   specificMolarHeat: 20.8
   thermalConductivity: 0.049
   viscosity: 31.8
+  color: "#cc9c00"
 
 - type: gas
   id: Hydrogen
@@ -18,6 +20,7 @@
   specificMolarHeat: 28.8
   thermalConductivity: 0.18
   viscosity: 8.9
+  color: "#bebebe"
 
 - type: gas
   id: Argon
@@ -25,6 +28,7 @@
   specificMolarHeat: 20.8
   thermalConductivity: 0.018
   viscosity: 22.5
+  color: "#75db8f"
 
 - type: gas
   id: Krypton
@@ -32,6 +36,7 @@
   specificMolarHeat: 20.8
   thermalConductivity: 0.0095
   viscosity: 24
+  color: "#62a3df"
 
 - type: gas
   id: Xenon
@@ -39,6 +44,7 @@
   specificMolarHeat: 20.8
   thermalConductivity: 0.0055
   viscosity: 23
+  color: "#894cc2"
 
 - type: gas
   id: Radon
@@ -46,3 +52,4 @@
   specificMolarHeat: 20.8
   thermalConductivity: 0.0036
   viscosity: 23
+  color: "#007413"

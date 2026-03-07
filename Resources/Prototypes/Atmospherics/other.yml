@@ -4,6 +4,7 @@
   specificMolarHeat: 80.1
   thermalConductivity: 0.025
   viscosity: 9.8
+  color: "#a70fbb"
 
 - type: gas
   id: Methane
@@ -11,3 +12,4 @@
   specificMolarHeat: 35.7
   thermalConductivity: 0.034
   viscosity: 11.13
+  color: "#885304"

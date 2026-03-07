@@ -33,10 +33,10 @@ public partial struct TileHeat : IRobustCloneable<TileHeat>, ISubGridTile
     [ViewVariables]
     public bool Initialized { get; set; } = true;
 
-    public TileHeat(float heatCapacity, float temperature, float thermalConductance)
+    public TileHeat(float heatCapacity, float temperature, float thermalConductance, bool immutable = false)
     {
-        Container = new HeatContainer(heatCapacity, temperature, thermalConductance);
-        ArchivedContainer = new HeatContainer(heatCapacity, temperature, thermalConductance);
+        Container = new HeatContainer(heatCapacity, temperature, thermalConductance, immutable);
+        ArchivedContainer = new HeatContainer(heatCapacity, temperature, thermalConductance, immutable);
     }
 
     public TileHeat(HeatContainer container)

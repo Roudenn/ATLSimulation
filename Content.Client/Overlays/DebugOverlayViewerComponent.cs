@@ -11,4 +11,10 @@ public sealed partial class DebugOverlayViewerComponent : Component
 
     [DataField]
     public bool SubGridTilesOverlay;
+
+    [DataField]
+    public bool HeatMapOverlay;
+
+    [DataField]
+    public bool AtmosCompositionOverlay;
 }

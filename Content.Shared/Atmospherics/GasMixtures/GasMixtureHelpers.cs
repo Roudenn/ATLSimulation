@@ -22,16 +22,14 @@ public static partial class GasMixtureHelpers
     [PublicAPI]
     public static float[] GetMolesRatioQuery(this ref GasMixture m)
     {
-        NumericsHelpers.Divide(m.Moles, GetTotalMolesQuery(ref m), m.MolesRatio);
-        return m.MolesRatio;
+        var ratio = new float[m.Moles.Length]; // TODO this could be awful. Profile it!!!
+        NumericsHelpers.Divide(m.Moles, GetTotalMolesQuery(ref m), ratio);
+        return ratio;
     }
 
     [PublicAPI]
     public static float GetTotalMolesQuery(this ref GasMixture m)
-    {
-        m.TotalMoles = NumericsHelpers.HorizontalAdd(m.Moles);
-        return m.TotalMoles;
-    }
+        => NumericsHelpers.HorizontalAdd(m.Moles);
 
     [PublicAPI]
     public static void AddHeat(this ref GasMixture m, float energy)
@@ -55,10 +53,7 @@ public static partial class GasMixtureHelpers
         if (m.Immutable)
             return 0f;
 
-        // Ensure that if the gas
-
         m.Moles[gasId] += moles;
-        m.TotalMoles += moles;
         return moles;
     }
 
@@ -82,19 +77,6 @@ public static partial class GasMixtureHelpers
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(volume);
         m.Volume = volume;
-        GetPressure(ref m);
-    }
-
-    /// <summary>
-    /// A helper method that should be called when <see cref="GasMixture.TotalMoles"/>,
-    /// <see cref="GasMixture.HeatContainer"/>, or <see cref="GasMixture.Volume"/> have changed.
-    /// </summary>
-    /// <param name="m"></param>
-    [PublicAPI]
-    public static float GetPressure(this ref GasMixture m)
-    {
-        m.Pressure = m.TotalMoles * m.HeatContainer.Temperature * PhysicalConstants.R / m.Volume;
-        return m.Pressure;
     }
 
     [PublicAPI]

@@ -2,9 +2,11 @@
 using System.Linq;
 using System.Numerics;
 using Content.Server.Statistics;
+using Content.Shared.GameCVars;
 using Content.Shared.GameTicking;
 using Content.Shared.Maps;
 using Robust.Server.Player;
+using Robust.Shared.Configuration;
 using Robust.Shared.EntitySerialization;
 using Robust.Shared.EntitySerialization.Systems;
 using Robust.Shared.Enums;
@@ -21,12 +23,13 @@ namespace Content.Server.GameTicking;
 public sealed class GameTicker : SharedGameTicker
 {
     [ViewVariables]
-    public string? CurrentSimulationMap = "LargeField";
+    public string? CurrentSimulationMap;
 
     public static readonly EntProtoId ObserverEntity = "MobObserver";
 
     [Dependency] private readonly IPlayerManager _playerManager = default!;
     [Dependency] private readonly IPrototypeManager _protoMan = default!;
+    [Dependency] private readonly IConfigurationManager _configMan = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly SharedMapSystem _mapSystem = default!;
     [Dependency] private readonly MapLoaderSystem _mapLoader = default!;
@@ -36,6 +39,7 @@ public sealed class GameTicker : SharedGameTicker
         base.Initialize();
         _playerManager.PlayerStatusChanged += PlayerStatusChanged;
         SubscribeLocalEvent<GetStatisticsEvent>(OnGetStats);
+        Subs.CVar(_configMan, GameConfigVars.GameDefaultMap, s => CurrentSimulationMap = s == string.Empty ? null : s, true);
     }
 
     public void PostInitialize()

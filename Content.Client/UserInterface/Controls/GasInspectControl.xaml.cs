@@ -133,7 +133,7 @@ public sealed partial class GasInspectControl : BoxContainer
         var gasBar = new SplitBar
         {
             MinHeight = height,
-            MinBarSize = new Vector2(12, 0)
+            MinBarSize = new Vector2(12, 1)
         };
         // Separator
         DataContainer.AddChild(new Control
@@ -146,6 +146,13 @@ public sealed partial class GasInspectControl : BoxContainer
         foreach (var gas in gasMix.Gases!)
         {
             totalGasAmount += gas.Amount;
+        }
+
+        if (totalGasAmount < SystemConstants.GasMinMoles)
+        {
+            // There is no gas
+            GasPlaceholder.Visible = true;
+            return;
         }
 
         tableKey.AddChild(new Label
@@ -162,6 +169,8 @@ public sealed partial class GasInspectControl : BoxContainer
         for (var j = 0; j < gasMix.Gases.Length; j++)
         {
             var gas = gasMix.Gases[j];
+            if (gas.Amount < SystemConstants.GasMinMoles)
+
             // Add to the table
             tableKey.AddChild(new Label
             {

@@ -25,6 +25,8 @@ public sealed class VisualsTabUIController : UIController
 
         VisualsTab.DebugSubGridChunksCheckBox.OnPressed += DebugSubGridChunksOnPressed;
         VisualsTab.DebugSubGridTilesCheckBox.OnPressed += DebugSubGridTilesOnPressed;
+        VisualsTab.AtmosphereVisibilityCheckBox.OnPressed += AtmosCompositionOnPressed;
+        VisualsTab.TemperatureVisibilityCheckBox.OnPressed += HeatMapOnPressed;
     }
 
     public void UnloadButton()
@@ -34,8 +36,12 @@ public sealed class VisualsTabUIController : UIController
 
         VisualsTab.DebugSubGridChunksCheckBox.Pressed = false;
         VisualsTab.DebugSubGridTilesCheckBox.Pressed = false;
+        VisualsTab.AtmosphereVisibilityCheckBox.Pressed = false;
+        VisualsTab.TemperatureVisibilityCheckBox.Pressed = false;
         VisualsTab.DebugSubGridChunksCheckBox.OnPressed -= DebugSubGridChunksOnPressed;
         VisualsTab.DebugSubGridTilesCheckBox.OnPressed -= DebugSubGridTilesOnPressed;
+        VisualsTab.AtmosphereVisibilityCheckBox.OnPressed -= AtmosCompositionOnPressed;
+        VisualsTab.TemperatureVisibilityCheckBox.OnPressed -= HeatMapOnPressed;
     }
 
     private void DebugSubGridChunksOnPressed(BaseButton.ButtonEventArgs args)
@@ -53,6 +59,24 @@ public sealed class VisualsTabUIController : UIController
             return;
 
         ent.Value.Comp.SubGridTilesOverlay = args.Button.Pressed;
+        _debugOverlay.UpdateOverlays(ent.Value.AsNullable());
+    }
+
+    private void HeatMapOnPressed(BaseButton.ButtonEventArgs args)
+    {
+        if (!TryGetViewerEnt(out var ent))
+            return;
+
+        ent.Value.Comp.HeatMapOverlay = args.Button.Pressed;
+        _debugOverlay.UpdateOverlays(ent.Value.AsNullable());
+    }
+
+    private void AtmosCompositionOnPressed(BaseButton.ButtonEventArgs args)
+    {
+        if (!TryGetViewerEnt(out var ent))
+            return;
+
+        ent.Value.Comp.AtmosCompositionOverlay = args.Button.Pressed;
         _debugOverlay.UpdateOverlays(ent.Value.AsNullable());
     }
 

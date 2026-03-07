@@ -38,4 +38,7 @@ public sealed partial class GameConfigVars : CVars
     /// </summary>
     public static readonly CVarDef<float> GameEntityMenuLookup =
         CVarDef.Create("game.entity_menu_lookup", 0.25f, CVar.CLIENTONLY | CVar.ARCHIVE);
+
+    public static readonly CVarDef<string> GameDefaultMap =
+        CVarDef.Create("game.default_map", "LargeField", CVar.SERVERONLY);
 }

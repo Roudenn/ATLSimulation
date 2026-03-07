@@ -19,13 +19,6 @@ public partial struct GasMixture : IRobustCloneable<GasMixture>
     public float[] Moles;
 
     /// <summary>
-    /// Percentages of all moles in the gas mixture.
-    /// Basically just <see cref="Moles"/> divided by <see cref="TotalMoles"/>
-    /// </summary>
-    [ViewVariables]
-    public float[] MolesRatio;
-
-    /// <summary>
     /// Heat container of the gas mixture.
     /// </summary>
     [DataField]
@@ -42,10 +35,17 @@ public partial struct GasMixture : IRobustCloneable<GasMixture>
     /// Calculated dynamically when moles are added to the mixture.
     /// </summary>
     [ViewVariables]
-    public float TotalMoles;
+    public float TotalMoles => this.GetTotalMolesQuery();
+
+    /// <summary>
+    /// Percentages of all moles in the gas mixture.
+    /// Basically just <see cref="Moles"/> divided by <see cref="TotalMoles"/>
+    /// </summary>
+    [ViewVariables]
+    public float[] MolesRatio => this.GetMolesRatioQuery();
 
     [ViewVariables]
-    public float Pressure;
+    public float Pressure => this.GetPressureQuery();
 
     /// <summary>
     /// If true, any attempts to modify the mixture will be cancelled.
@@ -55,18 +55,11 @@ public partial struct GasMixture : IRobustCloneable<GasMixture>
     public bool Immutable;
 
     /// <summary>
-    /// If true, the tile is considered to be spaced, allowing it to have special properties.
-    /// </summary>
-    [DataField]
-    public bool IsSpace;
-
-    /// <summary>
     /// Constructs a new gas mixture without any gas.
     /// </summary>
     public GasMixture(GasPrototypeManager manager, float volume, float temperature, bool immutable = false)
     {
         Moles = new float[manager.ArraySize];
-        MolesRatio = new float[manager.ArraySize];
         Volume = volume;
         HeatContainer = new HeatContainer(SystemConstants.MinimumHeatCapacity, temperature, 0f);
         Immutable = immutable;
@@ -81,7 +74,6 @@ public partial struct GasMixture : IRobustCloneable<GasMixture>
     public GasMixture(float[] moles, float volume, HeatContainer container)
     {
         Moles = moles;
-        MolesRatio = this.GetMolesRatioQuery();
         Volume = volume;
         HeatContainer = container;
     }
@@ -92,7 +84,6 @@ public partial struct GasMixture : IRobustCloneable<GasMixture>
     public GasMixture(SharedAtmosphericsSystem system, float[] moles, float volume, float temperature)
     {
         Moles = moles;
-        MolesRatio = this.GetMolesRatioQuery();
         Volume = volume;
         HeatContainer = system.CreateGasHeatContainer(ref this, temperature);
     }
@@ -100,11 +91,9 @@ public partial struct GasMixture : IRobustCloneable<GasMixture>
     public GasMixture(GasMixture g)
     {
         Moles = g.Moles;
-        MolesRatio = g.MolesRatio;
         Volume = g.Volume;
         HeatContainer = g.HeatContainer;
         Immutable = g.Immutable;
-        IsSpace = g.IsSpace;
     }
 
     public GasMixture Clone()

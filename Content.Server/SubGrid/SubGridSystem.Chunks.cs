@@ -131,6 +131,20 @@ public sealed partial class SubGridSystem
         ResolveAtmosMapRelativeToChunk(grid, ref AtmosNeighboursCache, ent.Comp.ChunkIndices);
         while (tiles.MoveNext(out var tile))
         {
+            var airtight = false;
+            var ents = MapSystem.GetAnchoredEntitiesEnumerator(grid.Owner, grid.Comp2, tile.GridIndices);
+            while (ents.MoveNext(out var anchored))
+            {
+                if (!_materialQuery.HasComp(anchored))
+                    continue;
+
+                airtight = true;
+                break;
+            }
+
+            if (airtight)
+                continue;
+
             InitializeAtmosAtTile(grid, tile.GridIndices, ent.Comp.ChunkIndices, ref ent.Comp.AtmosphereMap, AtmosNeighboursCache, true);
         }
     }
@@ -171,7 +185,7 @@ public sealed partial class SubGridSystem
                 var (foundChunk, index) = GetTileRelative(chunkIndices, VectorToIndex(corner.Value), vecDir);
                 if (!nearChunks.TryGetValue(foundChunk, out var foundAtmosGridCorner))
                 {
-                    Log.Error($"When trying to initialize chunk at {chunkIndices}, there was somehow no neighbouring empty chunk.");
+                    Log.Error($"When trying to initialize chunk at {chunkIndices} for tile {gridIndices}, there was somehow no neighbouring empty chunk at {foundChunk}.");
                     continue;
                 }
 
@@ -180,12 +194,11 @@ public sealed partial class SubGridSystem
             }
 
             // Handle sides
-            var moveDir = dir.GetClockwise90Degrees();
-            var moveVec = moveDir.ToIntVec();
+            var moveVec = vecDir.Rotate(Angle.FromDegrees(90));
             var startIndex = BoxIndexAtDirection(indexCorners, dir);
 
             // Since the chunk doesn't change we have to check if it's right only once.
-            var (chunkNeighbour, _) = GetTileRelative(chunkIndices, VectorToIndex(startIndex), vecDir);
+            var (chunkNeighbour, start) = GetTileRelative(chunkIndices, VectorToIndex(startIndex), vecDir);
             if (!nearChunks.TryGetValue(chunkNeighbour, out var foundAtmosGrid))
             {
                 Log.Error($"When trying to initialize chunk at {chunkIndices}, there was somehow no neighbouring empty chunk.");
@@ -194,7 +207,7 @@ public sealed partial class SubGridSystem
 
             for (int i = 0; i < SubGridTileSize - 1; i++)
             {
-                var currentIndex = VectorToIndex(startIndex + moveVec * i);
+                var currentIndex = start + VectorToIndex(moveVec * i);
                 var (_, index) = GetTileRelative(chunkIndices, currentIndex, vecDir);
                 foundAtmosGrid[index] = new TileAtmos(spaceMix);
             }
@@ -390,12 +403,13 @@ public sealed partial class SubGridSystem
         chunkComp.ParentGrid = grid.Owner;
         chunkComp.ChunkIndices = GetChunkIndices(gridIndices);
 
-        // preallocate gazzilion memory
+        // preallocate the memory
         chunkComp.AtmosphereMap = new TileAtmos[SubGridChunkArea];
         chunkComp.TemperatureMap = new TileHeat[SubGridChunkArea];
 
         grid.Comp.ChunkEntities.Add(chunkComp.ChunkIndices, chunk);
         Log.Info($"Added chunk {ToPrettyString(chunk)} to grid {ToPrettyString(grid)} with chunkIndices {chunkComp.ChunkIndices}");
+        Dirty(grid);
         return (chunk, chunkComp);
     }
 

@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using Content.Client.UserInterface.Systems;
 using Content.Shared.Constants;
 using Content.Shared.Subgrid.Components;
 using Content.Shared.Subgrid.Systems;
@@ -6,19 +7,19 @@ using Robust.Client.Graphics;
 using Robust.Shared.Enums;
 using Robust.Shared.Map;
 
-namespace Content.Client.Subgrid.Overlays;
+namespace Content.Client.Temperature.Overlays;
 
 /// <summary>
-/// Draws boundaries of all subgrid tiles on the screen.
+/// Shows the temperature of all heat containers on the map.
 /// </summary>
-public sealed class SubGridTileOverlay : Overlay
+public sealed class HeatMapOverlay : Overlay
 {
     private readonly IEntityManager _entityManager;
     private readonly IEyeManager _eyeManager;
     private readonly SharedTransformSystem _xform;
     private readonly SharedSubGridSystem _subGrid;
 
-    public SubGridTileOverlay(IEntityManager entityManager, IEyeManager eyeManager, SharedTransformSystem xform, SharedSubGridSystem subGrid)
+    public HeatMapOverlay(IEntityManager entityManager, IEyeManager eyeManager, SharedTransformSystem xform, SharedSubGridSystem subGrid)
     {
         _entityManager = entityManager;
         _eyeManager = eyeManager;
@@ -41,18 +42,6 @@ public sealed class SubGridTileOverlay : Overlay
             if (!viewport.Intersects(worldAABB))
                 continue;
 
-            for (int i = 0; i < subgrid.AtmosphereMap.Length; i++)
-            {
-                var tile = subgrid.AtmosphereMap[i];
-                if (!tile.Initialized)
-                    continue;
-
-                var pos = _subGrid.GetPositionFromIndex(subgrid.ChunkIndices, i);
-                var worldTilePos = _xform.ToMapCoordinates(new EntityCoordinates(subgrid.ParentGrid, pos));
-                var box = Box2.CenteredAround(worldTilePos.Position + tileWorldSize / 2, tileWorldSize);
-                args.WorldHandle.DrawRect(box, Color.Aquamarine.WithAlpha(0.2f), false);
-            }
-
             for (int i = 0; i < subgrid.TemperatureMap.Length; i++)
             {
                 var tile = subgrid.TemperatureMap[i];
@@ -62,7 +51,11 @@ public sealed class SubGridTileOverlay : Overlay
                 var pos = _subGrid.GetPositionFromIndex(subgrid.ChunkIndices, i);
                 var worldTilePos = _xform.ToMapCoordinates(new EntityCoordinates(subgrid.ParentGrid, pos));
                 var box = Box2.CenteredAround(worldTilePos.Position + tileWorldSize / 2, tileWorldSize);
-                args.WorldHandle.DrawRect(box, Color.Orange.WithAlpha(0.2f), false);
+                var temperature = tile.ArchivedContainer.Temperature;
+                args.WorldHandle.DrawRect(box,
+                    temperature >= 0
+                        ? ProgressColorHelpers.GradientWarm(temperature, 0f, 100f).WithAlpha(0.5f)
+                        : ProgressColorHelpers.GradientCold(temperature, 0f, -100f).WithAlpha(0.5f));
             }
         }
     }

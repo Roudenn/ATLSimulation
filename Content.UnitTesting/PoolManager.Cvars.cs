@@ -11,6 +11,8 @@ public static partial class PoolManager
     public static readonly (string cvar, string value)[] TestCvars =
     {
         // @formatter:off
+        (GameConfigVars.GameDefaultMap.Name, "Empty"),
+
         /*(CCVars.DatabaseSynchronous.Name,     "true"),
         (CCVars.DatabaseSqliteDelay.Name,     "0"),
         (CCVars.HolidaysEnabled.Name,         "false"),

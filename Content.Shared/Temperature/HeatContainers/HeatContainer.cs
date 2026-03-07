@@ -20,13 +20,13 @@ public partial struct HeatContainer : IRobustCloneable<HeatContainer>
     /// without a significant change in temperature.
     /// </summary>
     [DataField]
-    public float HeatCapacity = 4000f; // about 1kg of water
+    public float HeatCapacity = SystemConstants.MinimumHeatCapacity;
 
     /// <summary>
     /// The current temperature of the container in Kelvin.
     /// </summary>
     [DataField]
-    public float Temperature = PhysicalConstants.ROOM_TEMPERATURE; // room temperature
+    public float Temperature;
 
     /// <summary>
     /// The thermal conductance in watt per kelvin.
@@ -34,7 +34,14 @@ public partial struct HeatContainer : IRobustCloneable<HeatContainer>
     /// Higher values mean container gives away heat faster.
     /// </summary>
     [DataField]
-    public float ThermalConductance = 1f; // because i want so
+    public float ThermalConductance;
+
+    /// <summary>
+    /// If true, the temperature of the heat container cannot be changed.
+    /// </summary>
+    // TODO make it functional!!!
+    [DataField]
+    public bool Immutable;
 
     /// <summary>
     /// The current temperature of the container in Celsius.
@@ -50,11 +57,12 @@ public partial struct HeatContainer : IRobustCloneable<HeatContainer>
     [ViewVariables]
     public float InternalEnergy => Temperature * HeatCapacity;
 
-    public HeatContainer(float heatCapacity, float temperature, float thermalConductance)
+    public HeatContainer(float heatCapacity, float temperature, float thermalConductance, bool immutable = false)
     {
         HeatCapacity = heatCapacity;
         Temperature = temperature;
         ThermalConductance = thermalConductance;
+        Immutable = immutable;
     }
 
     /// <summary>
@@ -65,6 +73,8 @@ public partial struct HeatContainer : IRobustCloneable<HeatContainer>
     {
         HeatCapacity = c.HeatCapacity;
         Temperature = c.Temperature;
+        ThermalConductance = c.ThermalConductance;
+        Immutable = c.Immutable;
     }
 
     public HeatContainer Clone()

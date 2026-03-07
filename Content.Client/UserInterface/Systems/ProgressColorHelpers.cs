@@ -2,12 +2,9 @@ using System.Numerics;
 
 namespace Content.Client.UserInterface.Systems;
 
-/// <summary>
-/// This system handles getting an interpolated color based on the value of a cvar.
-/// </summary>
-public sealed class ProgressColorSystem : EntitySystem
+public static class ProgressColorHelpers
 {
-    public Color GetProgressColor(float progress)
+    public static Color GetProgressColor(float progress)
     {
         if (progress >= 1.0f)
         {
@@ -22,7 +19,7 @@ public sealed class ProgressColorSystem : EntitySystem
     /// <summary>
     /// Simple yellow -> orange -> red gradient.
     /// </summary>
-    public Color GradientWarm(float value, float min, float max)
+    public static Color GradientWarm(float value, float min, float max)
     {
         // map min to 1, max to 0
         value = (value - min) / (max - min);
@@ -34,7 +31,7 @@ public sealed class ProgressColorSystem : EntitySystem
     /// <summary>
     /// Simple green -> blue -> violet gradient.
     /// </summary>
-    public Color GradientCold(float value, float min, float max)
+    public static Color GradientCold(float value, float min, float max)
     {
         // map min to 1, max to 0
         value = (value - min) / (max - min);

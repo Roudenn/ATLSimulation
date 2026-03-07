@@ -4,6 +4,7 @@
   specificMolarHeat: 29.1
   thermalConductivity: 0.026
   viscosity: 17.8
+  color: "#ff0000"
 
 - type: gas
   id: Oxygen
@@ -11,6 +12,7 @@
   specificMolarHeat: 29.4
   thermalConductivity: 0.026
   viscosity: 20.2
+  color: "#00ccff"
 
 - type: gas
   id: Fluorine
@@ -18,6 +20,7 @@
   specificMolarHeat: 31.3
   thermalConductivity: 0.027
   viscosity: 18.5
+  color: "#c8ff00"
 
 - type: gas
   id: Chlorine
@@ -25,3 +28,4 @@
   specificMolarHeat: 34
   thermalConductivity: 0.009
   viscosity: 12.9
+  color: "#1eff00"

@@ -1,4 +1,7 @@
-﻿using Content.Client.Subgrid.Overlays;
+﻿using Content.Client.Atmospherics.Overlays;
+using Content.Client.Subgrid.Overlays;
+using Content.Client.Temperature.Overlays;
+using Content.Shared.Atmospherics;
 using Content.Shared.Subgrid.Systems;
 using Robust.Client.Graphics;
 using Robust.Client.Player;
@@ -13,10 +16,12 @@ public sealed class DebugOverlaySystem : EntitySystem
     [Dependency] private readonly IOverlayManager _overlayMan = default!;
     [Dependency] private readonly SharedTransformSystem _xform = default!;
     [Dependency] private readonly SharedSubGridSystem _subGrid = default!;
+    [Dependency] private readonly GasPrototypeManager _gasManager = default!;
 
     private SubGridChunkOverlay _subGridChunkOverlay = default!;
     private SubGridTileOverlay _subGridTileOverlay = default!;
-
+    private HeatMapOverlay _heatMapOverlay = default!;
+    private AtmosCompositionOverlay _atmosCompositionOverlay = default!;
 
     /// <inheritdoc/>
     public override void Initialize()
@@ -28,6 +33,8 @@ public sealed class DebugOverlaySystem : EntitySystem
 
         _subGridChunkOverlay = new(EntityManager, _eyeManager, _xform, _subGrid);
         _subGridTileOverlay = new(EntityManager, _eyeManager, _xform, _subGrid);
+        _heatMapOverlay = new(EntityManager, _eyeManager, _xform, _subGrid);
+        _atmosCompositionOverlay = new(EntityManager, _eyeManager, _gasManager, _xform, _subGrid);
     }
 
     public void UpdateOverlays(Entity<DebugOverlayViewerComponent?> ent)
@@ -71,11 +78,17 @@ public sealed class DebugOverlaySystem : EntitySystem
             _overlayMan.AddOverlay(_subGridChunkOverlay);
         if (ent.Comp.SubGridTilesOverlay)
             _overlayMan.AddOverlay(_subGridTileOverlay);
+        if (ent.Comp.HeatMapOverlay)
+            _overlayMan.AddOverlay(_heatMapOverlay);
+        if (ent.Comp.AtmosCompositionOverlay)
+            _overlayMan.AddOverlay(_atmosCompositionOverlay);
     }
 
     private void RemoveOverlays()
     {
         _overlayMan.RemoveOverlay(_subGridChunkOverlay);
         _overlayMan.RemoveOverlay(_subGridTileOverlay);
+        _overlayMan.RemoveOverlay(_heatMapOverlay);
+        _overlayMan.RemoveOverlay(_atmosCompositionOverlay);
     }
 }

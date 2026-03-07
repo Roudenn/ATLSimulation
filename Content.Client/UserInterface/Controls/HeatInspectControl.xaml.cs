@@ -18,6 +18,7 @@ public sealed partial class HeatInspectControl : BoxContainer
 
     public void Populate(HeatContainer container)
     {
+        DataContainer.RemoveAllChildren();
         // Temperature
         DataContainer.AddChild(new RichTextLabel
         {

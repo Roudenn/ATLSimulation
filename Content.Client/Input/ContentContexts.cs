@@ -12,14 +12,14 @@ public static class ContentContexts
     public static void SetupContexts(IInputContextContainer contexts)
     {
         var common = contexts.GetContext("common");
-            
+
         // Movement
         common.AddFunction(EngineKeyFunctions.MoveUp);
         common.AddFunction(EngineKeyFunctions.MoveDown);
         common.AddFunction(EngineKeyFunctions.MoveLeft);
         common.AddFunction(EngineKeyFunctions.MoveRight);
         common.AddFunction(EngineKeyFunctions.Walk);
-        
+
         // UI and utilities
         common.AddFunction(ContentKeyFunctions.EscapeContext);
         common.AddFunction(ContentKeyFunctions.ExamineEntity);
@@ -31,6 +31,7 @@ public static class ContentContexts
         common.AddFunction(ContentKeyFunctions.ResetZoom);
         common.AddFunction(ContentKeyFunctions.ToggleEntitySpawningWindow);
         common.AddFunction(ContentKeyFunctions.ToggleTileSpawningWindow);
+        common.AddFunction(ContentKeyFunctions.InspectSubgridElement);
 
         // Editor
         common.AddFunction(ContentKeyFunctions.EditorCopyObject);

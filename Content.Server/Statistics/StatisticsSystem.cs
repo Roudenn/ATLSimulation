@@ -18,8 +18,10 @@ public sealed class StatisticsSystem : SharedStatisticsSystem
     {
         base.Update(frameTime);
 
-        if (_nextUpdate < _timing.CurTime)
+        if (_nextUpdate >= _timing.CurTime)
             return;
+
+        _nextUpdate = _timing.CurTime + TimeSpan.FromSeconds(1);
 
         // Message is sent only if something had changed
         var stats = GetStatistics();
@@ -28,7 +30,7 @@ public sealed class StatisticsSystem : SharedStatisticsSystem
 
         ArchivedStatistics = stats;
         var ev = new StatisticsMessage(stats);
-        RaiseLocalEvent(ev);
+        RaiseNetworkEvent(ev);
     }
 
     private SimulationStats GetStatistics()
