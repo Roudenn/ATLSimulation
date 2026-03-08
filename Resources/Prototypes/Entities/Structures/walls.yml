@@ -15,6 +15,9 @@
     bodyType: Static
   - type: Sprite
     drawdepth: Walls
+  - type: Appearance
+  - type: IconSmooth
+    key: walls
   - type: Fixtures
     fixtures:
       fix1:
@@ -27,6 +30,10 @@
         - WallLayer
         density: 1000
   - type: Occluder
+  - type: Airtight
+  - type: HeatContainer
+  - type: Material
+
   #- type: Tag
   #  tags:
   #  - Wall
@@ -38,11 +45,7 @@
   components:
   - type: Sprite
     sprite: Structures/Walls/solid.rsi
-    #state: rgeneric
   - type: IconSmooth
-    key: walls
     base: reinf_over
-  - type: Appearance
   - type: Material
     material: StainlessSteel
-  - type: HeatContainer
