@@ -44,6 +44,7 @@ public sealed class StatisticsTabUIController : UIController
 
     private void OnGetStats(StatisticsMessage msg, EntitySessionEventArgs ev)
     {
+        StatisticsTab?.MainInfoContainer.RemoveAllChildren();
         PopulateStats(msg);
     }
 
