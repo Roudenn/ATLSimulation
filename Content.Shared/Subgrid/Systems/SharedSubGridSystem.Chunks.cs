@@ -253,13 +253,13 @@ public abstract partial class SharedSubGridSystem
         var set = new HashSet<(Vector2i, int[])>();
 
         // The trivial case.
-        var bottomLeftChunk = GetChunkIndices(aabb.BottomLeft);
-        var chunkBox = ChunkBoxAtIndices(bottomLeftChunk);
-        if (chunkBox.Encloses(aabb))
+        var chunk = GetChunkIndices(aabb.Center);
+        var chunkBox = ChunkBoxAtIndices(chunk);
+        if (chunkBox.Contains(aabb))
         {
-            var vec1 = GetRelativeChunkPosition(aabb.BottomLeft, bottomLeftChunk);
-            var vec2 = GetRelativeChunkPosition(aabb.TopRight, bottomLeftChunk);
-            set.Add((bottomLeftChunk, GetAreaTileIndexesRelativeChunk(vec1, vec2)));
+            var vec1 = GetRelativeChunkPosition(aabb.BottomLeft, chunk);
+            var vec2 = GetRelativeChunkPosition(aabb.TopRight, chunk);
+            set.Add((chunk, GetAreaTileIndexesRelativeChunk(vec1, vec2)));
             return set;
         }
 
@@ -287,15 +287,18 @@ public abstract partial class SharedSubGridSystem
         // Make sure that the resulting boxes don't intersect with other chunks.
         var bottomLeftChunkInter = GetChunkIndices(aabb.BottomLeft);
         var topRightChunkInter = GetChunkIndices(aabb.TopRight);
+        var chunkIndices = GetChunkIndices(aabb.Center);
 
         if (bottomLeftChunkInter == topRightChunkInter)
             return new List<Box2> { aabb }; // This box is contained inside a chunk.
 
         var list = new List<Box2>();
-        var intersected = aabb.AABBIntersection(ChunkBoxAtIndices(bottomLeftChunkInter));
+        var chunkBox = ChunkBoxAtIndices(chunkIndices);
+        var intersected = aabb.AABBIntersection(chunkBox);
 
         // Check if the chunks were connected diagonally or were far way.
-        if (Vector2.Sum(Vector2.Abs(topRightChunkInter - bottomLeftChunkInter)) < 2f)
+        if (chunkBox.Contains(aabb) // First condition handles cases with corners.
+            || Vector2.Sum(Vector2.Abs(topRightChunkInter - bottomLeftChunkInter)) < 2f)
         {
             // All boxes must have been contained now.
             list.AddRange(intersected);
