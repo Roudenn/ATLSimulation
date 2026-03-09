@@ -17,9 +17,16 @@ public abstract partial class SharedSubGridSystem
     /// <returns>Nearest chunk indices to the given coordinates.</returns>
     public static Vector2i GetChunkIndices(Vector2 coordinates)
     {
-        // Negative coordinates should have offset by 1 because of how coordinates work.
-        var x = (int) MathF.Round((coordinates.X >= 0 ? coordinates.X : coordinates.X + 1) / SystemConstants.PvsChunkSize, MidpointRounding.AwayFromZero);
-        var y = (int) MathF.Round((coordinates.Y >= 0 ? coordinates.Y : coordinates.Y + 1) / SystemConstants.PvsChunkSize, MidpointRounding.AwayFromZero);
+        var x = (int) MathF.Round(coordinates.X / SystemConstants.PvsChunkSize, MidpointRounding.AwayFromZero);
+        var y = (int) MathF.Round(coordinates.Y / SystemConstants.PvsChunkSize, MidpointRounding.AwayFromZero);
+        return new Vector2i(x, y);
+    }
+
+    public static Vector2i GetChunkIndicesTile(Vector2 gridIndices)
+    {
+        // Negative coordinates should have offset by 1 because Grid Indices are stored in the bottom left corners.
+        var x = (int) MathF.Round((gridIndices.X >= 0f ? gridIndices.X : gridIndices.X + 1f) / SystemConstants.PvsChunkSize, MidpointRounding.AwayFromZero);
+        var y = (int) MathF.Round((gridIndices.Y >= 0f ? gridIndices.Y : gridIndices.Y + 1f) / SystemConstants.PvsChunkSize, MidpointRounding.AwayFromZero);
         return new Vector2i(x, y);
     }
 
@@ -98,10 +105,17 @@ public abstract partial class SharedSubGridSystem
     /// <inheritdoc cref='TryGetChunk(Entity{SubGridComponent?}, Vector2, out Entity{SubGridChunkComponent}?)'/>
     public bool TryGetChunk(
         Entity<SubGridComponent?> grid,
-        EntityCoordinates coords,
+        Vector2i gridIndices,
         [NotNullWhen(true)] out Entity<SubGridChunkComponent>? chunk)
     {
-        return TryGetChunk(grid, coords.Position, out chunk);
+        chunk = null;
+        if (!SubGridQuery.Resolve(grid.Owner, ref grid.Comp)
+            || !grid.Comp.ChunkEntities.TryGetValue(GetChunkIndicesTile(gridIndices), out var ent)
+            || !ChunkQuery.TryComp(ent, out var subGridChunk))
+            return false;
+
+        chunk = (ent, subGridChunk);
+        return true;
     }
 
     /// <summary>
@@ -253,10 +267,9 @@ public abstract partial class SharedSubGridSystem
         var boxes = AABBIntersectRecursiveChunks(aabb);
         foreach (var box in boxes)
         {
-            if (!chunkBox.Contains(box))
-                Log.Warning("WTF");
-
-            var chunkIndices = GetChunkIndices(box.BottomLeft);
+            // The box is guaranteed to be inside the chunk,
+            // but to say for sure in which chunk the box is actually in, it has to look at it's center.
+            var chunkIndices = GetChunkIndices(box.Center);
             var vec1 = GetRelativeChunkPosition(box.BottomLeft, chunkIndices);
             var vec2 = GetRelativeChunkPosition(box.TopRight, chunkIndices);
             var indexes = GetAreaTileIndexesRelativeChunk(vec1, vec2);
@@ -282,7 +295,7 @@ public abstract partial class SharedSubGridSystem
         var intersected = aabb.AABBIntersection(ChunkBoxAtIndices(bottomLeftChunkInter));
 
         // Check if the chunks were connected diagonally or were far way.
-        if (!(Math.Abs(Vector2.Sum(topRightChunkInter - bottomLeftChunkInter)) > 2f))
+        if (Vector2.Sum(Vector2.Abs(topRightChunkInter - bottomLeftChunkInter)) < 2f)
         {
             // All boxes must have been contained now.
             list.AddRange(intersected);

@@ -313,7 +313,7 @@ public sealed partial class SubGridSystem
     /// <param name="gridIndices"></param>
     private void EnsureSubGridChunk(Entity<SubGridComponent> grid, Vector2i gridIndices)
     {
-        if (grid.Comp.ChunkEntities.ContainsKey(GetChunkIndices(gridIndices)))
+        if (grid.Comp.ChunkEntities.ContainsKey(GetChunkIndicesTile(gridIndices)))
             return;
 
         SpawnSubGridChunk(grid, gridIndices);
@@ -328,7 +328,7 @@ public sealed partial class SubGridSystem
     /// <param name="chunk"></param>
     private void EnsureSubGridChunk(Entity<SubGridComponent> grid, Vector2i gridIndices, out EntityUid chunk)
     {
-        if (grid.Comp.ChunkEntities.TryGetValue(GetChunkIndices(gridIndices), out chunk))
+        if (grid.Comp.ChunkEntities.TryGetValue(GetChunkIndicesTile(gridIndices), out chunk))
             return;
 
         chunk = SpawnSubGridChunk(grid, gridIndices);
@@ -336,7 +336,7 @@ public sealed partial class SubGridSystem
 
     private void EnsureSubGridChunk(Entity<SubGridComponent> grid, Vector2i gridIndices, out Entity<SubGridChunkComponent> chunk)
     {
-        if (grid.Comp.ChunkEntities.TryGetValue(GetChunkIndices(gridIndices), out var chunkUid))
+        if (grid.Comp.ChunkEntities.TryGetValue(GetChunkIndicesTile(gridIndices), out var chunkUid))
         {
             chunk = (chunkUid, ChunkQuery.Comp(chunkUid));
             return;
@@ -359,7 +359,7 @@ public sealed partial class SubGridSystem
 
         // TODO this is shitcode
         chunkComp.ParentGrid = grid.Owner;
-        chunkComp.ChunkIndices = GetChunkIndices(gridIndices);
+        chunkComp.ChunkIndices = GetChunkIndicesTile(gridIndices);
 
         // preallocate the memory
         chunkComp.AtmosphereMap = new TileAtmos[SubGridChunkArea];
@@ -388,13 +388,13 @@ public sealed partial class SubGridSystem
     /// <param name="grid"></param>
     /// <param name="position"></param>
     /// <returns></returns>
-    private bool TryRemoveSubGridChunk(Entity<SubGridComponent, MapGridComponent?> grid, Vector2 position)
+    private bool TryRemoveSubGridChunk(Entity<SubGridComponent, MapGridComponent?> grid, Vector2i gridIndices)
     {
         if (!MapGridQuery.Resolve(grid.Owner, ref grid.Comp2))
             return false;
 
         // Check 10x10 box around the center of the chunk for any tiles that are not empty.
-        var box = Box2.CenteredAround(GetChunkPosition(position),
+        var box = Box2.CenteredAround(GetChunkPosition(gridIndices),
             new Vector2(SystemConstants.PvsChunkSize + 2, SystemConstants.PvsChunkSize + 2));
 
         var tiles = MapSystem.GetLocalTilesEnumerator(grid.Owner, grid.Comp2, box);
@@ -404,7 +404,7 @@ public sealed partial class SubGridSystem
             return false;
         }
 
-        var indices = GetChunkIndices(position);
+        var indices = GetChunkIndicesTile(gridIndices);
         if (!grid.Comp1.ChunkEntities.TryGetValue(indices, out var chunk))
             return false; // It was already removed
 
