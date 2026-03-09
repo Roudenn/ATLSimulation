@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using Content.Shared.Constants;
+using Content.Shared.Maths;
 using Content.Shared.Subgrid.Components;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
@@ -42,6 +43,13 @@ public abstract partial class SharedSubGridSystem
     /// Half of the <see cref="ChunkSizeVector"/>.
     /// </summary>
     public static readonly Vector2 HalfChunkSizeVector = new(4f, 4f);
+
+    public static Box2 ChunkBoxAtIndices(Vector2i chunkIndices)
+    {
+        return Box2.CenteredAround(
+            chunkIndices * SystemConstants.PvsChunkSize,
+            new Vector2(SystemConstants.PvsChunkSize));
+    }
 
     /// <inheritdoc cref="VectorToIndex(int, int)"/>
     public int VectorToIndex(Vector2i relativePos)
@@ -222,6 +230,76 @@ public abstract partial class SharedSubGridSystem
     }
 
     /// <summary>
+    ///
+    /// </summary>
+    /// <param name="aabb"></param>
+    /// <returns></returns>
+    public HashSet<(Vector2i, int[])> GetTileIndexesWorld(Box2 aabb)
+    {
+        var set = new HashSet<(Vector2i, int[])>();
+
+        // The trivial case.
+        var bottomLeftChunk = GetChunkIndices(aabb.BottomLeft);
+        var chunkBox = ChunkBoxAtIndices(bottomLeftChunk);
+        if (chunkBox.Encloses(aabb))
+        {
+            var vec1 = GetRelativeChunkPosition(aabb.BottomLeft, bottomLeftChunk);
+            var vec2 = GetRelativeChunkPosition(aabb.TopRight, bottomLeftChunk);
+            set.Add((bottomLeftChunk, GetAreaTileIndexesRelativeChunk(vec1, vec2)));
+            return set;
+        }
+
+        // Split the box into boxes that fit inside their chunks.
+        var boxes = AABBIntersectRecursiveChunks(aabb);
+        foreach (var box in boxes)
+        {
+            if (!chunkBox.Contains(box))
+                Log.Warning("WTF");
+
+            var chunkIndices = GetChunkIndices(box.BottomLeft);
+            var vec1 = GetRelativeChunkPosition(box.BottomLeft, chunkIndices);
+            var vec2 = GetRelativeChunkPosition(box.TopRight, chunkIndices);
+            var indexes = GetAreaTileIndexesRelativeChunk(vec1, vec2);
+            set.Add((chunkIndices, indexes));
+        }
+
+        return set;
+    }
+
+    private List<Box2> AABBIntersectRecursiveChunks(Box2 aabb, int count = 0)
+    {
+        if (count > 10)
+            Log.Warning("uummm");
+
+        // Make sure that the resulting boxes don't intersect with other chunks.
+        var bottomLeftChunkInter = GetChunkIndices(aabb.BottomLeft);
+        var topRightChunkInter = GetChunkIndices(aabb.TopRight);
+
+        if (bottomLeftChunkInter == topRightChunkInter)
+            return new List<Box2> { aabb }; // This box is contained inside a chunk.
+
+        var list = new List<Box2>();
+        var intersected = aabb.AABBIntersection(ChunkBoxAtIndices(bottomLeftChunkInter));
+
+        // Check if the chunks were connected diagonally or were far way.
+        if (!(Math.Abs(Vector2.Sum(topRightChunkInter - bottomLeftChunkInter)) > 2f))
+        {
+            // All boxes must have been contained now.
+            list.AddRange(intersected);
+            return list;
+        }
+
+        foreach (var intersect in intersected)
+        {
+            count++;
+            var boxes = AABBIntersectRecursiveChunks(intersect, count);
+            list.AddRange(boxes);
+        }
+
+        return list;
+    }
+
+    /// <summary>
     /// Gets all tile indexes at specified grid indices.
     /// </summary>
     /// <param name="chunkIndices">Chunk indices to find the indexes in.</param>
@@ -274,6 +352,8 @@ public abstract partial class SharedSubGridSystem
             for (int j = 0; j < width; j++)
             {
                 arr[count] = GetTileRelativeLocal(corner, j, i);
+                if (arr[count] < 0)
+                    Log.Warning("WTF??");
                 count++;
             }
         }

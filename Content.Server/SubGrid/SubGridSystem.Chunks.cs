@@ -175,67 +175,25 @@ public sealed partial class SubGridSystem
             if (!tileData.MapAtmosphere)
                 continue;
 
-            var dir = vecDir.GetDir();
-            var indexCorners = GetTileCornerIndexes(chunkIndices, gridIndices, grid.Comp2.TileSizeVector);
+            var found =
+                GetTileIndexesWorld(
+                    new Box2(gridIndices, gridIndices + grid.Comp2.TileSizeVector)
+                        .Enlarged(SubGridWorldSize));
 
-            // Handle corners
-            var corner = BoxIndexAtCornerDirection(indexCorners, dir);
-            if (corner != null)
+            foreach (var (foundIndices, indexes) in found)
             {
-                var (foundChunk, index) = GetTileRelative(chunkIndices, VectorToIndex(corner.Value), vecDir);
-                if (!nearChunks.TryGetValue(foundChunk, out var foundAtmosGridCorner))
+                if (!nearChunks.TryGetValue(foundIndices, out var foundAtmosGridCorner))
                 {
-                    Log.Error($"When trying to initialize chunk at {chunkIndices} for tile {gridIndices}, there was somehow no neighbouring empty chunk at {foundChunk}.");
+                    Log.Error($"When trying to initialize chunk at {chunkIndices} for tile {gridIndices}, there was somehow no neighbouring empty chunk at {foundIndices}.");
                     continue;
                 }
 
-                foundAtmosGridCorner[index] = new TileAtmos(spaceMix);
-                continue;
-            }
-
-            // Handle sides
-            var moveVec = vecDir.Rotate(Angle.FromDegrees(90));
-            var startIndex = BoxIndexAtDirection(indexCorners, dir);
-
-            // Since the chunk doesn't change we have to check if it's right only once.
-            var (chunkNeighbour, start) = GetTileRelative(chunkIndices, VectorToIndex(startIndex), vecDir);
-            if (!nearChunks.TryGetValue(chunkNeighbour, out var foundAtmosGrid))
-            {
-                Log.Error($"When trying to initialize chunk at {chunkIndices}, there was somehow no neighbouring empty chunk.");
-                continue;
-            }
-
-            for (int i = 0; i < SubGridTileSize - 1; i++)
-            {
-                var currentIndex = start + VectorToIndex(moveVec * i);
-                var (_, index) = GetTileRelative(chunkIndices, currentIndex, vecDir);
-                foundAtmosGrid[index] = new TileAtmos(spaceMix);
+                foreach (var index in indexes)
+                {
+                    foundAtmosGridCorner[index] = new TileAtmos(spaceMix);
+                }
             }
         }
-    }
-
-    public static Vector2i? BoxIndexAtCornerDirection(Box2i box, Direction dir)
-    {
-        return dir switch
-        {
-            Direction.NorthWest => box.TopLeft,
-            Direction.NorthEast => box.TopRight,
-            Direction.SouthWest => box.BottomLeft,
-            Direction.SouthEast => box.BottomRight,
-            _ => null,
-        };
-    }
-
-    public static Vector2i BoxIndexAtDirection(Box2i box, Direction dir)
-    {
-        return dir switch
-        {
-            Direction.North => box.TopLeft,
-            Direction.East => box.TopRight,
-            Direction.West => box.BottomLeft,
-            Direction.South => box.BottomRight,
-            _ => throw new ArgumentException(),
-        };
     }
 
     private void InitializeChunkTemperature(Entity<SubGridChunkComponent> ent, Entity<SubGridComponent, MapGridComponent> grid)
