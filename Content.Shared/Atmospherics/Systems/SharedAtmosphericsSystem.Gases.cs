@@ -2,6 +2,7 @@
 
 public abstract partial class SharedAtmosphericsSystem
 {
+    // TODO I smell that this is bad but there is no easy solutions for now sadly
     /// <summary>
     /// A buffer used for temporarily storing data while using NumericsHelpers.
     /// Always has the size equal to <see cref="GasPrototypeManager.ArraySize"/>

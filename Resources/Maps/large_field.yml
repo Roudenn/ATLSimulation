@@ -59,6 +59,13 @@ entities:
       fixtures: {}
     - type: OccluderTree
     - type: SubGrid
+    - type: GridAtmosphere
+      mixture:
+        moles:
+          Oxygen: 10
+          Nitrogen: 20
+        heatContainer:
+          temperature: 293.15
 - proto: WallReinforced
   entities:
   - uid: 3
