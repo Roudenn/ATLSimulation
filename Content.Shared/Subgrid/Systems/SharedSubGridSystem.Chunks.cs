@@ -246,8 +246,9 @@ public abstract partial class SharedSubGridSystem
     /// <summary>
     ///
     /// </summary>
-    /// <param name="aabb"></param>
-    /// <returns></returns>
+    /// <param name="aabb">Box made of some grid positions.</param>
+    /// <returns>Pairs of chunk indices and their indexes that correspond to the box.</returns>
+    // TODO maybe this shouldn't return a hashset
     public HashSet<(Vector2i, int[])> GetTileIndexesWorld(Box2 aabb)
     {
         var set = new HashSet<(Vector2i, int[])>();
@@ -281,8 +282,11 @@ public abstract partial class SharedSubGridSystem
 
     private List<Box2> AABBIntersectRecursiveChunks(Box2 aabb, int count = 0)
     {
-        if (count > 10)
-            Log.Warning("uummm");
+        if (count > 20)
+        {
+            Log.Error($"Recursion for splitting box {aabb} was taking too much operations, falling back to an empty space.");
+            return new List<Box2>();
+        }
 
         // Make sure that the resulting boxes don't intersect with other chunks.
         var bottomLeftChunkInter = GetChunkIndices(aabb.BottomLeft);

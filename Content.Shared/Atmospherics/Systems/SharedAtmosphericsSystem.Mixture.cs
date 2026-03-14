@@ -3,7 +3,6 @@ using Content.Shared.Constants;
 using Content.Shared.Temperature.HeatContainers;
 using JetBrains.Annotations;
 using Robust.Shared.Prototypes;
-using Robust.Shared.Utility;
 
 namespace Content.Shared.Atmospherics.Systems;
 
@@ -14,14 +13,14 @@ public abstract partial class SharedAtmosphericsSystem
     public GasMixture GetGridMixture(EntityUid grid)
     {
         var mixture = _atmosGridQuery.CompOrNull(grid)?.Mixture ?? GetSpaceMixture();
-        DebugTools.Assert(mixture.Immutable);
+        mixture.SetVolume(_subGrid.SubGridTileVolume);
         return mixture;
     }
 
     [PublicAPI]
     public GasMixture GetSpaceMixture()
     {
-        return new GasMixture(GasManager, _subGrid.SubGridTileVolume, PhysicalConstants.TCMB, true);
+        return new GasMixture(GasManager.Count, _subGrid.SubGridTileVolume, PhysicalConstants.TCMB);
     }
 
     [PublicAPI]

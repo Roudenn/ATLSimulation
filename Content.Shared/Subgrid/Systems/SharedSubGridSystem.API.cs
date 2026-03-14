@@ -106,6 +106,36 @@ public abstract partial class SharedSubGridSystem
     }
 
     /// <summary>
+    /// Gets all atmosphere chunks on a grid and adds them to a given dictionary.
+    /// </summary>
+    /// <remarks>
+    /// Remember to clear the dictionary before passing any information into it!
+    /// </remarks>
+    /// <param name="grid">A grid to find the chunks on.</param>
+    /// <param name="map">A cache dictionary to add the chunk data.</param>
+    /// <param name="chunkIndices"></param>
+    [PublicAPI]
+    public void ResolveMapRelativeToChunk(Entity<SubGridComponent> grid, ref Dictionary<Vector2i, (TileAtmos[], TileHeat[])> map, Vector2i chunkIndices)
+    {
+        foreach (var dir in DirectionsWithDiagonals)
+        {
+            var chunkPos = chunkIndices + dir;
+            if (!grid.Comp.ChunkEntities.TryGetValue(chunkPos, out var chunk))
+                continue;
+
+            var chunkComp = ChunkQuery.Comp(chunk);
+            map.Add(chunkPos, (chunkComp.AtmosphereMap, chunkComp.TemperatureMap));
+        }
+
+        // Also include the center
+        if (!grid.Comp.ChunkEntities.TryGetValue(chunkIndices, out var centerChunk))
+            return;
+
+        var centerChunkComp = ChunkQuery.Comp(centerChunk);
+        map.Add(chunkIndices, (centerChunkComp.AtmosphereMap, centerChunkComp.TemperatureMap));
+    }
+
+    /// <summary>
     /// Tries to find an atmosphere tile near some other tile.
     /// </summary>
     /// <param name="chunks">A map of all chunks on a grid.</param>

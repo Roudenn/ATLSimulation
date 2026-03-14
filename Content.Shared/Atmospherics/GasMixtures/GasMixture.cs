@@ -57,12 +57,11 @@ public partial struct GasMixture : IRobustCloneable<GasMixture>
     /// <summary>
     /// Constructs a new gas mixture without any gas.
     /// </summary>
-    public GasMixture(GasPrototypeManager manager, float volume, float temperature, bool immutable = false)
+    public GasMixture(int size, float volume, float temperature)
     {
-        Moles = new float[manager.ArraySize];
+        Moles = new float[size];
         Volume = volume;
         HeatContainer = new HeatContainer(SystemConstants.MinimumHeatCapacity, temperature, 0f);
-        Immutable = immutable;
     }
 
     /// <summary>
