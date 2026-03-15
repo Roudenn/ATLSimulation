@@ -6,7 +6,7 @@ using Robust.Shared.GameObjects;
 namespace Content.Shared.IntegrationTests.Atmospherics;
 
 [Parallelizable(ParallelScope.All | ParallelScope.Fixtures)]
-[TestFixture, TestOf(typeof(GasMixtureHelpers))]
+[TestFixture]
 public sealed class SubGridTest
 {
     public async Task Test()

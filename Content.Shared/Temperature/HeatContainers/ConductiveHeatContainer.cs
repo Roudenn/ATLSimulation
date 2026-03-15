@@ -5,13 +5,12 @@ namespace Content.Shared.Temperature.HeatContainers;
 
 /// <summary>
 /// A general-purpose container for heat energy.
-/// Any object that contains, stores, or transfers heat should use a <see cref="HeatContainer"/>
-/// instead of implementing its own system.
-/// This allows for consistent heat transfer mechanics across different objects and systems.
+/// This variation of <see cref="HeatContainer"/> also stores conductance inside itself,
+/// which is useful if the container is frequently used for heat conduction.
 /// </summary>
 [Serializable, NetSerializable, DataDefinition]
-[Access(typeof(HeatContainerHelpers))]
-public partial struct HeatContainer : IRobustCloneable<HeatContainer>, IHeatContainer
+[Access(typeof(HeatContainerHelpers), typeof(ConductiveHeatContainerHelpers))]
+public partial struct ConductiveHeatContainer : IRobustCloneable<ConductiveHeatContainer>, IHeatContainer
 {
     /// <summary>
     /// The heat capacity of this container in Joules per Kelvin.
@@ -27,6 +26,14 @@ public partial struct HeatContainer : IRobustCloneable<HeatContainer>, IHeatCont
     /// </summary>
     [DataField]
     public float Temperature { get; set; } = PhysicalConstants.ROOM_TEMPERATURE;
+
+    /// <summary>
+    /// The thermal conductance in watt per kelvin.
+    /// This describes how well heat flows between the bodies.
+    /// Higher values mean container gives away heat faster.
+    /// </summary>
+    [DataField]
+    public float ThermalConductance { get; set; }
 
     /// <summary>
     /// If true, the temperature of the heat container cannot be changed.
@@ -48,20 +55,32 @@ public partial struct HeatContainer : IRobustCloneable<HeatContainer>, IHeatCont
     [ViewVariables]
     public float InternalEnergy => Temperature * HeatCapacity;
 
-    public HeatContainer(float heatCapacity, float temperature)
+    public ConductiveHeatContainer(float heatCapacity, float temperature, float thermalConductance, bool immutable = false)
     {
         HeatCapacity = heatCapacity;
         Temperature = temperature;
+        ThermalConductance = thermalConductance;
+        Immutable = immutable;
     }
 
-    private HeatContainer(HeatContainer c)
+    public ConductiveHeatContainer(HeatContainer c, float thermalConductance)
     {
         HeatCapacity = c.HeatCapacity;
         Temperature = c.Temperature;
+        ThermalConductance = thermalConductance;
+        Immutable = c.Immutable;
     }
 
-    public HeatContainer Clone()
+    private ConductiveHeatContainer(ConductiveHeatContainer c)
     {
-        return new HeatContainer(this);
+        HeatCapacity = c.HeatCapacity;
+        Temperature = c.Temperature;
+        ThermalConductance = c.ThermalConductance;
+        Immutable = c.Immutable;
+    }
+
+    public ConductiveHeatContainer Clone()
+    {
+        return new ConductiveHeatContainer(this);
     }
 }

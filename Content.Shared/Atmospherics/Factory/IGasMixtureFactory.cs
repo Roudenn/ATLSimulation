@@ -1,9 +1,9 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace Content.Shared.Atmospherics;
+namespace Content.Shared.Atmospherics.Factory;
 
-public interface IGasPrototypeManager : IEnumerable<GasPrototype>
-{ 
+public interface IGasMixtureFactory : IEnumerable<GasPrototype>
+{
         /// <summary>
         ///     Indexer to retrieve a gas definition by name.
         /// </summary>
@@ -40,7 +40,7 @@ public interface IGasPrototypeManager : IEnumerable<GasPrototype>
         ///     The number of gas definitions contained inside of this manager.
         /// </summary>
         int Count { get; }
-        
+
         /// <summary>
         ///     Array size that should be applied to all gas mixtures.
         /// </summary>

@@ -1,4 +1,5 @@
-﻿using Content.Shared.Atmospherics.Factory;
+﻿using System.Numerics;
+using Content.Shared.Atmospherics.Factory;
 using Content.Shared.Temperature;
 using Robust.Shared.Serialization;
 
@@ -9,13 +10,19 @@ namespace Content.Shared.Atmospherics.GasMixtures;
 /// </summary>
 [Serializable, NetSerializable, DataDefinition]
 [Access(typeof(GasMixtureFactory))]
-public partial struct GasMixture : IGasMixture, IRobustCloneable<GasMixture>
+public partial struct VelocityGasMixture : IGasMixture, IRobustCloneable<VelocityGasMixture>
 {
     /// <summary>
     /// Contains an amount of every single gas in moles.
     /// </summary>
     [DataField(customTypeSerializer: typeof(GasArraySerializer))]
     public float[] Moles { get; set; }
+
+    /// <summary>
+    /// Current velocity of gas in meters per second.
+    /// </summary>
+    [DataField]
+    public Vector2 Velocity { get; set; }
 
     /// <summary>
     /// Volume of the mixture's container.
@@ -47,11 +54,12 @@ public partial struct GasMixture : IGasMixture, IRobustCloneable<GasMixture>
     /// <summary>
     /// Constructs a new gas mixture without any gas.
     /// </summary>
-    public GasMixture(int size, float volume, float temperature, bool immutable = false)
+    public VelocityGasMixture(int size, float volume, float temperature, Vector2 velocity, bool immutable = false)
     {
         Moles = new float[size];
         Volume = volume;
         Temperature = temperature;
+        Velocity = velocity;
         Immutable = immutable;
     }
 
@@ -61,24 +69,35 @@ public partial struct GasMixture : IGasMixture, IRobustCloneable<GasMixture>
     /// <remarks>
     /// Ensure that the array size is correct and heat container has correct heat capacity relatively to the <see cref="Moles"/> array.
     /// </remarks>
-    public GasMixture(float[] moles, float volume, float temperature, bool immutable = false)
+    public VelocityGasMixture(float[] moles, float volume, float temperature, Vector2 velocity, bool immutable = false)
     {
         Moles = moles;
         Volume = volume;
         Temperature = temperature;
+        Velocity = velocity;
         Immutable = immutable;
     }
 
-    public GasMixture(GasMixture m)
+    public VelocityGasMixture(GasMixture m, Vector2 velocity)
     {
         Moles = m.Moles;
         Volume = m.Volume;
         Temperature = m.Temperature;
+        Velocity = velocity;
         Immutable = m.Immutable;
     }
 
-    public GasMixture Clone()
+    public VelocityGasMixture(VelocityGasMixture m)
     {
-        return new GasMixture(this);
+        Moles = m.Moles;
+        Volume = m.Volume;
+        Temperature = m.Temperature;
+        Velocity = m.Velocity;
+        Immutable = m.Immutable;
+    }
+
+    public VelocityGasMixture Clone()
+    {
+        return new VelocityGasMixture(this);
     }
 }

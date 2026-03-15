@@ -1,4 +1,5 @@
-﻿using Content.Shared.Atmospherics.GasMixtures;
+﻿using System.Numerics;
+using Content.Shared.Atmospherics.GasMixtures;
 using Content.Shared.Subgrid;
 using Robust.Shared.Serialization;
 
@@ -15,14 +16,14 @@ public partial struct TileAtmos : IRobustCloneable<TileAtmos>, ISubGridTile
     /// If you need to get safe information about the mixture, check <see cref="ArchivedMixture"/>
     /// </remarks>
     [DataField]
-    public GasMixture Mixture;
+    public VelocityGasMixture Mixture;
 
     /// <summary>
     /// Contains the state of tile's gas mixture on the previous atmos tick.
     /// When the tile is first created, it's the same as the basic <see cref="Mixture"/>.
     /// </summary>
     [DataField]
-    public GasMixture ArchivedMixture;
+    public VelocityGasMixture ArchivedMixture;
 
     /// <summary>
     /// If true, this tile shares the mixture of air with the parent map.
@@ -42,8 +43,8 @@ public partial struct TileAtmos : IRobustCloneable<TileAtmos>, ISubGridTile
 
     public TileAtmos(GasMixture mixture)
     {
-        Mixture = mixture;
-        ArchivedMixture = mixture;
+        Mixture = new VelocityGasMixture(mixture, Vector2.Zero);
+        ArchivedMixture = new VelocityGasMixture(mixture, Vector2.Zero);
         MapAtmosphere = mixture.Immutable;
     }
 

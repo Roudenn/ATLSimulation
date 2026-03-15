@@ -1,3 +1,4 @@
+using Content.Shared.Atmospherics.Factory;
 using Robust.Shared.Serialization;
 using Robust.Shared.Serialization.Manager;
 using Robust.Shared.Serialization.Markdown;
@@ -34,7 +35,7 @@ public sealed class GasArraySerializer : ITypeSerializer<float[], SequenceDataNo
         ISerializationContext? context = null,
         ISerializationManager.InstantiationDelegate<float[]>? instanceProvider = null)
     {
-        var gasMan = dependencies.Resolve<GasPrototypeManager>();
+        var gasMan = dependencies.Resolve<GasMixtureFactory>();
         var list = instanceProvider != null ? instanceProvider() : new float[gasMan.Count];
 
         for (var i = 0; i < node.Sequence.Count; i++)
@@ -50,7 +51,7 @@ public sealed class GasArraySerializer : ITypeSerializer<float[], SequenceDataNo
         IDependencyCollection dependencies,
         ISerializationContext? context = null)
     {
-        var gasMan = dependencies.Resolve<GasPrototypeManager>();
+        var gasMan = dependencies.Resolve<GasMixtureFactory>();
         var dict = new Dictionary<ValidationNode, ValidationNode>();
 
         foreach (var (key, value) in node.Children)
@@ -72,7 +73,7 @@ public sealed class GasArraySerializer : ITypeSerializer<float[], SequenceDataNo
         ISerializationContext? context = null,
         ISerializationManager.InstantiationDelegate<float[]>? instanceProvider = null)
     {
-        var gasMan = dependencies.Resolve<GasPrototypeManager>();
+        var gasMan = dependencies.Resolve<GasMixtureFactory>();
         var list = instanceProvider != null ? instanceProvider() : new float[gasMan.Count];
 
         foreach (var (gas, value) in node.Children)
@@ -95,7 +96,7 @@ public sealed class GasArraySerializer : ITypeSerializer<float[], SequenceDataNo
         bool alwaysWrite = false,
         ISerializationContext? context = null)
     {
-        var gasMan = dependencies.Resolve<GasPrototypeManager>();
+        var gasMan = dependencies.Resolve<GasMixtureFactory>();
         var mapping = new MappingDataNode();
 
         for (var i = 0; i < gasMan.Count; i++)

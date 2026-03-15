@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace Content.Shared.Atmospherics;
+namespace Content.Shared.Atmospherics.Factory;
 
-public sealed class GasPrototypeManager : IEnumerable<GasPrototype> // : IGasPrototypeManager
+public sealed partial class GasMixtureFactory : IGasMixtureFactory
 {
     private readonly List<GasPrototype> GasDefs;
     private readonly Dictionary<string, GasPrototype> _gasNames;
@@ -10,7 +10,7 @@ public sealed class GasPrototypeManager : IEnumerable<GasPrototype> // : IGasPro
     /// <summary>
     /// Default Constructor.
     /// </summary>
-    public GasPrototypeManager()
+    public GasMixtureFactory()
     {
         GasDefs = new List<GasPrototype>();
         _gasNames = new Dictionary<string, GasPrototype>();
@@ -35,7 +35,7 @@ public sealed class GasPrototypeManager : IEnumerable<GasPrototype> // : IGasPro
     }
 
     public int Count => GasDefs.Count;
-    
+
     public int ArraySize => MathHelper.NextMultipleOf(Count, 4);
 
     public GasPrototype this[string name] => _gasNames[name];
@@ -58,12 +58,12 @@ public sealed class GasPrototypeManager : IEnumerable<GasPrototype> // : IGasPro
         definition = GasDefs[id];
         return true;
     }
-    
+
     public IEnumerator<GasPrototype> GetEnumerator()
     {
         return GasDefs.GetEnumerator();
     }
-    
+
     System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
     {
         return GetEnumerator();

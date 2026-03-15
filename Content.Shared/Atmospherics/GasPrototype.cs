@@ -47,9 +47,6 @@ public sealed partial class GasPrototype : IPrototype, IInheritingPrototype
     [ViewVariables]
     public byte GasId { get; private set; }
 
-    [ViewVariables]
-    public float PrandtlNumber => SpecificMolarHeat * Viscosity / (ThermalConductivity * MolarMass) / 1000f;
-
     /// <summary>
     /// The literal name of the material that can be seen by users.
     /// </summary>

@@ -1,4 +1,4 @@
-﻿using Content.Shared.Temperature.HeatContainers;
+﻿using System.Numerics;
 
 namespace Content.Shared.Atmospherics;
 
@@ -8,13 +8,20 @@ namespace Content.Shared.Atmospherics;
 public struct GasMixEntry(
     float volume,
     float pressure,
-    HeatContainer heatContainer,
-    GasEntry[]? gases = null)
+    float temperature,
+    float heatCapacity,
+    float thermalConductivity,
+    float mass,
+    GasEntry[]? gases = null,
+    Vector2? speed = null)
 {
     public readonly float Volume = volume;
     public readonly float Pressure = pressure;
+    public readonly float Temperature = temperature;
+    public readonly float HeatCapacity = heatCapacity;
+    public readonly float ThermalConductivity = thermalConductivity;
+    public readonly float Mass = mass;
     public readonly GasEntry[]? Gases = gases;
-    public readonly HeatContainer HeatContainer = heatContainer;
 }
 
 /// <summary>

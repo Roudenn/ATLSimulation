@@ -11,13 +11,13 @@ public partial struct TileHeat : IRobustCloneable<TileHeat>, ISubGridTile
     /// The main container of this temperature tile.
     /// </summary>
     [DataField]
-    public HeatContainer Container;
+    public ConductiveHeatContainer Container;
 
     /// <summary>
     /// The main container of this temperature tile.
     /// </summary>
     [DataField]
-    public HeatContainer ArchivedContainer;
+    public ConductiveHeatContainer ArchivedContainer;
 
     [ViewVariables]
     public int CurrentTick { get; set; }
@@ -35,11 +35,11 @@ public partial struct TileHeat : IRobustCloneable<TileHeat>, ISubGridTile
 
     public TileHeat(float heatCapacity, float temperature, float thermalConductance, bool immutable = false)
     {
-        Container = new HeatContainer(heatCapacity, temperature, thermalConductance, immutable);
-        ArchivedContainer = new HeatContainer(heatCapacity, temperature, thermalConductance, immutable);
+        Container = new ConductiveHeatContainer(heatCapacity, temperature, thermalConductance, immutable);
+        ArchivedContainer = new ConductiveHeatContainer(heatCapacity, temperature, thermalConductance, immutable);
     }
 
-    public TileHeat(HeatContainer container)
+    public TileHeat(ConductiveHeatContainer container)
     {
         Container = container;
         ArchivedContainer = container;

@@ -68,7 +68,7 @@ public sealed partial class GasInspectControl : BoxContainer
         // If there is no gas, it doesn't really have a temperature, so skip displaying it
         if (gasMix.Pressure > SystemConstants.GasMinMoles)
         {
-            HeatInspect.Populate(gasMix.HeatContainer);
+            HeatInspect.Populate(gasMix.Temperature, gasMix.HeatCapacity, gasMix.ThermalConductivity);
         }
 
         if (gasMix.Gases == null || gasMix.Gases?.Length == 0)

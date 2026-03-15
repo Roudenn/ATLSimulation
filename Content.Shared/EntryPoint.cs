@@ -1,4 +1,5 @@
 using Content.Shared.Atmospherics;
+using Content.Shared.Atmospherics.Factory;
 using Content.Shared.Maps;
 using JetBrains.Annotations;
 using Robust.Shared.ContentPack;
@@ -68,10 +69,10 @@ public sealed class EntryPoint : GameShared
 
         foreach (var tileDef in prototypeList)
         {
-            Dependencies.Resolve<GasPrototypeManager>().Register(tileDef);
+            Dependencies.Resolve<GasMixtureFactory>().Register(tileDef);
         }
 
-        Dependencies.Resolve<GasPrototypeManager>().Initialize();
+        Dependencies.Resolve<GasMixtureFactory>().Initialize();
     }
 
     private void PrototypeReload(PrototypesReloadedEventArgs obj)
@@ -84,7 +85,7 @@ public sealed class EntryPoint : GameShared
 
         foreach (var gas in _prototypeManager.EnumeratePrototypes<GasPrototype>())
         {
-            gas.AssignGasId(Dependencies.Resolve<GasPrototypeManager>()[gas.ID].GasId);
+            gas.AssignGasId(Dependencies.Resolve<GasMixtureFactory>()[gas.ID].GasId);
         }
     }
 }

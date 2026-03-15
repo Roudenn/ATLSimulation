@@ -1,5 +1,5 @@
 ﻿using System.Numerics;
-using Content.Shared.Atmospherics;
+using Content.Shared.Atmospherics.Factory;
 using Content.Shared.Constants;
 using Content.Shared.Subgrid.Components;
 using Content.Shared.Subgrid.Systems;
@@ -16,11 +16,11 @@ public sealed class AtmosCompositionOverlay : Overlay
 {
     private readonly IEntityManager _entityManager;
     private readonly IEyeManager _eyeManager;
-    private readonly GasPrototypeManager _gasManager;
+    private readonly GasMixtureFactory _gasManager;
     private readonly SharedTransformSystem _xform;
     private readonly SharedSubGridSystem _subGrid;
 
-    public AtmosCompositionOverlay(IEntityManager entityManager, IEyeManager eyeManager, GasPrototypeManager gasManager, SharedTransformSystem xform, SharedSubGridSystem subGrid)
+    public AtmosCompositionOverlay(IEntityManager entityManager, IEyeManager eyeManager, GasMixtureFactory gasManager, SharedTransformSystem xform, SharedSubGridSystem subGrid)
     {
         _entityManager = entityManager;
         _eyeManager = eyeManager;
@@ -59,7 +59,7 @@ public sealed class AtmosCompositionOverlay : Overlay
                         continue;
 
                     var color = _gasManager[j].Color;
-                    var alpha = tile.ArchivedMixture.MolesRatio[j] / 3f;
+                    var alpha = tile.ArchivedMixture.Moles[j] / 3f;
                     args.WorldHandle.DrawRect(box, color.WithAlpha(alpha));
                 }
             }

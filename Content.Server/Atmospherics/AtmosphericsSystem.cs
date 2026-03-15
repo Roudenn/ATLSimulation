@@ -1,6 +1,5 @@
 ﻿using Content.Server.SubGrid;
 using Content.Shared.Atmospherics;
-using Content.Shared.Atmospherics.GasMixtures;
 using Content.Shared.Atmospherics.Systems;
 using Content.Shared.Subgrid.Components;
 using Robust.Shared.Map;
@@ -32,7 +31,7 @@ public sealed partial class AtmosphericsSystem : SharedAtmosphericsSystem
 
         foreach (var index in indexes)
         {
-            AddHeat(ref chunk.Value.Comp.AtmosphereMap[index].Mixture, energy);
+            GasManager.AddHeat(ref chunk.Value.Comp.AtmosphereMap[index].Mixture, energy);
         }
     }
 
@@ -47,20 +46,7 @@ public sealed partial class AtmosphericsSystem : SharedAtmosphericsSystem
 
         foreach (var index in indexes)
         {
-            AdjustMoles(ref chunk.Value.Comp.AtmosphereMap[index].Mixture, gas, moles);
-        }
-    }
-
-    public override void SetVolumeArea(Entity<SubGridComponent?, MapGridComponent?> grid, TileRef tile, float volume)
-    {
-        if (!_mapGridQuery.Resolve(grid.Owner, ref grid.Comp2)
-            || !_subGrid.TryGetChunk(grid, tile, out var chunk))
-            return;
-
-        var indexes = _subGrid.GetAreaTileIndexesAtTile(chunk.Value.Comp.ChunkIndices, tile.GridIndices, grid.Comp2.TileSizeVector);
-        foreach (var index in indexes)
-        {
-            chunk.Value.Comp.AtmosphereMap[index].Mixture.SetVolume(volume);
+            GasManager.AddMoles(ref chunk.Value.Comp.AtmosphereMap[index].Mixture, gas, moles);
         }
     }
 }

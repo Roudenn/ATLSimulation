@@ -37,14 +37,14 @@ public sealed class SubGridSetVolumeMessage(NetEntity targetGrid, Vector2i tileI
 
 [ByRefEvent]
 public record struct InspectSubGridAtmosphereTile(
-    GasMixture? GasMixture,
+    VelocityGasMixture? GasMixture,
     EntityUid Grid,
     Vector2i ChunkIndices,
     int Index);
 
 [ByRefEvent]
 public record struct InspectSubGridHeatTile(
-    HeatContainer? HeatContainer,
+    ConductiveHeatContainer? HeatContainer,
     EntityUid Grid,
     Vector2i ChunkIndices,
     int Index);

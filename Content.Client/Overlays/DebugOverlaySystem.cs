@@ -2,6 +2,7 @@
 using Content.Client.Subgrid.Overlays;
 using Content.Client.Temperature.Overlays;
 using Content.Shared.Atmospherics;
+using Content.Shared.Atmospherics.Factory;
 using Content.Shared.Subgrid.Systems;
 using Robust.Client.Graphics;
 using Robust.Client.Player;
@@ -16,7 +17,7 @@ public sealed class DebugOverlaySystem : EntitySystem
     [Dependency] private readonly IOverlayManager _overlayMan = default!;
     [Dependency] private readonly SharedTransformSystem _xform = default!;
     [Dependency] private readonly SharedSubGridSystem _subGrid = default!;
-    [Dependency] private readonly GasPrototypeManager _gasManager = default!;
+    [Dependency] private readonly GasMixtureFactory _gasManager = default!;
 
     private SubGridChunkOverlay _subGridChunkOverlay = default!;
     private SubGridTileOverlay _subGridTileOverlay = default!;

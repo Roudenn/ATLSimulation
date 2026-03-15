@@ -177,7 +177,6 @@ public sealed partial class SubGridSystem
     {
         // Check if it is located near space, and add a boundary layer of atmosphere tiles.
         var spaceMix = _atmos.GetSpaceMixture();
-        spaceMix.MarkImmutable();
         foreach (var vecDir in DirectionsWithDiagonals)
         {
             var tileRef = MapSystem.GetTileRef(grid.Owner, grid.Comp2, gridIndices + vecDir);
@@ -260,7 +259,8 @@ public sealed partial class SubGridSystem
             // Volume * Density = Mass, SpecificHeatCapacity * Mass = HeatCapacity.
             heatCapacity = material.SpecificHeatCapacity * SubGridTileVolume * material.Density;
             // Conductance = ThermalConductivity * Characteristic Length.
-            conductance = material.ThermalConductivity * SubGridWorldSize;
+            // Height is taken because of how Fourier's Law is canceled out for rectangular prisms.
+            conductance = material.ThermalConductivity * SubGridHeight;
             break;
         }
 
