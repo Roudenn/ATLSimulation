@@ -93,7 +93,7 @@ public sealed class StatisticsTabUIController : UIController
             return;
 
         var conductiveHeatContainer = args.HeatContainer.Value;
-        StatisticsTab.HeatInspector.Populate(ref conductiveHeatContainer);
+        StatisticsTab.HeatInspector.Populate(conductiveHeatContainer);
         StatisticsTab.HeatInspector.Visible = true;
         StatisticsTab.GasInspector.Visible = false;
     }

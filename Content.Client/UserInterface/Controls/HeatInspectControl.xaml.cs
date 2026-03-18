@@ -17,7 +17,7 @@ public sealed partial class HeatInspectControl : BoxContainer
         RobustXamlLoader.Load(this);
     }
 
-    public void Populate<T>(ref T container) where T : IHeatContainer
+    public void Populate<T>(T container) where T : IHeatContainer
     {
         DataContainer.RemoveAllChildren();
         // Temperature
@@ -51,7 +51,7 @@ public sealed partial class HeatInspectControl : BoxContainer
         }
     }
 
-    public void Populate(ref ConductiveHeatContainer container)
+    public void Populate(ConductiveHeatContainer container)
     {
         DataContainer.RemoveAllChildren();
         // Temperature

@@ -17,9 +17,13 @@ public sealed class GasMixtureTest
         await pair.RunTicksSync(30);
         await pair.Server.WaitPost(() =>
         {
-            var mixture = atmosSystem.ResolveMixture("Air", 1f);
-            var entry = atmosSystem.GenerateGaxMixEntry(mixture);
-            Assert.Warn(entry.ToString());
+            var mixture1 = atmosSystem.ResolveMixture("AirComposition", 1f);
+            var entry1 = atmosSystem.GenerateGaxMixEntry(mixture1);
+            Assert.Warn(entry1.ToString());
+
+            var mixture2 = atmosSystem.ResolveMixture("AirPercentage", 1f);
+            var entry2 = atmosSystem.GenerateGaxMixEntry(mixture2);
+            Assert.Warn(entry2.ToString());
         });
 
         await pair.CleanReturnAsync();

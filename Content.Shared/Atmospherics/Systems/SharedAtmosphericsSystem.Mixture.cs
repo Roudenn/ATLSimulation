@@ -13,19 +13,10 @@ public abstract partial class SharedAtmosphericsSystem
     /// Creates a gas mixture based on a prototype with explicitly specified volume.
     /// </summary>
     [PublicAPI]
-    public GasMixture ResolveMixture(ProtoId<GasMixturePrototype> mix, float volume)
+    public IGasMixture ResolveMixture(ProtoId<GasMixturePrototype> mix, float volume)
     {
         var proto = _protoMan.Index(mix);
-        var array = new float[GasManager.ArraySize];
-        foreach (var (id, value) in proto.Moles)
-        {
-            if (!_protoMan.Resolve<GasPrototype>(id, out var gasProto))
-                continue;
-
-            array[gasProto.GasId] = value;
-        }
-
-        return new GasMixture(array, volume, proto.Temperature);
+        return proto.Definition.CreateMixture(GasManager, _protoMan, volume);
     }
 
     [PublicAPI]

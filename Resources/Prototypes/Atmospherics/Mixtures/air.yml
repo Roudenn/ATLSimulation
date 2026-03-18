@@ -1,9 +1,22 @@
 ﻿- type: gasMixture
-  id: Air
-  temperature: 293.15
-  moles:
-    Oxygen: 8.601
-    Nitrogen: 32.061
-    Argon: 0.382
-    WaterVapor: 0.480
-    CarbonDioxide: 0.017
+  id: AirComposition
+  definition: !type:MixtureCompositionDefinition
+    temperature: 293.15
+    moles:
+      Nitrogen: 32.061
+      Oxygen: 8.601
+      Argon: 0.382
+      WaterVapor: 0.480
+      CarbonDioxide: 0.017
+
+- type: gasMixture
+  id: AirPercentage
+  definition: !type:MixturePercentageDefinition
+    temperature: 293.15
+    pressure: 101.25
+    percentages:
+      Nitrogen: 0.7808
+      Oxygen: 0.2095
+      Argon: 0.0093
+      WaterVapor: 0.01156
+      CarbonDioxide: 0.0004

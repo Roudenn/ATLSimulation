@@ -25,7 +25,7 @@ public abstract partial class SharedAtmosphericsSystem : EntitySystem
         _atmosGridQuery = GetEntityQuery<GridAtmosphereComponent>();
     }
 
-    public GasMixEntry GenerateGaxMixEntry(GasMixture m)
+    public GasMixEntry GenerateGaxMixEntry<T>(T m) where T : IGasMixture
     {
         var gases = new GasEntry[GasManager.ArraySize];
         for (var index = 0; index < m.Moles.Length; index++)

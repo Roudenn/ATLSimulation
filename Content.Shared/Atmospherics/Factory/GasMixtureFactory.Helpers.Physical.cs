@@ -118,5 +118,5 @@ public sealed partial class GasMixtureFactory
 
     [PublicAPI]
     public float GetPrandtlNumber<T>(ref T m, float thermalConductivity, float viscosity) where T : IGasMixture
-        => GetHeatCapacity(ref m) * viscosity / thermalConductivity;
+        => GetHeatCapacity(ref m) * viscosity / MathF.Max(thermalConductivity, SystemConstants.MinimumHeatCapacity);
 }

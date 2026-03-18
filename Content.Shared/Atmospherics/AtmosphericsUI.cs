@@ -72,6 +72,6 @@ public struct GasEntry
         return Loc.GetString(
             "gas-entry-info",
             ("gasName", Loc.GetString(Name)),
-            ("gasAmount", $"{Amount:0.00}"));
+            ("gasAmount", $"{Amount:0.000}"));
     }
 }
