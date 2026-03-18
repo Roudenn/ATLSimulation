@@ -1,0 +1,9 @@
+﻿- type: gasMixture
+  id: Air
+  temperature: 293.15
+  moles:
+    Oxygen: 8.601
+    Nitrogen: 32.061
+    Argon: 0.382
+    WaterVapor: 0.480
+    CarbonDioxide: 0.017

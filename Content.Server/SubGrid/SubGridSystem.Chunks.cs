@@ -158,7 +158,7 @@ public sealed partial class SubGridSystem
         ref TileAtmos[] atmos,
         bool gridMixture = false)
     {
-        var gridMix = gridMixture ? _atmos.GetGridMixture(grid.Owner) : _atmos.GetSpaceMixture();
+        var gridMix = gridMixture ? _atmos.GetGridMixture(grid.Owner) : _atmos.GetSpaceTileMixture();
 
         var subTiles = GetAreaTileIndexesAtTile(chunkIndices, gridIndices, grid.Comp2.TileSizeVector);
         foreach (var index in subTiles)
@@ -176,7 +176,7 @@ public sealed partial class SubGridSystem
         Dictionary<Vector2i, (TileAtmos[] Atmos, TileHeat[] Heat)> nearChunks)
     {
         // Check if it is located near space, and add a boundary layer of atmosphere tiles.
-        var spaceMix = _atmos.GetSpaceMixture();
+        var spaceMix = _atmos.GetSpaceTileMixture();
         foreach (var vecDir in DirectionsWithDiagonals)
         {
             var tileRef = MapSystem.GetTileRef(grid.Owner, grid.Comp2, gridIndices + vecDir);

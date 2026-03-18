@@ -24,7 +24,7 @@ public sealed partial class GasMixtureFactory
 
     [PublicAPI]
     public float GetPressure<T>(ref T m) where T : IGasMixture
-        => GetTotalMoles(ref m) * m.Temperature * PhysicalConstants.R / m.Volume;
+        => GetTotalMoles(ref m) / 1000f * m.Temperature * PhysicalConstants.R / m.Volume;
 
     /// <summary>
     /// Gets the heat capacity of a mixture.
@@ -62,20 +62,19 @@ public sealed partial class GasMixtureFactory
     [PublicAPI]
     public float GetThermalConductivity<T>(ref T m) where T : IGasMixture
     {
-        GetMolesRatio(ref m, ref GasBufferRatios);
-        NumericsHelpers.Multiply(GasBufferRatios, GasMolarMassesSquareRoots, GasBuffer);
+        NumericsHelpers.Multiply(m.Moles, GasMolarMassesSquareRoots, GasBuffer);
         NumericsHelpers.Multiply(GasBuffer, GasThermalConductivities, GasBuffer2);
-        var result = NumericsHelpers.HorizontalAdd(GasBuffer) / NumericsHelpers.HorizontalAdd(GasBuffer2);
+        var bottomPart = NumericsHelpers.HorizontalAdd(GasBuffer);
+        var topPart = NumericsHelpers.HorizontalAdd(GasBuffer2);
         ClearBuffer(ref GasBuffer, ref GasBuffer2, ref GasBufferRatios);
-        return result;
+        return topPart / MathF.Max(bottomPart, SystemConstants.MinimumHeatCapacity);
     }
 
     [PublicAPI]
     public float GetMass<T>(ref T m) where T : IGasMixture
     {
         NumericsHelpers.Multiply(m.Moles, GasMolarMasses, GasBuffer);
-        NumericsHelpers.Multiply(m.Moles, PhysicalConstants.GramsToKilograms, GasBuffer);
-        var result = NumericsHelpers.HorizontalAdd(GasBuffer);
+        var result = NumericsHelpers.HorizontalAdd(GasBuffer) / 1000f;
         ClearBuffer(ref GasBuffer);
         return result;
     }
@@ -92,16 +91,16 @@ public sealed partial class GasMixtureFactory
     [PublicAPI]
     public float GetViscosity<T>(ref T m) where T : IGasMixture
     {
-        GetMolesRatio(ref m, ref GasBufferRatios);
-        NumericsHelpers.Multiply(GasBufferRatios, GasMolarMassesSquareRoots, GasBuffer);
+        NumericsHelpers.Multiply(m.Moles, GasMolarMassesSquareRoots, GasBuffer);
         NumericsHelpers.Multiply(GasBuffer, GasViscosities, GasBuffer2);
-        var result = NumericsHelpers.HorizontalAdd(GasBuffer) / NumericsHelpers.HorizontalAdd(GasBuffer2);
+        var bottomPart = NumericsHelpers.HorizontalAdd(GasBuffer);
+        var topPart = NumericsHelpers.HorizontalAdd(GasBuffer2);
         ClearBuffer(ref GasBuffer, ref GasBuffer2, ref GasBufferRatios);
-        return result;
+        return topPart / MathF.Max(bottomPart, SystemConstants.MinimumHeatCapacity) * 10e-7f;
     }
 
     /// <summary>
-    /// Gets the prandtl number of a mixture.
+    /// Gets the Prandtl number of a mixture.
     /// </summary>
     /// <param name="m">The target gas mixture.</param>
     /// <returns>Calculated prandtl number.</returns>
@@ -109,7 +108,7 @@ public sealed partial class GasMixtureFactory
     /// This is an expensive operation! If you've already calculated conductivity and viscosity, use an overload.
     /// </remarks>
     [PublicAPI]
-    public float GetPrantlNumber<T>(ref T m) where T : IGasMixture
+    public float GetPrandtlNumber<T>(ref T m) where T : IGasMixture
     {
         // If that will be a hotspot, then some code here should be unwrapped to make shortcuts.
         var thermalConductivity = GetThermalConductivity(ref m);
@@ -118,6 +117,6 @@ public sealed partial class GasMixtureFactory
     }
 
     [PublicAPI]
-    public float GetPrantlNumber<T>(ref T m, float thermalConductivity, float viscosity) where T : IGasMixture
+    public float GetPrandtlNumber<T>(ref T m, float thermalConductivity, float viscosity) where T : IGasMixture
         => GetHeatCapacity(ref m) * viscosity / thermalConductivity;
 }

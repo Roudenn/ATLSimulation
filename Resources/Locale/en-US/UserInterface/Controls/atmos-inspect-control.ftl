@@ -11,3 +11,5 @@ gas-analyzer-window-percentage-column-name = %
 gas-analyzer-window-molarity-text = {$mol}
 gas-analyzer-window-percentage-text = {$percentage}
 gas-analyzer-window-molarity-percentage-text = {$gasName}: {$amount} mol ({$percentage}%)
+
+gas-entry-info = {$gasName}: {$gasAmount} mol

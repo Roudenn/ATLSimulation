@@ -53,7 +53,7 @@ public sealed class AtmosCompositionOverlay : Overlay
                 var pos = _subGrid.GetPositionFromIndex(subgrid.ChunkIndices, i);
                 var worldTilePos = _xform.ToMapCoordinates(new EntityCoordinates(subgrid.ParentGrid, pos));
                 var box = Box2.CenteredAround(worldTilePos.Position + tileWorldSize / 2f, tileWorldSize);
-                for (int j = 0; j < _gasManager.Count; j++)
+                for (int j = 0; j < _gasManager.ArraySize; j++)
                 {
                     if (tile.ArchivedMixture.Moles[j] < SystemConstants.GasMinMoles)
                         continue;

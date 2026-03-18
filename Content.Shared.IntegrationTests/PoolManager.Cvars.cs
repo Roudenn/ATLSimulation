@@ -1,7 +1,7 @@
 #nullable enable
 using Content.Shared.GameCVars;
 
-namespace Content.UnitTesting;
+namespace Content.Shared.IntegrationTests;
 
 // Partial class containing test cvars
 // This could probably be merged into the main file, but I'm keeping it separate to reduce

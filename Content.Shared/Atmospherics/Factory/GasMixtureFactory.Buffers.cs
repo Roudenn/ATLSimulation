@@ -51,7 +51,7 @@ public sealed partial class GasMixtureFactory
             GasThermalConductivities[i] = gas.ThermalConductivity;
 
             // Pre-calculated values
-            GasMolarMassesSquareRoots[i] = MathF.Sqrt(gas.MolarMass);
+            GasMolarMassesSquareRoots[i] = MathF.Sqrt(gas.MolarMass / 1000f);
         }
     }
 

@@ -6,7 +6,7 @@ using Robust.Shared.GameObjects;
 using Robust.Shared.Map;
 using Robust.Shared.Utility;
 
-namespace Content.UnitTesting;
+namespace Content.Shared.IntegrationTests;
 
 // Contains misc helper functions to make writing tests easier.
 public sealed partial class TestPair

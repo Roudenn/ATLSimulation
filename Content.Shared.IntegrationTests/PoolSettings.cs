@@ -1,4 +1,4 @@
-﻿namespace Content.UnitTesting;
+﻿namespace Content.Shared.IntegrationTests;
 
 /// <inheritdoc/>
 public sealed class PoolSettings : PairSettings

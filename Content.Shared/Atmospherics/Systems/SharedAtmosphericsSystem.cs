@@ -1,5 +1,6 @@
 ﻿using Content.Shared.Atmospherics.Components;
 using Content.Shared.Atmospherics.Factory;
+using Content.Shared.Atmospherics.GasMixtures;
 using Content.Shared.Subgrid.Systems;
 using Robust.Shared.Configuration;
 using Robust.Shared.Prototypes;
@@ -22,5 +23,50 @@ public abstract partial class SharedAtmosphericsSystem : EntitySystem
         InitializeCVars();
 
         _atmosGridQuery = GetEntityQuery<GridAtmosphereComponent>();
+    }
+
+    public GasMixEntry GenerateGaxMixEntry(GasMixture m)
+    {
+        var gases = new GasEntry[GasManager.ArraySize];
+        for (var index = 0; index < m.Moles.Length; index++)
+        {
+            var gasAmount = m.Moles[index];
+            var gasProto = GasManager[index];
+            gases[index] = new GasEntry(gasProto.Name, gasAmount, gasProto.Color);
+        }
+
+        return new GasMixEntry(
+            m.Volume,
+            GasManager.GetPressure(ref m),
+            m.Temperature,
+            GasManager.GetHeatCapacity(ref m),
+            GasManager.GetThermalConductivity(ref m),
+            GasManager.GetViscosity(ref m),
+            GasManager.GetMass(ref m),
+            GasManager.GetPrandtlNumber(ref m),
+            gases);
+    }
+
+    public GasMixEntry GenerateGaxMixEntry(VelocityGasMixture m)
+    {
+        var gases = new GasEntry[GasManager.ArraySize];
+        for (var index = 0; index < m.Moles.Length; index++)
+        {
+            var gasAmount = m.Moles[index];
+            var gasProto = GasManager[index];
+            gases[index] = new GasEntry(gasProto.Name, gasAmount, gasProto.Color);
+        }
+
+        return new GasMixEntry(
+            m.Volume,
+            GasManager.GetPressure(ref m),
+            m.Temperature,
+            GasManager.GetHeatCapacity(ref m),
+            GasManager.GetThermalConductivity(ref m),
+            GasManager.GetViscosity(ref m),
+            GasManager.GetMass(ref m),
+            GasManager.GetPrandtlNumber(ref m),
+            gases,
+            m.Velocity);
     }
 }

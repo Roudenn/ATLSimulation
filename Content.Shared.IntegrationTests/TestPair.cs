@@ -6,7 +6,7 @@ using Robust.Shared.IoC;
 using Robust.Shared.Log;
 using Robust.UnitTesting;
 
-namespace Content.UnitTesting;
+namespace Content.Shared.IntegrationTests;
 
 /// <summary>
 /// This object wraps a pooled server+client pair.

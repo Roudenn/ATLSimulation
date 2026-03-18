@@ -36,7 +36,7 @@ public sealed class GasArraySerializer : ITypeSerializer<float[], SequenceDataNo
         ISerializationManager.InstantiationDelegate<float[]>? instanceProvider = null)
     {
         var gasMan = dependencies.Resolve<GasMixtureFactory>();
-        var list = instanceProvider != null ? instanceProvider() : new float[gasMan.Count];
+        var list = instanceProvider != null ? instanceProvider() : new float[gasMan.ArraySize];
 
         for (var i = 0; i < node.Sequence.Count; i++)
         {
@@ -74,7 +74,7 @@ public sealed class GasArraySerializer : ITypeSerializer<float[], SequenceDataNo
         ISerializationManager.InstantiationDelegate<float[]>? instanceProvider = null)
     {
         var gasMan = dependencies.Resolve<GasMixtureFactory>();
-        var list = instanceProvider != null ? instanceProvider() : new float[gasMan.Count];
+        var list = instanceProvider != null ? instanceProvider() : new float[gasMan.ArraySize];
 
         foreach (var (gas, value) in node.Children)
         {
@@ -99,7 +99,7 @@ public sealed class GasArraySerializer : ITypeSerializer<float[], SequenceDataNo
         var gasMan = dependencies.Resolve<GasMixtureFactory>();
         var mapping = new MappingDataNode();
 
-        for (var i = 0; i < gasMan.Count; i++)
+        for (var i = 0; i < gasMan.ArraySize; i++)
         {
             if (value[i] == 0f)
                 continue; // Skip empty entries, they don't matter.

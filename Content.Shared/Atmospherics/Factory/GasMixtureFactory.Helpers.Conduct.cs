@@ -146,7 +146,7 @@ public sealed partial class GasMixtureFactory
         // Multiplying on 1/1000 because viscosity is measured in µPa·s, which is 10e-6, or 10e-3 after the square root.
         var viscosity = GetViscosity(ref m);
         var reynold = MathF.Sqrt(GetDensity(ref m) * speed * cLength / viscosity * 0.001f);
-        var prantl = GetPrantlNumber(ref m, GetThermalConductivity(ref m), viscosity);
+        var prantl = GetPrandtlNumber(ref m, GetThermalConductivity(ref m), viscosity);
 
         // Calculate the heat transfer coefficient using an approximation: h ≈ 0.664 * Re * ∛Pr * g.
         // Source: https://www.researchgate.net/publication/352146707_Review_of_Convective_Heat_Transfer_Modelling_in_CFD_Simulations_of_Fire-Driven_Flows

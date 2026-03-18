@@ -193,7 +193,7 @@ public sealed partial class GasInspectControl : BoxContainer
             gasBar.AddEntry(gas.Amount,
                 gas.Color,
                 tooltip: Loc.GetString("gas-analyzer-window-molarity-percentage-text",
-                    ("gasName", gas.Name),
+                    ("gasName", Loc.GetString(gas.Name)),
                     ("amount", $"{gas.Amount:0.##}"),
                     ("percentage", $"{(gas.Amount / totalGasAmount * 100):0.#}")));
         }

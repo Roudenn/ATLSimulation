@@ -1,4 +1,5 @@
-﻿namespace Content.UnitTesting;
+﻿// TODO not sure why but it works only if I put it here.
+namespace Content.Shared.IntegrationTests;
 
 [SetUpFixture]
 public sealed class PoolManagerTestEventHandler

@@ -18,6 +18,7 @@ public sealed partial class GasMixtureFactory : IGasMixtureFactory
 
     public void Initialize()
     {
+        InitializeGases();
     }
 
     public void Register(GasPrototype gasDef)

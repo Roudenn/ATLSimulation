@@ -1,10 +1,9 @@
 #nullable enable
 using System.Linq;
 using System.Reflection;
-using Content.Shared.GameCVars;
 using Robust.UnitTesting;
 
-namespace Content.UnitTesting;
+namespace Content.Shared.IntegrationTests;
 
 // The static class exist to avoid breaking changes
 public static partial class PoolManager
