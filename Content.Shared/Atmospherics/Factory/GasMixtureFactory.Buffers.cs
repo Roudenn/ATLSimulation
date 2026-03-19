@@ -22,6 +22,9 @@ public sealed partial class GasMixtureFactory
     /// <inheritdoc cref="GasBuffer1"/>
     public float[] GasBuffer3 = Array.Empty<float>();
 
+    /// <inheritdoc cref="GasBuffer1"/>
+    public float[] GasBuffer4 = Array.Empty<float>();
+
     /// <summary>
     /// Buffer that is generally used to store results of a function that returns an array of gases.
     /// This helps to prevent unnecessary memory allocations and buffer collisions.
@@ -54,6 +57,7 @@ public sealed partial class GasMixtureFactory
         Array.Resize(ref GasBuffer1, size);
         Array.Resize(ref GasBuffer2, size);
         Array.Resize(ref GasBuffer3, size);
+        Array.Resize(ref GasBuffer4, size);
         Array.Resize(ref GasBufferResults1, size);
         Array.Resize(ref GasBufferResults2, size);
         Array.Resize(ref GasSpecificHeats, size);

@@ -1,5 +1,4 @@
-﻿using System.Buffers;
-using Content.Shared.Atmospherics.Factory;
+﻿using Content.Shared.Atmospherics.Factory;
 using Content.Shared.Atmospherics.Systems;
 using Content.Shared.Constants;
 
@@ -93,11 +92,11 @@ public sealed class GasMixtureTest
         string result = string.Empty;
         for (int i = 0; i < iterations; i++)
         {
+            var diffusions = new float[factory.ArraySize];
+            factory.DiffuseMixtures(ref m1, ref m2, ref diffusions, 2.5f, 1f);
+
             if (iterations % 100 != 0)
                 continue;
-
-            var diffusions = new float[factory.ArraySize];
-            factory.DiffuseMixtures(ref m1, ref m2, ref diffusions, 2.5f, 0.1f);
 
             result += "Diffused moles: \n";
             foreach (var d in diffusions)

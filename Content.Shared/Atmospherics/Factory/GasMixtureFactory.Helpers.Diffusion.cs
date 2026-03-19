@@ -11,9 +11,9 @@ public sealed partial class GasMixtureFactory
         where T1 : IGasMixture
         where T2 : IGasMixture
     {
-        DiffuseMixturesQuery(ref m1, ref m2, ref GasBuffer3, cLength, frameTime);
-        TransferMoles(ref m1, ref m2, GasBuffer3);
-        ClearBuffer(ref GasBuffer3);
+        DiffuseMixturesQuery(ref m1, ref m2, ref GasBuffer4, cLength, frameTime);
+        TransferMoles(ref m1, ref m2, GasBuffer4);
+        ClearBuffer(ref GasBuffer4);
     }
 
     [PublicAPI]
@@ -59,12 +59,9 @@ public sealed partial class GasMixtureFactory
         where T1 : IGasMixture
         where T2 : IGasMixture
     {
-        // Calculate the parts that are the same for all gases.
-        var sharedCoefficient = m1.Volume * cLength * frameTime / MathF.Sqrt(PhysicalConstants.R * m1.Temperature) * 1000f;
-
         // Top part for the first diffusion transfer
         GetPartialPressures(ref m1, ref GasBufferResults1);
-        NumericsHelpers.Multiply(GasBufferResults1, sharedCoefficient);
+        NumericsHelpers.Multiply(GasBufferResults1, m1.Volume * cLength * frameTime / MathF.Sqrt(PhysicalConstants.R * m1.Temperature) * 1000f);
         // Bottom part for the first diffusion transfer
         NumericsHelpers.Multiply(GasAtomBetaSizes, m1.Moles, GasBuffer1);
         NumericsHelpers.Multiply(GasBuffer1, 0.001f); // Convert g/moles to kg/moles
@@ -74,7 +71,7 @@ public sealed partial class GasMixtureFactory
 
         // Top part for the second diffusion transfer
         GetPartialPressures(ref m2, ref GasBufferResults2);
-        NumericsHelpers.Multiply(GasBufferResults2, sharedCoefficient);
+        NumericsHelpers.Multiply(GasBufferResults2, m2.Volume * cLength * frameTime / MathF.Sqrt(PhysicalConstants.R * m2.Temperature) * 1000f);
         // Bottom part for the second diffusion transfer
         NumericsHelpers.Multiply(GasAtomBetaSizes, m2.Moles, GasBuffer2);
         NumericsHelpers.Multiply(GasBuffer2, 0.001f); // Convert g/moles to kg/moles
