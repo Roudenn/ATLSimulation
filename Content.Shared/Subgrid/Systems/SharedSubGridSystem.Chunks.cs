@@ -372,28 +372,10 @@ public abstract partial class SharedSubGridSystem
             for (int j = 0; j < width; j++)
             {
                 arr[count] = GetTileRelativeLocal(corner, j, i);
-                if (arr[count] < 0)
-                    Log.Warning("WTF??");
                 count++;
             }
         }
 
         return arr;
-    }
-
-    /// <summary>
-    /// Gets corner indexes of o
-    /// </summary>
-    /// <param name="chunkIndices"></param>
-    /// <param name="gridIndices"></param>
-    /// <param name="tileSizeVector"></param>
-    /// <returns></returns>
-    public Box2i GetTileCornerIndexes(Vector2i chunkIndices, Vector2i gridIndices, Vector2 tileSizeVector)
-    {
-        var vec1 = GetRelativeChunkPosition(gridIndices, chunkIndices);
-        var vec2 = GetRelativeChunkPosition(gridIndices + tileSizeVector, chunkIndices);
-        var bottomLeftIndex = (Vector2i) (vec1 * SubGridTileSize).Rounded() - Vector2i.One;
-        var topRightIndex = (Vector2i) (vec2 * SubGridTileSize).Rounded() - Vector2i.One;
-        return new Box2i(bottomLeftIndex, topRightIndex);
     }
 }

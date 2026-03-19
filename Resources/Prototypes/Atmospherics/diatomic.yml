@@ -4,6 +4,7 @@
   specificMolarHeat: 29.1
   thermalConductivity: 0.026
   viscosity: 17.8
+  effectiveDiameter: 3.64
   color: "#ff0000"
 
 - type: gas
@@ -12,6 +13,7 @@
   specificMolarHeat: 29.4
   thermalConductivity: 0.026
   viscosity: 20.2
+  effectiveDiameter: 3.46
   color: "#00ccff"
 
 - type: gas
@@ -20,6 +22,7 @@
   specificMolarHeat: 31.3
   thermalConductivity: 0.027
   viscosity: 18.5
+  effectiveDiameter: 3.35
   color: "#c8ff00"
 
 - type: gas
@@ -28,4 +31,5 @@
   specificMolarHeat: 34
   thermalConductivity: 0.009
   viscosity: 12.9
+  effectiveDiameter: 4.40
   color: "#1eff00"

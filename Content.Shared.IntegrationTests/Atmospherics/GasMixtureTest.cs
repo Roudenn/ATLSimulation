@@ -1,5 +1,7 @@
-﻿using Content.Shared.Atmospherics.Factory;
+﻿using System.Buffers;
+using Content.Shared.Atmospherics.Factory;
 using Content.Shared.Atmospherics.Systems;
+using Content.Shared.Constants;
 
 namespace Content.Shared.IntegrationTests.Atmospherics;
 
@@ -11,7 +13,6 @@ public sealed class GasMixtureTest
     public async Task TestPhysicalProperties()
     {
         var pair = await PoolManager.GetServerClient();
-        var protoMan = pair.Server.ProtoMan;
         var atmosSystem = pair.Server.EntMan.System<SharedAtmosphericsSystem>();
 
         await pair.RunTicksSync(30);
@@ -27,6 +28,105 @@ public sealed class GasMixtureTest
         });
 
         await pair.CleanReturnAsync();
+    }
+
+    [Test]
+    public async Task TestDiffusion()
+    {
+        var pair = await PoolManager.GetServerClient();
+        var factory = pair.Server.Resolve<GasMixtureFactory>();
+
+        var atmosSystem = pair.Server.EntMan.System<SharedAtmosphericsSystem>();
+
+        await pair.RunTicksSync(30);
+        await pair.Server.WaitPost(() =>
+        {
+            Diffusion(factory, atmosSystem, "PureNitrogen", "PureOxygen");
+            Diffusion(factory, atmosSystem, "PureOxygen0Degrees", "PureOxygen100Degrees");
+            Diffusion(factory, atmosSystem, "PureOxygen0Degrees", "PureNitrogen100Degrees");
+        });
+
+        await pair.CleanReturnAsync();
+    }
+
+    [Test]
+    public async Task TestDiffusionLoop()
+    {
+        var pair = await PoolManager.GetServerClient();
+        var factory = pair.Server.Resolve<GasMixtureFactory>();
+
+        var atmosSystem = pair.Server.EntMan.System<SharedAtmosphericsSystem>();
+
+        await pair.RunTicksSync(30);
+        await pair.Server.WaitPost(() =>
+        {
+            DiffusionLoop(factory, atmosSystem, "PureOxygen0Degrees", "PureNitrogen100Degrees", 1000);
+        });
+
+        await pair.CleanReturnAsync();
+    }
+
+    private void Diffusion(GasMixtureFactory factory, SharedAtmosphericsSystem atmosSystem, string firstMixture, string secondMixture)
+    {
+        var m1 = atmosSystem.ResolveMixture(firstMixture, 2.5f);
+        var m2 = atmosSystem.ResolveMixture(secondMixture, 2.5f);
+        var diffusions = new float[factory.ArraySize];
+        factory.DiffuseMixtures(ref m1, ref m2, ref diffusions, 2.5f, 1f);
+        string result = string.Empty;
+        foreach (var d in diffusions)
+        {
+            if (MathF.Abs(d) <= SystemConstants.GasMinMoles)
+                continue;
+
+            result += $"{d} \n";
+        }
+        result += $"Temp 1: {m1.Temperature:0.00} \n";
+        result += $"Temp 2: {m2.Temperature:0.00} \n";
+
+        Assert.Warn(result);
+    }
+
+    private void DiffusionLoop(GasMixtureFactory factory, SharedAtmosphericsSystem atmosSystem, string firstMixture, string secondMixture, int iterations)
+    {
+        var m1 = atmosSystem.ResolveMixture(firstMixture, 2.5f);
+        var m2 = atmosSystem.ResolveMixture(secondMixture, 2.5f);
+        string result = string.Empty;
+        for (int i = 0; i < iterations; i++)
+        {
+            if (iterations % 100 != 0)
+                continue;
+
+            var diffusions = new float[factory.ArraySize];
+            factory.DiffuseMixtures(ref m1, ref m2, ref diffusions, 2.5f, 0.1f);
+
+            result += "Diffused moles: \n";
+            foreach (var d in diffusions)
+            {
+                if (MathF.Abs(d) <= SystemConstants.GasMinMoles)
+                    continue;
+
+                result += $"{d} \n";
+            }
+            result += "Mixture 1 Air composition: \n";
+            foreach (var m in m1.Moles)
+            {
+                if (MathF.Abs(m) <= SystemConstants.GasMinMoles)
+                    continue;
+
+                result += $"{m:0.0000} \n";
+            }
+            result += "Mixture 2 Air composition: \n";
+            foreach (var m in m2.Moles)
+            {
+                if (MathF.Abs(m) <= SystemConstants.GasMinMoles)
+                    continue;
+
+                result += $"{m:0.0000} \n";
+            }
+            result += $"Temp 1: {m1.Temperature:0.00} \n";
+            result += $"Temp 2: {m2.Temperature:0.00} \n";
+        }
+        Assert.Warn(result);
     }
 
     [Test]

@@ -2,6 +2,7 @@
 
 namespace Content.Shared.Temperature.HeatContainers;
 
+// Migrated to a separate class in order to not interfere with upstream code.
 public static class ConductiveHeatContainerHelpers
 {
     #region Conduct

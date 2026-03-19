@@ -4,6 +4,7 @@
   specificMolarHeat: 80.1
   thermalConductivity: 0.025
   viscosity: 9.8
+  effectiveDiameter: 2.60
   color: "#a70fbb"
 
 - type: gas
@@ -12,4 +13,5 @@
   specificMolarHeat: 35.7
   thermalConductivity: 0.034
   viscosity: 11.13
+  effectiveDiameter: 3.80
   color: "#885304"

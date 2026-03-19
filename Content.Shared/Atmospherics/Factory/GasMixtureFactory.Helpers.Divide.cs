@@ -18,13 +18,13 @@ public sealed partial class GasMixtureFactory
         where T2 : IGasMixture
     {
         fraction = Math.Clamp(fraction, 0f, 1f);
-        NumericsHelpers.Multiply(c.Moles, fraction, GasBuffer);
+        NumericsHelpers.Multiply(c.Moles, fraction, GasBuffer1);
 
-        cSplit.Moles = GasBuffer;
+        cSplit.Moles = GasBuffer1;
         cSplit.Temperature = c.Temperature;
 
-        NumericsHelpers.Sub(c.Moles, GasBuffer);
-        ClearBuffer(ref GasBuffer);
+        NumericsHelpers.Sub(c.Moles, GasBuffer1);
+        ClearBuffer(ref GasBuffer1);
     }
 
     /// <summary>

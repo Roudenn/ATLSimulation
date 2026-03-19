@@ -6,13 +6,26 @@ namespace Content.Shared.Atmospherics.Factory;
 
 public sealed partial class GasMixtureFactory
 {
+    /// <inheritdoc cref="ConductHeatQuery{T1,T2}"/>
+    [PublicAPI]
+    public float ConductHeat<T1, T2>(ref T1 cA, ref T2 cB, float cLength, float heatG, float deltaTime)
+        where T1 : IHeatContainer
+        where T2 : IGasMixture
+    {
+        var dQ = ConductHeatQuery(ref cA, ref cB, cLength, cLength, deltaTime);
+        HeatContainerHelpers.AddHeat(ref cA, dQ);
+        AddHeat(ref cB, -dQ);
+        return dQ;
+    }
+
     /// <summary>
-    /// Calculates the amount of heat that would be conducted between two <see cref="IHeatContainer"/>s,
+    /// Calculates the amount of heat that would be conducted between <see cref="IHeatContainer"/> and a <see cref="IGasMixture"/>,
     /// given some time delta. Does not modify the containers.
     /// </summary>
     /// <param name="c">The <see cref="IHeatContainer"/> to conduct heat to.</param>
     /// <param name="m">The <see cref="IGasMixture"/> to conduct heat to.</param>
-    /// <param name="cLength">Characteristic length of a gas mixture</param>
+    /// <param name="cLength">Characteristic length of both containers.</param>
+    /// <param name="heatG">The thermal conductance of the heat container in watt per kelvin.</param>
     /// <param name="deltaTime">
     /// The amount of time that the heat is allowed to conduct, in seconds.
     /// This value should be small such that deltaTime &lt;&lt; C / g where C is the heat capacity of the container.
@@ -23,9 +36,6 @@ public sealed partial class GasMixtureFactory
     /// <remarks>
     /// This performs a single step using the Euler method for solving the Fourier heat equation
     /// \frac{dQ}{dt} = g \Delta T.
-    /// If we need more precision in the future consider using a higher order integration scheme.
-    /// If we need support for larger time steps in the future consider adding a method to split the time delta into several
-    /// integration steps with adaptive step size.
     /// </remarks>
     [PublicAPI]
     public float ConductHeatQuery<T1, T2>(ref T1 c, ref T2 m, float cLength, float heatG, float deltaTime)
@@ -43,13 +53,23 @@ public sealed partial class GasMixtureFactory
         return Math.Clamp(dQ, -dQMax, dQMax);
     }
 
+    /// <inheritdoc cref="ConductHeatQuery{T1}"/>
+    [PublicAPI]
+    public float ConductHeat<T>(ref ConductiveHeatContainer c, ref T m, float cLength, float deltaTime) where T : IGasMixture
+    {
+        var dQ = ConductHeatQuery(ref c, ref m, cLength, cLength, deltaTime);
+        HeatContainerHelpers.AddHeat(ref c, dQ);
+        AddHeat(ref m, -dQ);
+        return dQ;
+    }
+
     /// <summary>
     /// Calculates the amount of heat that would be conducted between two <see cref="IHeatContainer"/>s,
     /// given some time delta. Does not modify the containers.
     /// </summary>
-    /// <param name="c">The <see cref="IHeatContainer"/> to conduct heat to.</param>
+    /// <param name="c">The <see cref="ConductiveHeatContainer"/> to conduct heat to.</param>
     /// <param name="m">The <see cref="IGasMixture"/> to conduct heat to.</param>
-    /// <param name="cLength">Characteristic length of a gas mixture</param>
+    /// <param name="cLength">Characteristic length of both containers.</param>
     /// <param name="deltaTime">
     /// The amount of time that the heat is allowed to conduct, in seconds.
     /// This value should be small such that deltaTime &lt;&lt; C / g where C is the heat capacity of the container.
@@ -60,9 +80,6 @@ public sealed partial class GasMixtureFactory
     /// <remarks>
     /// This performs a single step using the Euler method for solving the Fourier heat equation
     /// \frac{dQ}{dt} = g \Delta T.
-    /// If we need more precision in the future consider using a higher order integration scheme.
-    /// If we need support for larger time steps in the future consider adding a method to split the time delta into several
-    /// integration steps with adaptive step size.
     /// </remarks>
     [PublicAPI]
     public float ConductHeatQuery<T>(ref ConductiveHeatContainer c, ref T m, float cLength, float deltaTime) where T : IGasMixture
@@ -78,6 +95,15 @@ public sealed partial class GasMixtureFactory
         return Math.Clamp(dQ, -dQMax, dQMax);
     }
 
+    [PublicAPI]
+    public float ConductHeatVelocity<T>(ref T c, ref VelocityGasMixture m, float cLength, float heatG, float deltaTime) where T : IHeatContainer
+    {
+        var dQ = ConductHeatQuery(ref c, ref m, cLength, cLength, deltaTime);
+        HeatContainerHelpers.AddHeat(ref c, dQ);
+        AddHeat(ref m, -dQ);
+        return dQ;
+    }
+
     /// <summary>
     /// Calculates the amount of heat that would be conducted between two <see cref="IHeatContainer"/>s,
     /// given some time delta. Does not modify the containers.
@@ -85,6 +111,7 @@ public sealed partial class GasMixtureFactory
     /// <param name="c">The <see cref="IHeatContainer"/> to conduct heat to.</param>
     /// <param name="m">The <see cref="IGasMixture"/> to conduct heat to.</param>
     /// <param name="cLength">Characteristic length of a gas mixture</param>
+    /// <param name="heatG">The thermal conductance of the heat container in watt per kelvin.</param>
     /// <param name="deltaTime">
     /// The amount of time that the heat is allowed to conduct, in seconds.
     /// This value should be small such that deltaTime &lt;&lt; C / g where C is the heat capacity of the container.
@@ -113,6 +140,15 @@ public sealed partial class GasMixtureFactory
         return Math.Clamp(dQ, -dQMax, dQMax);
     }
 
+    [PublicAPI]
+    public float ConductHeatVelocity(ref ConductiveHeatContainer c, ref VelocityGasMixture m, float cLength, float surfaceArea, float deltaTime)
+    {
+        var dQ = ConductHeatQuery(ref c, ref m, cLength, cLength, deltaTime);
+        HeatContainerHelpers.AddHeat(ref c, dQ);
+        AddHeat(ref m, -dQ);
+        return dQ;
+    }
+
     /// <summary>
     /// Calculates the amount of heat that would be conducted between two <see cref="IHeatContainer"/>s,
     /// given some time delta. Does not modify the containers.
@@ -130,10 +166,9 @@ public sealed partial class GasMixtureFactory
     /// <example>A positive value indicates heat transfer from a hot c2 to a cold c1.</example>
     /// <remarks>
     /// The calculations are done according to Newton's law of cooling.
-    ///
     /// </remarks>
     [PublicAPI]
-    public float ConductHeatVelocityQuery<T>(ref ConductiveHeatContainer c, ref VelocityGasMixture m, float cLength, float surfaceArea, float deltaTime)
+    public float ConductHeatVelocityQuery(ref ConductiveHeatContainer c, ref VelocityGasMixture m, float cLength, float surfaceArea, float deltaTime)
     {
         // The harmonic mean is used because conductance adds up inversely proportional.
         var mixtureG = GetThermalConductivity(ref m) * cLength;
@@ -145,10 +180,11 @@ public sealed partial class GasMixtureFactory
         // Calculate Reynold's number: Re = √(ρvL / μ)
         // Multiplying on 1/1000 because viscosity is measured in µPa·s, which is 10e-6, or 10e-3 after the square root.
         var viscosity = GetViscosity(ref m);
-        var reynold = MathF.Sqrt(GetDensity(ref m) * speed * cLength / viscosity * 0.001f);
+        var reynold = MathF.Sqrt(GetDensity(ref m) * speed * cLength / (viscosity * 0.001f));
         var prantl = GetPrandtlNumber(ref m, GetThermalConductivity(ref m), viscosity);
 
         // Calculate the heat transfer coefficient using an approximation: h ≈ 0.664 * Re * ∛Pr * g.
+        // TODO I didn't fact-check that enough, maybe it's a wrong formula.
         // Source: https://www.researchgate.net/publication/352146707_Review_of_Convective_Heat_Transfer_Modelling_in_CFD_Simulations_of_Fire-Driven_Flows
         var h = 0.664f * reynold * MathF.Cbrt(prantl) * g;
 

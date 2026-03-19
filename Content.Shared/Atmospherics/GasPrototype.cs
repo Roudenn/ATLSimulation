@@ -32,6 +32,12 @@ public sealed partial class GasPrototype : IPrototype, IInheritingPrototype
     public float Viscosity;
 
     /// <summary>
+    /// Effective molecular diameter in Angstroms (10e-10 meters, or 0.1 nm).
+    /// </summary>
+    [DataField(required: true)]
+    public float EffectiveDiameter;
+
+    /// <summary>
     /// Color of this gas that is used in UIs.
     /// </summary>
     [DataField(required: true)]

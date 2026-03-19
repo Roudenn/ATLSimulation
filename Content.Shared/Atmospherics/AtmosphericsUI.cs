@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using Content.Shared.Constants;
 
 namespace Content.Shared.Atmospherics;
 
@@ -6,6 +7,7 @@ namespace Content.Shared.Atmospherics;
 /// Contains information on a gas mix entry, turns into a tab in the UI
 /// </summary>
 public struct GasMixEntry(
+    float totalMoles,
     float volume,
     float pressure,
     float temperature,
@@ -17,6 +19,7 @@ public struct GasMixEntry(
     GasEntry[]? gases = null,
     Vector2? velocity = null)
 {
+    public readonly float TotalMoles = totalMoles;
     public readonly float Volume = volume;
     public readonly float Pressure = pressure;
     public readonly float Temperature = temperature;
@@ -43,7 +46,7 @@ public struct GasMixEntry(
         for (int i = 0; i < Gases?.Length; i++)
         {
             var gas = Gases[i];
-            main += gas + "\n";
+            main += gas.ToPercentageString(TotalMoles) + "\n";
         }
 
         return main;
@@ -64,6 +67,16 @@ public struct GasEntry
         Name = name;
         Amount = amount;
         Color = color;
+    }
+
+    public string ToPercentageString(float totalMoles)
+    {
+        // e.g. "Plasma: 2000 mol"
+        return Amount <= SystemConstants.GasMinMoles ? string.Empty :
+            Loc.GetString(
+            "gas-entry-info",
+            ("gasName", Loc.GetString(Name)),
+            ("gasAmount", $"{Amount:0.000} ({(Amount / totalMoles):0.0000}%)"));
     }
 
     public override string ToString()

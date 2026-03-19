@@ -17,14 +17,16 @@ public sealed partial class GasMixtureFactory
         => NumericsHelpers.HorizontalAdd(m.Moles);
 
     [PublicAPI]
-    public void GetMolesRatio<T>(ref T m, ref float[] ratios) where T : IGasMixture
-    {
-        NumericsHelpers.Divide(m.Moles, GetTotalMoles(ref m), ratios);
-    }
+    public void GetMolesRatio<T>(ref T m, ref float[] buffer) where T : IGasMixture
+        => NumericsHelpers.Divide(m.Moles, GetTotalMoles(ref m), buffer);
 
     [PublicAPI]
     public float GetPressure<T>(ref T m) where T : IGasMixture
         => GetTotalMoles(ref m) / 1000f * m.Temperature * PhysicalConstants.R / m.Volume;
+
+    [PublicAPI]
+    public void GetPartialPressures<T>(ref T m, ref float[] buffer) where T : IGasMixture
+        => NumericsHelpers.Multiply(m.Moles, 0.001f * m.Temperature * PhysicalConstants.R / m.Volume, buffer);
 
     /// <summary>
     /// Gets the heat capacity of a mixture.
@@ -34,9 +36,23 @@ public sealed partial class GasMixtureFactory
     [PublicAPI]
     public float GetHeatCapacity<T>(ref T m) where T : IGasMixture
     {
-        NumericsHelpers.Multiply(m.Moles, GasSpecificHeats, GasBuffer);
-        var result = MathF.Max(NumericsHelpers.HorizontalAdd(GasBuffer), SystemConstants.MinimumHeatCapacity);
-        ClearBuffer(ref GasBuffer);
+        NumericsHelpers.Multiply(m.Moles, GasSpecificHeats, GasBuffer1);
+        var result = MathF.Max(NumericsHelpers.HorizontalAdd(GasBuffer1), SystemConstants.MinimumHeatCapacity);
+        ClearBuffer(ref GasBuffer1);
+        return result;
+    }
+
+    /// <summary>
+    /// Gets the heat capacity of a mixture.
+    /// </summary>
+    /// <param name="mixture">The array that represents a gas mixture.</param>
+    /// <returns>Calculated heat capacity.</returns>
+    [PublicAPI]
+    public float GetHeatCapacity(ref float[] mixture)
+    {
+        NumericsHelpers.Multiply(mixture, GasSpecificHeats, GasBuffer1);
+        var result = MathF.Max(NumericsHelpers.HorizontalAdd(GasBuffer1), SystemConstants.MinimumHeatCapacity);
+        ClearBuffer(ref GasBuffer1);
         return result;
     }
 
@@ -49,10 +65,10 @@ public sealed partial class GasMixtureFactory
     [PublicAPI]
     public float GetSpecificHeatCapacity<T>(ref T m) where T : IGasMixture
     {
-        GetMolesRatio(ref m, ref GasBufferRatios);
-        NumericsHelpers.Multiply(GasBufferRatios, GasSpecificHeats, GasBuffer);
-        var result = MathF.Max(NumericsHelpers.HorizontalAdd(GasBuffer), SystemConstants.MinimumHeatCapacity);
-        ClearBuffer(ref GasBuffer, ref GasBufferRatios);
+        GetMolesRatio(ref m, ref GasBufferResults1);
+        NumericsHelpers.Multiply(GasBufferResults1, GasSpecificHeats, GasBuffer1);
+        var result = MathF.Max(NumericsHelpers.HorizontalAdd(GasBuffer1), SystemConstants.MinimumHeatCapacity);
+        ClearBuffer(ref GasBuffer1, ref GasBufferResults1);
         return result;
     }
 
@@ -62,20 +78,20 @@ public sealed partial class GasMixtureFactory
     [PublicAPI]
     public float GetThermalConductivity<T>(ref T m) where T : IGasMixture
     {
-        NumericsHelpers.Multiply(m.Moles, GasMolarMassesSquareRoots, GasBuffer);
-        NumericsHelpers.Multiply(GasBuffer, GasThermalConductivities, GasBuffer2);
-        var bottomPart = NumericsHelpers.HorizontalAdd(GasBuffer);
+        NumericsHelpers.Multiply(m.Moles, GasMolarMassesSquareRoots, GasBuffer1);
+        NumericsHelpers.Multiply(GasBuffer1, GasThermalConductivities, GasBuffer2);
+        var bottomPart = NumericsHelpers.HorizontalAdd(GasBuffer1);
         var topPart = NumericsHelpers.HorizontalAdd(GasBuffer2);
-        ClearBuffer(ref GasBuffer, ref GasBuffer2, ref GasBufferRatios);
+        ClearBuffer(ref GasBuffer1, ref GasBuffer2, ref GasBufferResults1);
         return topPart / MathF.Max(bottomPart, SystemConstants.MinimumHeatCapacity);
     }
 
     [PublicAPI]
     public float GetMass<T>(ref T m) where T : IGasMixture
     {
-        NumericsHelpers.Multiply(m.Moles, GasMolarMasses, GasBuffer);
-        var result = NumericsHelpers.HorizontalAdd(GasBuffer) / 1000f;
-        ClearBuffer(ref GasBuffer);
+        NumericsHelpers.Multiply(m.Moles, GasMolarMasses, GasBuffer1);
+        var result = NumericsHelpers.HorizontalAdd(GasBuffer1) / 1000f;
+        ClearBuffer(ref GasBuffer1);
         return result;
     }
 
@@ -91,11 +107,11 @@ public sealed partial class GasMixtureFactory
     [PublicAPI]
     public float GetViscosity<T>(ref T m) where T : IGasMixture
     {
-        NumericsHelpers.Multiply(m.Moles, GasMolarMassesSquareRoots, GasBuffer);
-        NumericsHelpers.Multiply(GasBuffer, GasViscosities, GasBuffer2);
-        var bottomPart = NumericsHelpers.HorizontalAdd(GasBuffer);
+        NumericsHelpers.Multiply(m.Moles, GasMolarMassesSquareRoots, GasBuffer1);
+        NumericsHelpers.Multiply(GasBuffer1, GasViscosities, GasBuffer2);
+        var bottomPart = NumericsHelpers.HorizontalAdd(GasBuffer1);
         var topPart = NumericsHelpers.HorizontalAdd(GasBuffer2);
-        ClearBuffer(ref GasBuffer, ref GasBuffer2, ref GasBufferRatios);
+        ClearBuffer(ref GasBuffer1, ref GasBuffer2, ref GasBufferResults1);
         return topPart / MathF.Max(bottomPart, SystemConstants.MinimumHeatCapacity) * 10e-7f;
     }
 

@@ -36,6 +36,7 @@ public abstract partial class SharedAtmosphericsSystem : EntitySystem
         }
 
         return new GasMixEntry(
+            GasManager.GetTotalMoles(ref m),
             m.Volume,
             GasManager.GetPressure(ref m),
             m.Temperature,
@@ -58,6 +59,7 @@ public abstract partial class SharedAtmosphericsSystem : EntitySystem
         }
 
         return new GasMixEntry(
+            GasManager.GetTotalMoles(ref m),
             m.Volume,
             GasManager.GetPressure(ref m),
             m.Temperature,

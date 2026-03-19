@@ -38,6 +38,20 @@ public sealed partial class GasMixtureFactory
     }
 
     /// <summary>
+    /// Adds or removes moles of a gas inside the gas mixture.
+    /// </summary>
+    /// <param name="m">Gas mixture to add the gas to.</param>
+    /// <param name="moles">Amounts of gases to add.</param>
+    [PublicAPI]
+    public void AddMoles<T>(ref T m, ref float[] moles) where T : IGasMixture
+    {
+        if (m.Immutable)
+            return;
+
+        NumericsHelpers.Add(m.Moles, moles);
+    }
+
+    /// <summary>
     /// Sets new volume for this gas mixture.
     /// </summary>
     /// <param name="m">Gas mixture to change the volume of.</param>

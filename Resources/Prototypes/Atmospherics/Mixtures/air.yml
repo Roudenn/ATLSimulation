@@ -20,3 +20,43 @@
       Argon: 0.0093
       WaterVapor: 0.01156
       CarbonDioxide: 0.0004
+
+- type: gasMixture
+  id: PureNitrogen
+  definition: !type:MixturePercentageDefinition
+    temperature: 293.15
+    pressure: 100
+    percentages:
+      Nitrogen: 1.00
+
+- type: gasMixture
+  id: PureOxygen
+  definition: !type:MixturePercentageDefinition
+    temperature: 293.15
+    pressure: 100
+    percentages:
+      Oxygen: 1.00
+
+- type: gasMixture
+  id: PureNitrogen100Degrees
+  definition: !type:MixturePercentageDefinition
+    temperature: 373.15
+    pressure: 100
+    percentages:
+      Nitrogen: 1.00
+
+- type: gasMixture
+  id: PureOxygen0Degrees
+  definition: !type:MixturePercentageDefinition
+    temperature: 273.15
+    pressure: 100
+    percentages:
+      Oxygen: 1.00
+
+- type: gasMixture
+  id: PureOxygen100Degrees
+  definition: !type:MixturePercentageDefinition
+    temperature: 373.15
+    pressure: 100
+    percentages:
+      Oxygen: 1.00
