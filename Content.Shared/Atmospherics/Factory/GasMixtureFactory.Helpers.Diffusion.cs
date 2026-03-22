@@ -108,19 +108,21 @@ public sealed partial class GasMixtureFactory
         where T1 : IGasMixture
         where T2 : IGasMixture
     {
-        // Top part for the first diffusion transfer
+        // Find the difference in partial pressure of each gas.
         var temperature = (m1.Temperature + m2.Temperature) / 2f;
         GetPartialPressures(m1.Moles, temperature, m1.Volume, ref GasBufferResults1);
         GetPartialPressures(m2.Moles, temperature, m2.Volume, ref GasBufferResults2);
         NumericsHelpers.Sub(GasBufferResults1, GasBufferResults2, GasBufferResults1);
         NumericsHelpers.Max(GasBufferResults1, 0f);
 
+        // Calculate the partial result
         NumericsHelpers.Multiply(GasBufferResults1, m1.Volume * cLength * frameTime / MathF.Sqrt(PhysicalConstants.R * m1.Temperature) * 1000f);
-        // Bottom part for the first diffusion transfer
+
+        // Multiply moles by their beta sizes
         NumericsHelpers.Multiply(GasAtomBetaSizes, m1.Moles, GasBuffer1);
-        NumericsHelpers.Multiply(GasBuffer1, 0.001f); // Convert g/moles to kg/moles
-        NumericsHelpers.Max(GasBuffer1, SystemConstants.Epsilon);
-        // Results for the first diffusion transfer
+        NumericsHelpers.Max(GasBuffer1, SystemConstants.Epsilon); // Prevent division by zero
+
+        // Get the results
         NumericsHelpers.Divide(GasBufferResults1, GasBuffer1, diffusion);
         ClearBuffer(ref GasBuffer1, ref GasBufferResults1, ref GasBuffer2);
     }

@@ -47,8 +47,12 @@ public sealed partial class GasMixtureFactory
     /// <summary>
     /// Effective diameters of the molecules of gases that are ready
     /// for use in Fick's first law of diffusion.
-    /// Formula: β = π^1.5 * d^2 * N_A * M^0.5
+    /// Formula: β = π^1.5 * d^2 * N_A * M^0.5 / 1000
     /// </summary>
+    /// <remarks>
+    /// Division by a thousand is required so it's possible to just
+    /// multiply beta sizes with moles and get the correct result.
+    /// </remarks>
     public float[] GasAtomBetaSizes = Array.Empty<float>();
 
     private void InitializeGases()
@@ -79,7 +83,7 @@ public sealed partial class GasMixtureFactory
 
             // Pre-calculated values
             GasMolarMassesSquareRoots[i] = MathF.Sqrt(gas.MolarMass / 1000f);
-            GasAtomBetaSizes[i] = 1.5f * gas.EffectiveDiameter * MathF.PI * MathF.Sqrt(MathF.PI) * (MathF.Sqrt(gas.MolarMass / 1000f) * 6022f);
+            GasAtomBetaSizes[i] = 1.5f * gas.EffectiveDiameter * MathF.PI * MathF.Sqrt(MathF.PI) * (MathF.Sqrt(gas.MolarMass / 1000f) * 6.022f);
         }
     }
 
