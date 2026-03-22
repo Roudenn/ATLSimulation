@@ -59,7 +59,7 @@ public sealed class GasMixtureTest
         await pair.RunTicksSync(30);
         await pair.Server.WaitPost(() =>
         {
-            DiffusionLoop(factory, atmosSystem, "PureOxygen0Degrees", "PureNitrogen100Degrees", 1000);
+            DiffusionLoop(factory, atmosSystem, "PureOxygen0Degrees", "PureNitrogen100Degrees", 100);
         });
 
         await pair.CleanReturnAsync();
@@ -69,10 +69,18 @@ public sealed class GasMixtureTest
     {
         var m1 = atmosSystem.ResolveMixture(firstMixture, 2.5f);
         var m2 = atmosSystem.ResolveMixture(secondMixture, 2.5f);
-        var diffusions = new float[factory.ArraySize];
-        factory.DiffuseMixtures(ref m1, ref m2, ref diffusions, 2.5f, 1f);
+        var diffusion1 = new float[factory.ArraySize];
+        var diffusion2 = new float[factory.ArraySize];
+        factory.DiffuseMixtures(ref m1, ref m2, ref diffusion1, ref diffusion2, 2.5f, 1f);
         string result = string.Empty;
-        foreach (var d in diffusions)
+        foreach (var d in diffusion1)
+        {
+            if (MathF.Abs(d) <= SystemConstants.GasMinMoles)
+                continue;
+
+            result += $"{d} \n";
+        }
+        foreach (var d in diffusion2)
         {
             if (MathF.Abs(d) <= SystemConstants.GasMinMoles)
                 continue;
@@ -92,14 +100,22 @@ public sealed class GasMixtureTest
         string result = string.Empty;
         for (int i = 0; i < iterations; i++)
         {
-            var diffusions = new float[factory.ArraySize];
-            factory.DiffuseMixtures(ref m1, ref m2, ref diffusions, 2.5f, 1f);
+            var diffusion1 = new float[factory.ArraySize];
+            var diffusion2 = new float[factory.ArraySize];
+            factory.DiffuseMixtures(ref m1, ref m2, ref diffusion1, ref diffusion2, 2.5f, 1f);
 
-            if (iterations % 100 != 0)
+            if (iterations % 10 != 0)
                 continue;
 
             result += "Diffused moles: \n";
-            foreach (var d in diffusions)
+            foreach (var d in diffusion1)
+            {
+                if (MathF.Abs(d) <= SystemConstants.GasMinMoles)
+                    continue;
+
+                result += $"{d} \n";
+            }
+            foreach (var d in diffusion2)
             {
                 if (MathF.Abs(d) <= SystemConstants.GasMinMoles)
                     continue;

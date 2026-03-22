@@ -26,7 +26,11 @@ public sealed partial class GasMixtureFactory
 
     [PublicAPI]
     public void GetPartialPressures<T>(ref T m, ref float[] buffer) where T : IGasMixture
-        => NumericsHelpers.Multiply(m.Moles, 0.001f * m.Temperature * PhysicalConstants.R / m.Volume, buffer);
+        => GetPartialPressures(m.Moles, m.Temperature, m.Volume, ref buffer);
+
+    [PublicAPI]
+    public void GetPartialPressures(float[] moles, float temperature, float volume, ref float[] buffer)
+        => NumericsHelpers.Multiply(moles, 0.001f * temperature * PhysicalConstants.R / volume, buffer);
 
     /// <summary>
     /// Gets the heat capacity of a mixture.
@@ -37,7 +41,7 @@ public sealed partial class GasMixtureFactory
     public float GetHeatCapacity<T>(ref T m) where T : IGasMixture
     {
         NumericsHelpers.Multiply(m.Moles, GasSpecificHeats, GasBuffer1);
-        var result = MathF.Max(NumericsHelpers.HorizontalAdd(GasBuffer1), SystemConstants.MinimumHeatCapacity);
+        var result = MathF.Max(NumericsHelpers.HorizontalAdd(GasBuffer1), SystemConstants.Epsilon);
         ClearBuffer(ref GasBuffer1);
         return result;
     }
@@ -51,7 +55,7 @@ public sealed partial class GasMixtureFactory
     public float GetHeatCapacity(ref float[] mixture)
     {
         NumericsHelpers.Multiply(mixture, GasSpecificHeats, GasBuffer1);
-        var result = MathF.Max(NumericsHelpers.HorizontalAdd(GasBuffer1), SystemConstants.MinimumHeatCapacity);
+        var result = MathF.Max(NumericsHelpers.HorizontalAdd(GasBuffer1), SystemConstants.Epsilon);
         ClearBuffer(ref GasBuffer1);
         return result;
     }
@@ -67,7 +71,7 @@ public sealed partial class GasMixtureFactory
     {
         GetMolesRatio(ref m, ref GasBufferResults1);
         NumericsHelpers.Multiply(GasBufferResults1, GasSpecificHeats, GasBuffer1);
-        var result = MathF.Max(NumericsHelpers.HorizontalAdd(GasBuffer1), SystemConstants.MinimumHeatCapacity);
+        var result = MathF.Max(NumericsHelpers.HorizontalAdd(GasBuffer1), SystemConstants.Epsilon);
         ClearBuffer(ref GasBuffer1, ref GasBufferResults1);
         return result;
     }
@@ -83,7 +87,7 @@ public sealed partial class GasMixtureFactory
         var bottomPart = NumericsHelpers.HorizontalAdd(GasBuffer1);
         var topPart = NumericsHelpers.HorizontalAdd(GasBuffer2);
         ClearBuffer(ref GasBuffer1, ref GasBuffer2, ref GasBufferResults1);
-        return topPart / MathF.Max(bottomPart, SystemConstants.MinimumHeatCapacity);
+        return topPart / MathF.Max(bottomPart, SystemConstants.Epsilon);
     }
 
     [PublicAPI]
@@ -112,7 +116,7 @@ public sealed partial class GasMixtureFactory
         var bottomPart = NumericsHelpers.HorizontalAdd(GasBuffer1);
         var topPart = NumericsHelpers.HorizontalAdd(GasBuffer2);
         ClearBuffer(ref GasBuffer1, ref GasBuffer2, ref GasBufferResults1);
-        return topPart / MathF.Max(bottomPart, SystemConstants.MinimumHeatCapacity) * 10e-7f;
+        return topPart / MathF.Max(bottomPart, SystemConstants.Epsilon) * 10e-7f;
     }
 
     /// <summary>
@@ -134,5 +138,5 @@ public sealed partial class GasMixtureFactory
 
     [PublicAPI]
     public float GetPrandtlNumber<T>(ref T m, float thermalConductivity, float viscosity) where T : IGasMixture
-        => GetHeatCapacity(ref m) * viscosity / MathF.Max(thermalConductivity, SystemConstants.MinimumHeatCapacity);
+        => GetHeatCapacity(ref m) * viscosity / MathF.Max(thermalConductivity, SystemConstants.Epsilon);
 }

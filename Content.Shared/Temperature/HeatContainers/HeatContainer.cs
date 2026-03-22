@@ -20,7 +20,7 @@ public partial struct HeatContainer : IRobustCloneable<HeatContainer>, IHeatCont
     /// without a significant change in temperature.
     /// </summary>
     [DataField]
-    public float HeatCapacity { get; set; } = SystemConstants.MinimumHeatCapacity;
+    public float HeatCapacity { get; set; } = SystemConstants.Epsilon;
 
     /// <summary>
     /// The current temperature of the container in Kelvin.

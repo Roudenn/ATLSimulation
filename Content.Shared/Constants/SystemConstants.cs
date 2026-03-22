@@ -31,5 +31,5 @@ public static class SystemConstants
     /// <summary>
     ///     Minimum heat capacity.
     /// </summary>
-    public const float MinimumHeatCapacity = 0.0003f;
+    public const float Epsilon = 0.0003f;
 }
