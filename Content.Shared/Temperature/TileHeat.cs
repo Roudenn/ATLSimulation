@@ -45,7 +45,7 @@ public partial struct TileHeat : IRobustCloneable<TileHeat>, ISubGridTile
         ArchivedContainer = container;
     }
 
-    private TileHeat(TileHeat c)
+    public TileHeat(TileHeat c)
     {
         Container = c.Container;
         ArchivedContainer = c.ArchivedContainer;

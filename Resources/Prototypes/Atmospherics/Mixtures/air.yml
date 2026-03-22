@@ -1,5 +1,5 @@
 ﻿- type: gasMixture
-  id: AirComposition
+  id: Air
   definition: !type:MixtureCompositionDefinition
     temperature: 293.15
     moles:
@@ -22,7 +22,7 @@
       CarbonDioxide: 0.0004
 
 - type: gasMixture
-  id: PureNitrogen
+  id: NitrogenPure
   definition: !type:MixturePercentageDefinition
     temperature: 293.15
     pressure: 100
@@ -30,7 +30,7 @@
       Nitrogen: 1.00
 
 - type: gasMixture
-  id: PureOxygen
+  id: OxygenPure
   definition: !type:MixturePercentageDefinition
     temperature: 293.15
     pressure: 100
@@ -38,7 +38,7 @@
       Oxygen: 1.00
 
 - type: gasMixture
-  id: PureNitrogen100Degrees
+  id: NitrogenPure100Degrees
   definition: !type:MixturePercentageDefinition
     temperature: 373.15
     pressure: 100
@@ -46,7 +46,7 @@
       Nitrogen: 1.00
 
 - type: gasMixture
-  id: PureOxygen0Degrees
+  id: OxygenPure0Degrees
   definition: !type:MixturePercentageDefinition
     temperature: 273.15
     pressure: 100
@@ -54,7 +54,7 @@
       Oxygen: 1.00
 
 - type: gasMixture
-  id: PureOxygen100Degrees
+  id: OxygenPure100Degrees
   definition: !type:MixturePercentageDefinition
     temperature: 373.15
     pressure: 100

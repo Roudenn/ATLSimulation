@@ -1,14 +1,13 @@
 ﻿using Content.Server.Atmospherics;
 using Content.Server.Statistics;
-using Content.Shared.Atmospherics;
+using Content.Server.Temperature;
 using Content.Shared.Atmospherics.Components;
+using Content.Shared.Atmospherics.Factory;
 using Content.Shared.Materials;
 using Content.Shared.Subgrid.Components;
 using Content.Shared.Subgrid.Systems;
-using Content.Shared.Temperature;
 using Content.Shared.Temperature.Components;
 using Robust.Shared.Map;
-using Robust.Shared.Map.Components;
 using Robust.Shared.Prototypes;
 
 namespace Content.Server.SubGrid;
@@ -17,11 +16,13 @@ public sealed partial class SubGridSystem : SharedSubGridSystem
 {
     [Dependency] private readonly ITileDefinitionManager _tileDefMan = default!;
     [Dependency] private readonly IPrototypeManager _proto = default!;
-
     [Dependency] private readonly AtmosphericsSystem _atmos = default!;
+    [Dependency] private readonly TemperatureSystem _temperature = default!;
+    [Dependency] private readonly GasMixtureFactory _gasFactory = default!;
 
     private EntityQuery<HeatContainerComponent> _temperatureQuery;
     private EntityQuery<MaterialComponent> _materialQuery;
+    private EntityQuery<GasMarkerComponent> _markerQuery;
 
     public override void Initialize()
     {
@@ -32,6 +33,7 @@ public sealed partial class SubGridSystem : SharedSubGridSystem
         SubscribeLocalEvent<GetStatisticsEvent>(OnGetStats);
         _temperatureQuery = GetEntityQuery<HeatContainerComponent>();
         _materialQuery = GetEntityQuery<MaterialComponent>();
+        _markerQuery = GetEntityQuery<GasMarkerComponent>();
     }
 
     private void OnGetStats(ref GetStatisticsEvent ev)
@@ -65,21 +67,10 @@ public sealed partial class SubGridSystem : SharedSubGridSystem
         ev.Stats.TileCount = tileCount;
     }
 
-    /*public override void Update(float frameTime)
+    public override void Update(float frameTime)
     {
         base.Update(frameTime);
-
-        var query = EntityQueryEnumerator<SubGridComponent>();
-        while (query.MoveNext(out var uid, out var grid))
-        {
-            // Set up proper maps for work
-            AtmosphereCache.Clear();
-            TemperatureCache.Clear();
-            ResolveAtmosphereChunkMap((uid, grid), ref AtmosphereCache);
-            ResolveTemperatureChunkMap((uid, grid), ref TemperatureCache);
-
-            // TODO add tick rate scaling
-            //_atmos.ProcessAtmosGrid((uid, grid), frameTime);
-        }
-    }*/
+        _atmos.UpdateAtmos();
+        _temperature.UpdateHeat();
+    }
 }

@@ -28,7 +28,7 @@ public abstract partial class SharedSubGridSystem : EntitySystem
         ChunkQuery = GetEntityQuery<SubGridChunkComponent>();
     }
 
-    public static readonly Vector2i[] Directions = new[]
+    public static readonly List<Vector2i> Directions = new()
     {
         Vector2i.Up,
         Vector2i.Right,
@@ -36,7 +36,7 @@ public abstract partial class SharedSubGridSystem : EntitySystem
         Vector2i.Left,
     };
 
-    public static readonly Vector2i[] DirectionsWithDiagonals = new[]
+    public static readonly List<Vector2i> DirectionsWithDiagonals = new()
     {
         Vector2i.Up,
         Vector2i.UpRight,

@@ -1,3 +1,4 @@
+using System.Linq;
 using Content.Shared.Atmospherics.Components;
 using Content.Shared.Subgrid.Systems;
 using JetBrains.Annotations;
@@ -135,7 +136,7 @@ namespace Content.Shared.Atmospherics.Systems
                 return myDirection;
 
             // TODO ATMOS MULTIZ: When we make multiZ atmos, special case this.
-            for (var i = 0; i < SharedSubGridSystem.Directions.Length; i++)
+            for (var i = 0; i < SharedSubGridSystem.Directions.Count; i++)
             {
                 var direction = (AtmosDirection) (1 << i);
                 if (!myDirection.IsFlagSet(direction))

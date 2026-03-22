@@ -173,7 +173,7 @@ public abstract partial class SharedSubGridSystem
     /// <param name="found">A temperature tile that was found.</param>
     /// <returns>True if the temperature tile was found.</returns>
     [PublicAPI]
-    public bool TryGetTemperatureTileRelative(
+    public bool TryGetHeatTileRelative(
         Dictionary<Vector2i, TileHeat[]> chunks,
         Vector2i chunkIndices,
         int index,

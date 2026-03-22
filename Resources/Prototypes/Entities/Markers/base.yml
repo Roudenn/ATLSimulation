@@ -1,0 +1,15 @@
+﻿- type: entity
+  abstract: true
+  id: BaseMarkerGas
+  name: base gas marker
+  placement:
+    mode: SnapgridCenter
+  components:
+  - type: Sprite
+    sprite: Markers/atmos.rsi
+    drawdepth: Overdoors
+  - type: Transform
+    anchored: true
+  - type: Clickable
+  - type: Marker
+  - type: GasMarker

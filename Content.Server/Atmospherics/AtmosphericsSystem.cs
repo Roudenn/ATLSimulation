@@ -5,19 +5,24 @@ using Content.Shared.Subgrid.Components;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Timing;
 
 namespace Content.Server.Atmospherics;
 
 public sealed partial class AtmosphericsSystem : SharedAtmosphericsSystem
 {
     [Dependency] private readonly SubGridSystem _subGrid = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     private EntityQuery<MapGridComponent> _mapGridQuery;
+    private EntityQuery<SubGridChunkComponent> _subgridChunkQuery;
 
     public override void Initialize()
     {
         base.Initialize();
         _mapGridQuery = GetEntityQuery<MapGridComponent>();
+        _subgridChunkQuery = GetEntityQuery<SubGridChunkComponent>();
+        Array.Resize(ref _chunkCache, _subGrid.SubGridChunkArea);
     }
 
     public override void AddHeatArea(Entity<SubGridComponent?, MapGridComponent?> grid, TileRef tile, float energy)

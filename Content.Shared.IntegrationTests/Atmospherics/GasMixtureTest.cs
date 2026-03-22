@@ -40,9 +40,9 @@ public sealed class GasMixtureTest
         await pair.RunTicksSync(30);
         await pair.Server.WaitPost(() =>
         {
-            Diffusion(factory, atmosSystem, "PureNitrogen", "PureOxygen");
-            Diffusion(factory, atmosSystem, "PureOxygen0Degrees", "PureOxygen100Degrees");
-            Diffusion(factory, atmosSystem, "PureOxygen0Degrees", "PureNitrogen100Degrees");
+            Diffusion(factory, atmosSystem, "NitrogenPure", "OxygenPure");
+            Diffusion(factory, atmosSystem, "OxygenPure0Degrees", "OxygenPure100Degrees");
+            Diffusion(factory, atmosSystem, "OxygenPure0Degrees", "NitrogenPure100Degrees");
         });
 
         await pair.CleanReturnAsync();
@@ -59,7 +59,7 @@ public sealed class GasMixtureTest
         await pair.RunTicksSync(30);
         await pair.Server.WaitPost(() =>
         {
-            DiffusionLoop(factory, atmosSystem, "PureOxygen0Degrees", "PureNitrogen100Degrees", 100);
+            DiffusionLoop(factory, atmosSystem, "OxygenPure0Degrees", "NitrogenPure100Degrees", 100);
         });
 
         await pair.CleanReturnAsync();

@@ -1,5 +1,6 @@
-﻿using Content.Shared.Atmospherics.GasMixtures;
+﻿using Content.Shared.Atmospherics.Prototypes;
 using Robust.Shared.GameStates;
+using Robust.Shared.Prototypes;
 
 namespace Content.Shared.Atmospherics.Components;
 
@@ -10,6 +11,6 @@ namespace Content.Shared.Atmospherics.Components;
 [RegisterComponent, NetworkedComponent]
 public sealed partial class GridAtmosphereComponent : Component
 {
-    [DataField]
-    public GasMixture Mixture;
+    [DataField(required: true)]
+    public ProtoId<GasMixturePrototype> Mixture;
 }

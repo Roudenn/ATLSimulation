@@ -49,3 +49,12 @@
     base: reinf_over
   - type: Material
     material: StainlessSteel
+
+- type: entity
+  parent: WallReinforced
+  id: WallReinforcedHot
+  name: reinforced wall
+  suffix: Hot, 100 Celsius
+  components:
+  - type: HeatContainer
+    startingTemperature: 373.15

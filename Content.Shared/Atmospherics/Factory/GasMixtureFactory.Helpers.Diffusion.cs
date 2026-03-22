@@ -17,6 +17,16 @@ public sealed partial class GasMixtureFactory
     }
 
     [PublicAPI]
+    public void DiffuseMixturesArchived<T1, T2>(ref T1 m1, ref T2 m2, ref T1 m1Archived, ref T2 m2Archived, float cLength, float frameTime)
+        where T1 : IGasMixture
+        where T2 : IGasMixture
+    {
+        DiffuseMixturesQuery(ref m1, ref m2, ref GasBuffer3, ref GasBuffer4, cLength, frameTime);
+        TransferMoles(ref m1Archived, ref m2Archived, GasBuffer3, GasBuffer4);
+        ClearBuffer(ref GasBuffer3, ref GasBuffer4);
+    }
+
+    [PublicAPI]
     public void DiffuseMixtures<T1, T2>(
         ref T1 m1,
         ref T2 m2,
@@ -109,6 +119,7 @@ public sealed partial class GasMixtureFactory
         where T2 : IGasMixture
     {
         // Find the difference in partial pressure of each gas.
+        // TODO calculate concentration here instead of partial pressure
         var temperature = (m1.Temperature + m2.Temperature) / 2f;
         GetPartialPressures(m1.Moles, temperature, m1.Volume, ref GasBufferResults1);
         GetPartialPressures(m2.Moles, temperature, m2.Volume, ref GasBufferResults2);
@@ -116,7 +127,9 @@ public sealed partial class GasMixtureFactory
         NumericsHelpers.Max(GasBufferResults1, 0f);
 
         // Calculate the partial result
-        NumericsHelpers.Multiply(GasBufferResults1, m1.Volume * cLength * frameTime / MathF.Sqrt(PhysicalConstants.R * m1.Temperature) * 1000f);
+        NumericsHelpers.Multiply(GasBufferResults1,
+            m1.Volume * cLength * frameTime * MathF.Sqrt(PhysicalConstants.R * temperature)
+            / (PhysicalConstants.R * m1.Temperature) * 1000f);
 
         // Multiply moles by their beta sizes
         NumericsHelpers.Multiply(GasAtomBetaSizes, m1.Moles, GasBuffer1);

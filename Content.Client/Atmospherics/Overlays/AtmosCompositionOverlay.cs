@@ -59,8 +59,10 @@ public sealed class AtmosCompositionOverlay : Overlay
                         continue;
 
                     var color = _gasManager[j].Color;
-                    var alpha = tile.ArchivedMixture.Moles[j] / 3f;
+                    _gasManager.GetMolesRatio(ref tile.ArchivedMixture, ref _gasManager.GasBuffer4);
+                    var alpha = _gasManager.GasBuffer4[j] / 4f;
                     args.WorldHandle.DrawRect(box, color.WithAlpha(alpha));
+                    _gasManager.ClearBuffer(ref _gasManager.GasBuffer4);
                 }
             }
         }

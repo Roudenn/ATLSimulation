@@ -7,5 +7,6 @@ public static class IgnoredComponents
         "IconSmooth",
         "Clickable",
         "DebugOverlayViewer",
+        "Marker",
     };
 }

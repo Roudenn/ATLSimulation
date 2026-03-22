@@ -132,21 +132,25 @@ public sealed partial class SubGridSystem
         ResolveMapRelativeToChunk(grid, ref AtmosNeighboursCache, ent.Comp.ChunkIndices);
         while (tiles.MoveNext(out var tile))
         {
+            var mixture = _atmos.GetGridMixture(grid.Owner);
             var isAirtight = false;
             var ents = MapSystem.GetAnchoredEntitiesEnumerator(grid.Owner, grid.Comp2, tile.GridIndices);
             while (ents.MoveNext(out var anchored))
             {
-                if (!_materialQuery.HasComp(anchored))
-                    continue;
+                if (_materialQuery.HasComp(anchored))
+                    isAirtight = true;
 
-                isAirtight = true;
-                break;
+                if (_markerQuery.TryComp(anchored, out var markerComp))
+                    mixture = (GasMixture) _proto.Index(markerComp.Mixture).Definition.CreateMixture(
+                        _gasFactory,
+                        _proto,
+                        SubGridTileVolume);
             }
 
             if (isAirtight)
                 continue;
 
-            InitializeAtmosAtTile(grid, tile.GridIndices, ent.Comp.ChunkIndices, AtmosNeighboursCache, ref ent.Comp.AtmosphereMap, true);
+            InitializeAtmosAtTile(grid, tile.GridIndices, ent.Comp.ChunkIndices, AtmosNeighboursCache, ref ent.Comp.AtmosphereMap, mixture);
         }
     }
 
@@ -156,14 +160,12 @@ public sealed partial class SubGridSystem
         Vector2i chunkIndices,
         Dictionary<Vector2i, (TileAtmos[] Atmos, TileHeat[] Heat)> nearChunks,
         ref TileAtmos[] atmos,
-        bool gridMixture = false)
+        GasMixture gridMixture)
     {
-        var gridMix = gridMixture ? _atmos.GetGridMixture(grid.Owner) : _atmos.GetSpaceTileMixture();
-
         var subTiles = GetAreaTileIndexesAtTile(chunkIndices, gridIndices, grid.Comp2.TileSizeVector);
         foreach (var index in subTiles)
         {
-            atmos[index] = new TileAtmos(gridMix);
+            atmos[index] = new TileAtmos(gridMixture);
         }
 
         InitializeTileBorders(grid, gridIndices, chunkIndices, nearChunks);

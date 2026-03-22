@@ -1,0 +1,25 @@
+﻿- type: entity
+  parent: BaseMarkerGas
+  id: MarkerGasOxygen
+  name: oxygen marker
+  components:
+  - type: Sprite
+    sprite: Markers/atmos.rsi
+    drawdepth: Overdoors
+    layers:
+    - state: base
+    - state: oxygen
+  - type: GasMarker
+    mixture: OxygenPure
+
+- type: entity
+  parent: BaseMarkerGas
+  id: MarkerGasNitrogen
+  name: nitrogen marker
+  components:
+  - type: Sprite
+    layers:
+    - state: base
+    - state: nitrogen
+  - type: GasMarker
+    mixture: NitrogenPure

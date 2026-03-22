@@ -48,7 +48,7 @@ public partial struct TileAtmos : IRobustCloneable<TileAtmos>, ISubGridTile
         MapAtmosphere = mixture.Immutable;
     }
 
-    private TileAtmos(TileAtmos c)
+    public TileAtmos(TileAtmos c)
     {
         Mixture = c.Mixture;
         ArchivedMixture = c.ArchivedMixture;

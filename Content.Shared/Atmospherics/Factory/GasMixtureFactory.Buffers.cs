@@ -87,14 +87,14 @@ public sealed partial class GasMixtureFactory
         }
     }
 
-    private void ClearBuffer(ref float[] buffer)
+    public void ClearBuffer(ref float[] buffer)
     {
         NumericsHelpers.Min(buffer, 0f);
         NumericsHelpers.Max(buffer, 0f);
         DebugTools.Assert(NumericsHelpers.HorizontalAdd(buffer) == 0f);
     }
 
-    private void ClearBuffer(ref float[] buffer1, ref float[] buffer2)
+    public void ClearBuffer(ref float[] buffer1, ref float[] buffer2)
     {
         NumericsHelpers.Min(buffer1, 0f);
         NumericsHelpers.Min(buffer2, 0f);
@@ -104,7 +104,7 @@ public sealed partial class GasMixtureFactory
         DebugTools.Assert(NumericsHelpers.HorizontalAdd(buffer2) == 0f);
     }
 
-    private void ClearBuffer(ref float[] buffer1, ref float[] buffer2, ref float[] buffer3)
+    public void ClearBuffer(ref float[] buffer1, ref float[] buffer2, ref float[] buffer3)
     {
         NumericsHelpers.Min(buffer1, 0f);
         NumericsHelpers.Min(buffer2, 0f);
