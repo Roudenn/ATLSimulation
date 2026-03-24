@@ -50,10 +50,10 @@ public sealed class SubGridTileOverlay : Overlay
                 var pos = _subGrid.GetPositionFromIndex(subgrid.ChunkIndices, i);
                 var worldTilePos = _xform.ToMapCoordinates(new EntityCoordinates(subgrid.ParentGrid, pos));
                 var box = Box2.CenteredAround(worldTilePos.Position + tileWorldSize / 2, tileWorldSize);
-                args.WorldHandle.DrawRect(box, Color.Aquamarine.WithAlpha(0.2f), false);
+                args.WorldHandle.DrawRect(box, tile.MapAtmosphere ? Color.White.WithAlpha(0.2f) : Color.Aquamarine.WithAlpha(0.2f), false);
             }
 
-            /*for (int i = 0; i < subgrid.TemperatureMap.Length; i++)
+            for (int i = 0; i < subgrid.TemperatureMap.Length; i++)
             {
                 var tile = subgrid.TemperatureMap[i];
                 if (!tile.Initialized)
@@ -63,7 +63,7 @@ public sealed class SubGridTileOverlay : Overlay
                 var worldTilePos = _xform.ToMapCoordinates(new EntityCoordinates(subgrid.ParentGrid, pos));
                 var box = Box2.CenteredAround(worldTilePos.Position + tileWorldSize / 2, tileWorldSize);
                 args.WorldHandle.DrawRect(box, Color.Orange.WithAlpha(0.2f), false);
-            }*/
+            }
         }
     }
 }

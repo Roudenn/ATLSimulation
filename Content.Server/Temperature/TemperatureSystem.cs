@@ -2,7 +2,6 @@
 using Content.Shared.Subgrid.Components;
 using Content.Shared.Subgrid.Systems;
 using Content.Shared.Temperature;
-using Content.Shared.Temperature.HeatContainers;
 using Content.Shared.Temperature.Systems;
 using Robust.Shared.Timing;
 
@@ -19,7 +18,6 @@ public sealed class TemperatureSystem : SharedTemperatureSystem
     {
         base.Initialize();
         _subgridChunkQuery = GetEntityQuery<SubGridChunkComponent>();
-        Array.Resize(ref _chunkCache, _subGrid.SubGridChunkArea);
     }
 
     private Dictionary<Vector2i, TileHeat[]> _heatCache = new(64);
@@ -30,6 +28,9 @@ public sealed class TemperatureSystem : SharedTemperatureSystem
     {
         if (!TemperatureEnabled)
             return;
+
+        // TODO make this an event
+        Array.Resize(ref _chunkCache, _subGrid.SubGridChunkArea);
 
         var query = EntityQueryEnumerator<SubGridComponent>();
         var deltaTime = (float) (_timing.CurTime - _lastUpdate).TotalSeconds;
@@ -48,11 +49,17 @@ public sealed class TemperatureSystem : SharedTemperatureSystem
 
                 for (var i = 0; i < chunkData.Length; i++)
                 {
-                    _chunkCache[i] = ProcessTile(chunkData[i], chunkIndices, i, deltaTime);
+                    var tile = chunkData[i];
+                    if (!tile.Initialized)
+                        continue;
+
+                    _chunkCache[i] = ProcessTile(tile, chunkIndices, i, deltaTime);
                 }
 
                 chunkComp.TemperatureMap = _chunkCache;
             }
+
+            Dirty(uid, comp);
         }
     }
 
@@ -71,12 +78,7 @@ public sealed class TemperatureSystem : SharedTemperatureSystem
                 alteredTime /= 2f;
 
             var foundTile = found.Value;
-            ConductiveHeatContainerHelpers.ConductHeatArchived(
-                ref newTile.ArchivedContainer,
-                ref foundTile.ArchivedContainer,
-                ref newTile.Container,
-                ref foundTile.Container,
-                alteredTime);
+            TileHeatHelpers.ConductHeatTiles(ref newTile, ref foundTile, alteredTime);
         }
 
         return newTile;

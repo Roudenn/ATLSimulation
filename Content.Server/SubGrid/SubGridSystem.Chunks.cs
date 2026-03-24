@@ -1,8 +1,10 @@
-﻿using System.Numerics;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Numerics;
 using Content.Shared.Atmospherics;
 using Content.Shared.Atmospherics.GasMixtures;
 using Content.Shared.Constants;
 using Content.Shared.Maps;
+using Content.Shared.Subgrid;
 using Content.Shared.Subgrid.Components;
 using Content.Shared.Temperature;
 using Robust.Shared.Map;
@@ -25,6 +27,31 @@ public sealed partial class SubGridSystem
         SubscribeLocalEvent<SubGridComponent, SubGridInitializeEvent>(OnSubGridInit);
         SubscribeLocalEvent<SubGridChunkComponent, SubGridChunkInitializeEvent>(OnChunkInit);
         SubscribeLocalEvent<SubGridChunkComponent, EntityTerminatingEvent>(OnChunkDeleted);
+
+        SubscribeLocalEvent<SubGridResizedEvent>(OnGridResized);
+        SubscribeLocalEvent<SubGridHeightChangedEvent>(OnGridHeightChanged);
+    }
+
+    private void OnGridResized(ref SubGridResizedEvent ev)
+    {
+        var chunkQuery = EntityQueryEnumerator<SubGridChunkComponent>();
+        while (chunkQuery.MoveNext(out var chunk, out var chunkComp))
+        {
+            foreach (var atmosTile in chunkComp.AtmosphereMap)
+            {
+
+            }
+
+            foreach (var heatTile in chunkComp.TemperatureMap)
+            {
+
+            }
+        }
+    }
+
+    private void OnGridHeightChanged(ref SubGridHeightChangedEvent ev)
+    {
+
     }
 
     private void OnGridInit(GridInitializeEvent ev)
@@ -40,25 +67,33 @@ public sealed partial class SubGridSystem
         EnsureSubGrid(ent);
     }
 
+    private HashSet<EntityUid> _chunkInitializeCache = new(16);
+
     private void OnGridChanged(Entity<SubGridComponent> ent, ref TileChangedEvent args)
     {
         if (Paused(ent.Owner)) // We don't care about it until we are initialized
             return;
 
         // TODO this doesn't support grid splitting
+        _chunkInitializeCache.Clear();
         foreach (var change in args.Changes)
         {
             if (change.OldTile.TypeId == 0)
             {
                 // If space changed to something else, initialize subgrid tiles on a new place
-                EnsureSubGridChunkWithNeighbours(ent, change.GridIndices);
+                EnsureSubGridChunkWithNeighbours(ent, change.GridIndices, ref _chunkInitializeCache);
             }
             else if (change.NewTile.TypeId == 0)
             {
                 // Otherwise check the chunks to be removed
                 TryRemoveSubGridChunkWithNeighbours(ent, change.GridIndices);
-                // TODO subgrid cells removal
             }
+        }
+
+        foreach (var uid in _chunkInitializeCache)
+        {
+            var ev = new SubGridChunkInitializeEvent();
+            RaiseLocalEvent(uid, ref ev);
         }
 
         // We have to go through the loop of all changes again
@@ -70,8 +105,17 @@ public sealed partial class SubGridSystem
                 if (!TryGetChunk(ent.AsNullable(), change.GridIndices, out var chunk))
                     continue;
 
-                var ev = new SubGridChunkInitializeEvent();
-                RaiseLocalEvent(chunk.Value.Owner, ref ev);
+                InitializeAtmosAtTile(
+                    (ent.Owner, ent.Comp, args.Entity.Comp),
+                    change.GridIndices,
+                    chunk.Value.Comp.ChunkIndices,
+                    ref chunk.Value.Comp.AtmosphereMap);
+
+                AtmosNeighboursCache.Clear();
+                ResolveMapRelativeToChunk(ent, ref AtmosNeighboursCache, chunk.Value.Comp.ChunkIndices);
+
+                InitializeTileBorders((ent.Owner, ent.Comp, args.Entity.Comp), change.GridIndices, ref AtmosNeighboursCache);
+                ApplyMap(ent, ref AtmosNeighboursCache);
                 Dirty(chunk.Value); // TODO ATL optimization
             }
             else if (change.NewTile.TypeId == 0)
@@ -98,11 +142,18 @@ public sealed partial class SubGridSystem
             var comp = ChunkQuery.Comp(chunk);
             InitChunk((chunk, comp));
         }
+
+        foreach (var (_, chunk) in ent.Comp.ChunkEntities)
+        {
+            var comp = ChunkQuery.Comp(chunk);
+            InitializeChunkBorders((chunk, comp));
+        }
     }
 
     private void OnChunkInit(Entity<SubGridChunkComponent> ent, ref SubGridChunkInitializeEvent args)
     {
         InitChunk(ent);
+        InitializeChunkBorders(ent);
     }
 
     private void InitChunk(Entity<SubGridChunkComponent> ent)
@@ -128,8 +179,6 @@ public sealed partial class SubGridSystem
         var chunkArea = Box2.CenteredAround(chunkPos, ChunkSizeVector);
         var tiles = MapSystem.GetLocalTilesEnumerator(grid.Owner, grid.Comp2, chunkArea);
 
-        AtmosNeighboursCache.Clear();
-        ResolveMapRelativeToChunk(grid, ref AtmosNeighboursCache, ent.Comp.ChunkIndices);
         while (tiles.MoveNext(out var tile))
         {
             var mixture = _atmos.GetGridMixture(grid.Owner);
@@ -150,7 +199,7 @@ public sealed partial class SubGridSystem
             if (isAirtight)
                 continue;
 
-            InitializeAtmosAtTile(grid, tile.GridIndices, ent.Comp.ChunkIndices, AtmosNeighboursCache, ref ent.Comp.AtmosphereMap, mixture);
+            InitializeAtmosAtTile(grid, tile.GridIndices, ent.Comp.ChunkIndices, ref ent.Comp.AtmosphereMap, mixture);
         }
     }
 
@@ -158,27 +207,47 @@ public sealed partial class SubGridSystem
         Entity<SubGridComponent, MapGridComponent> grid,
         Vector2i gridIndices,
         Vector2i chunkIndices,
-        Dictionary<Vector2i, (TileAtmos[] Atmos, TileHeat[] Heat)> nearChunks,
         ref TileAtmos[] atmos,
-        GasMixture gridMixture)
+        GasMixture? mixture = null)
     {
+        mixture ??= _atmos.GetSpaceTileMixture();
         var subTiles = GetAreaTileIndexesAtTile(chunkIndices, gridIndices, grid.Comp2.TileSizeVector);
         foreach (var index in subTiles)
         {
-            atmos[index] = new TileAtmos(gridMixture);
+            atmos[index] = new TileAtmos(mixture.Value);
+        }
+    }
+
+    private void InitializeChunkBorders(Entity<SubGridChunkComponent> ent)
+    {
+        if (!MapGridQuery.TryComp(ent.Comp.ParentGrid, out var mapGridComp)
+            || !SubGridQuery.TryComp(ent.Comp.ParentGrid, out var subGridComp))
+        {
+            Log.Error("SubGrid chunk was initialized without a parent grid!");
+            return;
         }
 
-        InitializeTileBorders(grid, gridIndices, chunkIndices, nearChunks);
+        Entity<SubGridComponent, MapGridComponent> grid = (ent.Comp.ParentGrid, subGridComp, mapGridComp);
+        var chunkPos = ChunkIndicesToPosition(ent.Comp.ChunkIndices);
+        var chunkArea = Box2.CenteredAround(chunkPos, ChunkSizeVector + grid.Comp2.TileSizeVector * 2f);
+        var tiles = MapSystem.GetLocalTilesEnumerator(grid.Owner, grid.Comp2, chunkArea);
+
+        AtmosNeighboursCache.Clear();
+        ResolveMapRelativeToChunk(grid, ref AtmosNeighboursCache, ent.Comp.ChunkIndices);
+        while (tiles.MoveNext(out var tile))
+        {
+            InitializeTileBorders(grid, tile.GridIndices, ref AtmosNeighboursCache);
+        }
     }
 
     private void InitializeTileBorders(
         Entity<SubGridComponent, MapGridComponent> grid,
         Vector2i gridIndices,
-        Vector2i chunkIndices,
-        Dictionary<Vector2i, (TileAtmos[] Atmos, TileHeat[] Heat)> nearChunks)
+        ref Dictionary<Vector2i, (TileAtmos[] Atmos, TileHeat[] Heat)> nearChunks)
     {
         // Check if it is located near space, and add a boundary layer of atmosphere tiles.
         var spaceMix = _atmos.GetSpaceTileMixture();
+        _gasFactory.MarkImmutable(ref spaceMix);
         foreach (var vecDir in DirectionsWithDiagonals)
         {
             var tileRef = MapSystem.GetTileRef(grid.Owner, grid.Comp2, gridIndices + vecDir);
@@ -194,7 +263,7 @@ public sealed partial class SubGridSystem
             {
                 if (!nearChunks.TryGetValue(foundIndices, out var foundAtmosGridCorner))
                 {
-                    Log.Error($"When trying to initialize chunk at {chunkIndices} for tile {gridIndices}, there was somehow no neighbouring empty chunk at {foundIndices}.");
+                    Log.Error($"When trying to initialize chunk for tile {gridIndices}, there was somehow no neighbouring empty chunk at {foundIndices}.");
                     continue;
                 }
 
@@ -219,26 +288,14 @@ public sealed partial class SubGridSystem
         var chunkPos = ChunkIndicesToPosition(ent.Comp.ChunkIndices);
         var chunkArea = Box2.CenteredAround(chunkPos, ChunkSizeVector);
 
-        AtmosNeighboursCache.Clear();
-        ResolveMapRelativeToChunk(grid, ref AtmosNeighboursCache, ent.Comp.ChunkIndices);
-
         var tiles = MapSystem.GetLocalTilesEnumerator(grid.Owner, grid.Comp2, chunkArea);
-        var initializedTiles = new List<Vector2i>();
         while (tiles.MoveNext(out var tile))
         {
-            if (InitializeTemperatureAtTile(grid, tile.GridIndices, ent.Comp.ChunkIndices, ref ent.Comp.TemperatureMap))
-                initializedTiles.Add(tile.GridIndices);
-        }
-
-        // In order to prevent clipping and rce conditions,
-        // tile borders of the airtight tiles have to be initialized after all of them were placed.
-        foreach (var initialized in initializedTiles)
-        {
-            InitializeTileBorders(grid, initialized, ent.Comp.ChunkIndices, AtmosNeighboursCache);
+            InitializeTemperatureAtTile(grid, tile.GridIndices, ent.Comp.ChunkIndices, ref ent.Comp.TemperatureMap);
         }
     }
 
-    private bool InitializeTemperatureAtTile(
+    private void InitializeTemperatureAtTile(
         Entity<SubGridComponent, MapGridComponent> grid,
         Vector2i gridIndices,
         Vector2i chunkIndices,
@@ -269,15 +326,13 @@ public sealed partial class SubGridSystem
         if (heatCapacity == null
             || temperature == null
             || conductance == null)
-            return false;
+            return;
 
         var subTiles = GetAreaTileIndexesAtTile(chunkIndices, gridIndices, grid.Comp2.TileSizeVector);
         foreach (var index in subTiles)
         {
             temperatures[index] = new TileHeat(heatCapacity.Value, temperature.Value, conductance.Value);
         }
-
-        return true;
     }
 
     private void OnChunkDeleted(Entity<SubGridChunkComponent> ent, ref EntityTerminatingEvent args)
@@ -313,9 +368,10 @@ public sealed partial class SubGridSystem
             positions.Add(tile.Value.GridIndices);
         }
 
+        _chunkInitializeCache.Clear();
         foreach (var pos in positions)
         {
-            EnsureSubGridChunkWithNeighbours(grid, pos);
+            EnsureSubGridChunkWithNeighbours(grid, pos, ref _chunkInitializeCache);
         }
 
         var ev = new SubGridInitializeEvent();
@@ -328,15 +384,15 @@ public sealed partial class SubGridSystem
     /// Ensures that a given tile position and also all neighbours in 8 directions
     /// have an assigned subgrid chunk.
     /// </summary>
-    /// <param name="grid"></param>
-    /// <param name="gridIndices"></param>
-    private void EnsureSubGridChunkWithNeighbours(Entity<SubGridComponent> grid, Vector2i gridIndices)
+    private void EnsureSubGridChunkWithNeighbours(Entity<SubGridComponent> grid, Vector2i gridIndices, ref HashSet<EntityUid> set)
     {
-        EnsureSubGridChunk(grid, gridIndices);
+        if (TryEnsureSubGridChunk(grid, gridIndices, out var spawned))
+            set.Add(spawned.Value);
 
         foreach (var dir in DirectionsWithDiagonals)
         {
-            EnsureSubGridChunk(grid, gridIndices + dir);
+            if (TryEnsureSubGridChunk(grid, gridIndices + dir, out var spawnedDir))
+                set.Add(spawnedDir.Value);
         }
     }
 
@@ -345,12 +401,14 @@ public sealed partial class SubGridSystem
     /// </summary>
     /// <param name="grid"></param>
     /// <param name="gridIndices"></param>
-    private void EnsureSubGridChunk(Entity<SubGridComponent> grid, Vector2i gridIndices)
+    private bool TryEnsureSubGridChunk(Entity<SubGridComponent> grid, Vector2i gridIndices, [NotNullWhen(true)] out EntityUid? spawned)
     {
+        spawned = null;
         if (grid.Comp.ChunkEntities.ContainsKey(GetChunkIndicesTile(gridIndices)))
-            return;
+            return false;
 
-        SpawnSubGridChunk(grid, gridIndices);
+        spawned = SpawnSubGridChunk(grid, gridIndices);
+        return true;
     }
 
     /// <summary>

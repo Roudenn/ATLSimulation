@@ -135,6 +135,19 @@ public abstract partial class SharedSubGridSystem
         map.Add(chunkIndices, (centerChunkComp.AtmosphereMap, centerChunkComp.TemperatureMap));
     }
 
+    public void ApplyMap(Entity<SubGridComponent> grid, ref Dictionary<Vector2i, (TileAtmos[], TileHeat[])> map)
+    {
+        foreach (var (chunkIndices, (atmosMap, heatMap)) in map)
+        {
+            if (!grid.Comp.ChunkEntities.TryGetValue(chunkIndices, out var chunk))
+                continue;
+
+            var chunkComp = ChunkQuery.Comp(chunk);
+            chunkComp.AtmosphereMap = atmosMap;
+            chunkComp.TemperatureMap = heatMap;
+        }
+    }
+
     /// <summary>
     /// Tries to find an atmosphere tile near some other tile.
     /// </summary>

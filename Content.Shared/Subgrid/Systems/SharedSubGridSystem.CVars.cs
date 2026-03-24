@@ -57,6 +57,9 @@ public abstract partial class SharedSubGridSystem
     {
         SubGridHeight = f;
         UpdateVolumeValue();
+
+        var ev = new SubGridHeightChangedEvent();
+        RaiseLocalEvent(ref ev);
     }
 
     private void OnSubGridSizeChanged(int num)
@@ -72,6 +75,9 @@ public abstract partial class SharedSubGridSystem
         SubGridChunkSize = SystemConstants.PvsChunkSize * (1 << num);
         SubGridChunkArea = SystemConstants.PvsChunkSize * (1 << num) * SystemConstants.PvsChunkSize * (1 << num);
         UpdateVolumeValue();
+
+        var ev = new SubGridResizedEvent();
+        RaiseLocalEvent(ref ev);
     }
 
     private void UpdateVolumeValue()

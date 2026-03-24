@@ -36,7 +36,7 @@ public abstract partial class SharedSubGridSystem
     /// <param name="coordinates">Grid position that we are trying to find the chunk position for.</param>
     /// <returns>Nearest chunk position to the given coordinates.</returns>
     public static Vector2 GetChunkPosition(Vector2 coordinates)
-        => GetChunkIndices(coordinates) * SystemConstants.PvsChunkSize;
+        => GetChunkIndicesTile(coordinates) * SystemConstants.PvsChunkSize;
 
     public static Vector2 ChunkIndicesToPosition(Vector2i indices)
         => indices * SystemConstants.PvsChunkSize;
