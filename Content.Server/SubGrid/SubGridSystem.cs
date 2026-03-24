@@ -46,7 +46,7 @@ public sealed partial class SubGridSystem : SharedSubGridSystem
         {
             chunkCount++;
             // TODO implement a better way to count active tiles
-            foreach (var atmosTile in chunkComp.AtmosphereMap)
+            foreach (var atmosTile in chunkComp.ChunkData.AtmosphereMap)
             {
                 if (!atmosTile.Initialized)
                     continue;
@@ -54,7 +54,7 @@ public sealed partial class SubGridSystem : SharedSubGridSystem
                 tileCount++;
             }
 
-            foreach (var temperatureTile in chunkComp.TemperatureMap)
+            foreach (var temperatureTile in chunkComp.ChunkData.TemperatureMap)
             {
                 if (!temperatureTile.Initialized)
                     continue;

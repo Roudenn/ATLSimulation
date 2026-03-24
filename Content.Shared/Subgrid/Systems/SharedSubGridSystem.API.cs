@@ -18,30 +18,12 @@ public abstract partial class SharedSubGridSystem
     /// <param name="grid">A grid to find the chunks on.</param>
     /// <param name="map">A cache dictionary to add the chunk data.</param>
     [PublicAPI]
-    public void ResolveAtmosMap(Entity<SubGridComponent> grid, ref Dictionary<Vector2i, TileAtmos[]> map)
+    public void ResolveMap(Entity<SubGridComponent> grid, ref Dictionary<Vector2i, SubGridChunk> map)
     {
         foreach (var (chunkPos, chunk) in grid.Comp.ChunkEntities)
         {
             var chunkComp = ChunkQuery.Comp(chunk);
-            map.Add(chunkPos, chunkComp.AtmosphereMap);
-        }
-    }
-
-    /// <summary>
-    /// Gets all temperature chunks on a grid and adds them to a given dictionary.
-    /// </summary>
-    /// <remarks>
-    /// Remember to clear the dictionary before passing any information into it!
-    /// </remarks>
-    /// <param name="grid">A grid to find the chunks on.</param>
-    /// <param name="map">A cache dictionary to add the chunk data.</param>
-    [PublicAPI]
-    public void ResolveHeatMap(Entity<SubGridComponent> grid, ref Dictionary<Vector2i, TileHeat[]> map)
-    {
-        foreach (var (chunkPos, chunk) in grid.Comp.ChunkEntities)
-        {
-            var chunkComp = ChunkQuery.Comp(chunk);
-            map.Add(chunkPos, chunkComp.TemperatureMap);
+            map.Add(chunkPos, chunkComp.ChunkData);
         }
     }
 
@@ -55,7 +37,7 @@ public abstract partial class SharedSubGridSystem
     /// <param name="map">A cache dictionary to add the chunk data.</param>
     /// <param name="chunkIndices"></param>
     [PublicAPI]
-    public void ResolveAtmosMapRelativeToChunk(Entity<SubGridComponent> grid, ref Dictionary<Vector2i, TileAtmos[]> map, Vector2i chunkIndices)
+    public void ResolveMapRelativeToChunk(Entity<SubGridComponent> grid, ref Dictionary<Vector2i, SubGridChunk> map, Vector2i chunkIndices)
     {
         foreach (var dir in DirectionsWithDiagonals)
         {
@@ -64,7 +46,7 @@ public abstract partial class SharedSubGridSystem
                 continue;
 
             var chunkComp = ChunkQuery.Comp(chunk);
-            map.Add(chunkPos, chunkComp.AtmosphereMap);
+            map.Add(chunkPos, chunkComp.ChunkData);
         }
 
         // Also include the center
@@ -72,70 +54,10 @@ public abstract partial class SharedSubGridSystem
             return;
 
         var centerChunkComp = ChunkQuery.Comp(centerChunk);
-        map.Add(chunkIndices, centerChunkComp.AtmosphereMap);
+        map.Add(chunkIndices, centerChunkComp.ChunkData);
     }
 
-    /// <summary>
-    /// Gets all temperature chunks on a grid and adds them to a given dictionary.
-    /// </summary>
-    /// <remarks>
-    /// Remember to clear the dictionary before passing any information into it!
-    /// </remarks>
-    /// <param name="grid">A grid to find the chunks on.</param>
-    /// <param name="map">A cache dictionary to add the chunk data.</param>
-    /// <param name="chunkIndices"></param>
-    [PublicAPI]
-    public void ResolveHeatMapRelativeToChunk(Entity<SubGridComponent> grid, ref Dictionary<Vector2i, TileHeat[]> map, Vector2i chunkIndices)
-    {
-        foreach (var dir in DirectionsWithDiagonals)
-        {
-            var chunkPos = chunkIndices + dir;
-            if (!grid.Comp.ChunkEntities.TryGetValue(chunkPos, out var chunk))
-                continue;
-
-            var chunkComp = ChunkQuery.Comp(chunk);
-            map.Add(chunkPos, chunkComp.TemperatureMap);
-        }
-
-        // Also include the center
-        if (!grid.Comp.ChunkEntities.TryGetValue(chunkIndices, out var centerChunk))
-            return;
-
-        var centerChunkComp = ChunkQuery.Comp(centerChunk);
-        map.Add(chunkIndices, centerChunkComp.TemperatureMap);
-    }
-
-    /// <summary>
-    /// Gets all atmosphere chunks on a grid and adds them to a given dictionary.
-    /// </summary>
-    /// <remarks>
-    /// Remember to clear the dictionary before passing any information into it!
-    /// </remarks>
-    /// <param name="grid">A grid to find the chunks on.</param>
-    /// <param name="map">A cache dictionary to add the chunk data.</param>
-    /// <param name="chunkIndices"></param>
-    [PublicAPI]
-    public void ResolveMapRelativeToChunk(Entity<SubGridComponent> grid, ref Dictionary<Vector2i, (TileAtmos[], TileHeat[])> map, Vector2i chunkIndices)
-    {
-        foreach (var dir in DirectionsWithDiagonals)
-        {
-            var chunkPos = chunkIndices + dir;
-            if (!grid.Comp.ChunkEntities.TryGetValue(chunkPos, out var chunk))
-                continue;
-
-            var chunkComp = ChunkQuery.Comp(chunk);
-            map.Add(chunkPos, (chunkComp.AtmosphereMap, chunkComp.TemperatureMap));
-        }
-
-        // Also include the center
-        if (!grid.Comp.ChunkEntities.TryGetValue(chunkIndices, out var centerChunk))
-            return;
-
-        var centerChunkComp = ChunkQuery.Comp(centerChunk);
-        map.Add(chunkIndices, (centerChunkComp.AtmosphereMap, centerChunkComp.TemperatureMap));
-    }
-
-    public void ApplyMap(Entity<SubGridComponent> grid, ref Dictionary<Vector2i, (TileAtmos[], TileHeat[])> map)
+    /*public void ApplyMap(Entity<SubGridComponent> grid, ref Dictionary<Vector2i, (TileAtmos[], TileHeat[])> map)
     {
         foreach (var (chunkIndices, (atmosMap, heatMap)) in map)
         {
@@ -146,7 +68,7 @@ public abstract partial class SharedSubGridSystem
             chunkComp.AtmosphereMap = atmosMap;
             chunkComp.TemperatureMap = heatMap;
         }
-    }
+    }*/
 
     /// <summary>
     /// Tries to find an atmosphere tile near some other tile.
@@ -159,7 +81,7 @@ public abstract partial class SharedSubGridSystem
     /// <returns>True if the atmosphere tile was found.</returns>
     [PublicAPI]
     public bool TryGetAtmosphereTileRelative(
-        Dictionary<Vector2i, TileAtmos[]> chunks,
+        Dictionary<Vector2i, SubGridChunk> chunks,
         Vector2i chunkIndices,
         int index,
         Vector2i dir,
@@ -172,7 +94,7 @@ public abstract partial class SharedSubGridSystem
         if (!chunks.TryGetValue(targetChunk, out var chunk))
             return false;
 
-        found = chunk[targetLocalIndex];
+        found = chunk.AtmosphereMap[targetLocalIndex];
         return true;
     }
 
@@ -187,7 +109,7 @@ public abstract partial class SharedSubGridSystem
     /// <returns>True if the temperature tile was found.</returns>
     [PublicAPI]
     public bool TryGetHeatTileRelative(
-        Dictionary<Vector2i, TileHeat[]> chunks,
+        Dictionary<Vector2i, SubGridChunk> chunks,
         Vector2i chunkIndices,
         int index,
         Vector2i dir,
@@ -200,7 +122,7 @@ public abstract partial class SharedSubGridSystem
         if (!chunks.TryGetValue(targetChunk, out var chunk))
             return false;
 
-        found = chunk[targetLocalIndex];
+        found = chunk.TemperatureMap[targetLocalIndex];
         return true;
     }
 }

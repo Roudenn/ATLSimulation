@@ -37,12 +37,12 @@ public sealed partial class SubGridSystem
         var chunkQuery = EntityQueryEnumerator<SubGridChunkComponent>();
         while (chunkQuery.MoveNext(out var chunk, out var chunkComp))
         {
-            foreach (var atmosTile in chunkComp.AtmosphereMap)
+            foreach (var atmosTile in chunkComp.ChunkData.AtmosphereMap)
             {
 
             }
 
-            foreach (var heatTile in chunkComp.TemperatureMap)
+            foreach (var heatTile in chunkComp.ChunkData.TemperatureMap)
             {
 
             }
@@ -109,13 +109,13 @@ public sealed partial class SubGridSystem
                     (ent.Owner, ent.Comp, args.Entity.Comp),
                     change.GridIndices,
                     chunk.Value.Comp.ChunkIndices,
-                    ref chunk.Value.Comp.AtmosphereMap);
+                    chunk.Value.Comp.ChunkData);
 
                 AtmosNeighboursCache.Clear();
                 ResolveMapRelativeToChunk(ent, ref AtmosNeighboursCache, chunk.Value.Comp.ChunkIndices);
 
-                InitializeTileBorders((ent.Owner, ent.Comp, args.Entity.Comp), change.GridIndices, ref AtmosNeighboursCache);
-                ApplyMap(ent, ref AtmosNeighboursCache);
+                InitializeTileBorders((ent.Owner, ent.Comp, args.Entity.Comp), change.GridIndices, AtmosNeighboursCache);
+                //ApplyMap(ent, ref AtmosNeighboursCache);
                 Dirty(chunk.Value); // TODO ATL optimization
             }
             else if (change.NewTile.TypeId == 0)
@@ -171,7 +171,7 @@ public sealed partial class SubGridSystem
     }
 
     // TODO this is bad and also prevents multithreading
-    public Dictionary<Vector2i, (TileAtmos[], TileHeat[])> AtmosNeighboursCache = new(10);
+    public Dictionary<Vector2i, SubGridChunk> AtmosNeighboursCache = new(10);
 
     private void InitializeChunkAtmos(Entity<SubGridChunkComponent> ent, Entity<SubGridComponent, MapGridComponent> grid)
     {
@@ -199,7 +199,7 @@ public sealed partial class SubGridSystem
             if (isAirtight)
                 continue;
 
-            InitializeAtmosAtTile(grid, tile.GridIndices, ent.Comp.ChunkIndices, ref ent.Comp.AtmosphereMap, mixture);
+            InitializeAtmosAtTile(grid, tile.GridIndices, ent.Comp.ChunkIndices, ent.Comp.ChunkData, mixture);
         }
     }
 
@@ -207,14 +207,14 @@ public sealed partial class SubGridSystem
         Entity<SubGridComponent, MapGridComponent> grid,
         Vector2i gridIndices,
         Vector2i chunkIndices,
-        ref TileAtmos[] atmos,
+        SubGridChunk chunk,
         GasMixture? mixture = null)
     {
         mixture ??= _atmos.GetSpaceTileMixture();
         var subTiles = GetAreaTileIndexesAtTile(chunkIndices, gridIndices, grid.Comp2.TileSizeVector);
         foreach (var index in subTiles)
         {
-            atmos[index] = new TileAtmos(mixture.Value);
+            chunk.AtmosphereMap[index] = new TileAtmos(mixture.Value);
         }
     }
 
@@ -236,14 +236,14 @@ public sealed partial class SubGridSystem
         ResolveMapRelativeToChunk(grid, ref AtmosNeighboursCache, ent.Comp.ChunkIndices);
         while (tiles.MoveNext(out var tile))
         {
-            InitializeTileBorders(grid, tile.GridIndices, ref AtmosNeighboursCache);
+            InitializeTileBorders(grid, tile.GridIndices, AtmosNeighboursCache);
         }
     }
 
     private void InitializeTileBorders(
         Entity<SubGridComponent, MapGridComponent> grid,
         Vector2i gridIndices,
-        ref Dictionary<Vector2i, (TileAtmos[] Atmos, TileHeat[] Heat)> nearChunks)
+        Dictionary<Vector2i, SubGridChunk> nearChunks)
     {
         // Check if it is located near space, and add a boundary layer of atmosphere tiles.
         var spaceMix = _atmos.GetSpaceTileMixture();
@@ -269,11 +269,11 @@ public sealed partial class SubGridSystem
 
                 foreach (var index in indexes)
                 {
-                    if (foundAtmosGridCorner.Atmos[index].Initialized
-                        || foundAtmosGridCorner.Heat[index].Initialized)
+                    if (foundAtmosGridCorner.AtmosphereMap[index].Initialized
+                        || foundAtmosGridCorner.TemperatureMap[index].Initialized)
                         continue;
 
-                    foundAtmosGridCorner.Atmos[index] = new TileAtmos(spaceMix);
+                    foundAtmosGridCorner.AtmosphereMap[index] = new TileAtmos(spaceMix);
                 }
             }
 
@@ -291,7 +291,7 @@ public sealed partial class SubGridSystem
         var tiles = MapSystem.GetLocalTilesEnumerator(grid.Owner, grid.Comp2, chunkArea);
         while (tiles.MoveNext(out var tile))
         {
-            InitializeTemperatureAtTile(grid, tile.GridIndices, ent.Comp.ChunkIndices, ref ent.Comp.TemperatureMap);
+            InitializeTemperatureAtTile(grid, tile.GridIndices, ent.Comp.ChunkIndices, ent.Comp.ChunkData);
         }
     }
 
@@ -299,7 +299,7 @@ public sealed partial class SubGridSystem
         Entity<SubGridComponent, MapGridComponent> grid,
         Vector2i gridIndices,
         Vector2i chunkIndices,
-        ref TileHeat[] temperatures)
+        SubGridChunk chunk)
     {
         float? heatCapacity = null;
         float? temperature = null;
@@ -331,7 +331,7 @@ public sealed partial class SubGridSystem
         var subTiles = GetAreaTileIndexesAtTile(chunkIndices, gridIndices, grid.Comp2.TileSizeVector);
         foreach (var index in subTiles)
         {
-            temperatures[index] = new TileHeat(heatCapacity.Value, temperature.Value, conductance.Value);
+            chunk.TemperatureMap[index] = new TileHeat(heatCapacity.Value, temperature.Value, conductance.Value);
         }
     }
 
@@ -454,8 +454,7 @@ public sealed partial class SubGridSystem
         chunkComp.ChunkIndices = GetChunkIndicesTile(gridIndices);
 
         // preallocate the memory
-        chunkComp.AtmosphereMap = new TileAtmos[SubGridChunkArea];
-        chunkComp.TemperatureMap = new TileHeat[SubGridChunkArea];
+        chunkComp.ChunkData = new SubGridChunk(SubGridChunkArea);
 
         grid.Comp.ChunkEntities.Add(chunkComp.ChunkIndices, chunk);
         Log.Info($"Added chunk {ToPrettyString(chunk)} to grid {ToPrettyString(grid)} with chunkIndices {chunkComp.ChunkIndices}");

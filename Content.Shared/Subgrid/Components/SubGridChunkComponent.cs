@@ -1,7 +1,4 @@
-﻿using Content.Shared.Atmospherics;
-using Content.Shared.Temperature;
-using Robust.Shared.GameStates;
-using Robust.Shared.Utility;
+﻿using Robust.Shared.GameStates;
 
 namespace Content.Shared.Subgrid.Components;
 
@@ -16,8 +13,5 @@ public sealed partial class SubGridChunkComponent : Component
     public Vector2i ChunkIndices;
 
     [DataField, AutoNetworkedField]
-    public TileHeat[] TemperatureMap;
-
-    [DataField, AutoNetworkedField]
-    public TileAtmos[] AtmosphereMap;
+    public SubGridChunk ChunkData;
 }

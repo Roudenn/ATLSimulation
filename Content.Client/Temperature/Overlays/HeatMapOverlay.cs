@@ -42,9 +42,9 @@ public sealed class HeatMapOverlay : Overlay
             if (!viewport.Intersects(worldAABB))
                 continue;
 
-            for (int i = 0; i < subgrid.TemperatureMap.Length; i++)
+            for (int i = 0; i < subgrid.ChunkData.TemperatureMap.Length; i++)
             {
-                var tile = subgrid.TemperatureMap[i];
+                var tile = subgrid.ChunkData.TemperatureMap[i];
                 if (!tile.Initialized)
                     continue;
 

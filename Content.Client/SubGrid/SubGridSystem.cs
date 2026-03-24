@@ -37,7 +37,7 @@ public sealed class SubGridSystem : SharedSubGridSystem
         if (!TryGetChunk((gridUid, subGrid), localPos, out var chunk))
             return;
 
-        var atmosTile = chunk.Value.Comp.AtmosphereMap[index];
+        var atmosTile = chunk.Value.Comp.ChunkData.AtmosphereMap[index];
         if (atmosTile.Initialized)
         {
             var atmosEv = new InspectSubGridAtmosphereTile(atmosTile.Mixture, gridUid, GetChunkIndices(localPos), index);
@@ -45,7 +45,7 @@ public sealed class SubGridSystem : SharedSubGridSystem
             return;
         }
 
-        var heatTile = chunk.Value.Comp.TemperatureMap[index];
+        var heatTile = chunk.Value.Comp.ChunkData.TemperatureMap[index];
         if (heatTile.Initialized)
         {
             var atmosEv = new InspectSubGridHeatTile(heatTile.Container, gridUid, GetChunkIndices(localPos), index);

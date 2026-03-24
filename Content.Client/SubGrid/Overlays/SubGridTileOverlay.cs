@@ -41,9 +41,9 @@ public sealed class SubGridTileOverlay : Overlay
             if (!viewport.Intersects(worldAABB))
                 continue;
 
-            for (int i = 0; i < subgrid.AtmosphereMap.Length; i++)
+            for (int i = 0; i < subgrid.ChunkData.AtmosphereMap.Length; i++)
             {
-                var tile = subgrid.AtmosphereMap[i];
+                var tile = subgrid.ChunkData.AtmosphereMap[i];
                 if (!tile.Initialized)
                     continue;
 
@@ -53,9 +53,9 @@ public sealed class SubGridTileOverlay : Overlay
                 args.WorldHandle.DrawRect(box, tile.MapAtmosphere ? Color.White.WithAlpha(0.2f) : Color.Aquamarine.WithAlpha(0.2f), false);
             }
 
-            for (int i = 0; i < subgrid.TemperatureMap.Length; i++)
+            for (int i = 0; i < subgrid.ChunkData.TemperatureMap.Length; i++)
             {
-                var tile = subgrid.TemperatureMap[i];
+                var tile = subgrid.ChunkData.TemperatureMap[i];
                 if (!tile.Initialized)
                     continue;
 

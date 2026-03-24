@@ -1,4 +1,5 @@
 ﻿using Content.Shared.Atmospherics;
+using Content.Shared.Subgrid;
 using Content.Shared.Subgrid.Components;
 using Content.Shared.Subgrid.Systems;
 
@@ -6,7 +7,7 @@ namespace Content.Server.Atmospherics;
 
 public sealed partial class AtmosphericsSystem
 {
-    private Dictionary<Vector2i, TileAtmos[]> _atmosCache = new(64);
+    private Dictionary<Vector2i, SubGridChunk> _atmosCache = new(64);
     private TileAtmos[] _chunkCache = new TileAtmos[0];
     private TimeSpan _lastUpdate = TimeSpan.Zero;
 
@@ -21,7 +22,7 @@ public sealed partial class AtmosphericsSystem
         while (query.MoveNext(out var uid, out var comp))
         {
             _atmosCache.Clear();
-            _subGrid.ResolveAtmosMap((uid, comp), ref _atmosCache);
+            _subGrid.ResolveMap((uid, comp), ref _atmosCache);
 
             foreach (var (chunkIndices, chunkData) in _atmosCache)
             {
@@ -29,16 +30,16 @@ public sealed partial class AtmosphericsSystem
                 if (!_subgridChunkQuery.TryComp(chunkEnt, out var chunkComp))
                     continue;
 
-                for (var i = 0; i < chunkData.Length; i++)
+                for (var i = 0; i < chunkData.AtmosphereMap.Length; i++)
                 {
-                    var tile = chunkData[i];
+                    var tile = chunkData.AtmosphereMap[i];
                     if (!tile.Initialized)
                         continue;
 
                     _chunkCache[i] = ProcessTile(tile, chunkIndices, i, deltaTime);
                 }
 
-                chunkComp.AtmosphereMap = _chunkCache;
+                chunkComp.ChunkData.AtmosphereMap = _chunkCache;
             }
         }
     }

@@ -1,4 +1,5 @@
 ﻿using Content.Server.SubGrid;
+using Content.Shared.Subgrid;
 using Content.Shared.Subgrid.Components;
 using Content.Shared.Subgrid.Systems;
 using Content.Shared.Temperature;
@@ -20,7 +21,7 @@ public sealed class TemperatureSystem : SharedTemperatureSystem
         _subgridChunkQuery = GetEntityQuery<SubGridChunkComponent>();
     }
 
-    private Dictionary<Vector2i, TileHeat[]> _heatCache = new(64);
+    private Dictionary<Vector2i, SubGridChunk> _heatCache = new(64);
     private TileHeat[] _chunkCache = new TileHeat[0];
     private TimeSpan _lastUpdate = TimeSpan.Zero;
 
@@ -39,7 +40,7 @@ public sealed class TemperatureSystem : SharedTemperatureSystem
         while (query.MoveNext(out var uid, out var comp))
         {
             _heatCache.Clear();
-            _subGrid.ResolveHeatMap((uid, comp), ref _heatCache);
+            _subGrid.ResolveMap((uid, comp), ref _heatCache);
 
             foreach (var (chunkIndices, chunkData) in _heatCache)
             {
@@ -47,16 +48,16 @@ public sealed class TemperatureSystem : SharedTemperatureSystem
                 if (!_subgridChunkQuery.TryComp(chunkEnt, out var chunkComp))
                     continue;
 
-                for (var i = 0; i < chunkData.Length; i++)
+                for (var i = 0; i < chunkData.TemperatureMap.Length; i++)
                 {
-                    var tile = chunkData[i];
+                    var tile = chunkData.TemperatureMap[i];
                     if (!tile.Initialized)
                         continue;
 
                     _chunkCache[i] = ProcessTile(tile, chunkIndices, i, deltaTime);
                 }
 
-                chunkComp.TemperatureMap = _chunkCache;
+                chunkComp.ChunkData.TemperatureMap = _chunkCache;
             }
 
             Dirty(uid, comp);
