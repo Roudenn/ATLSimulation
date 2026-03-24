@@ -41,4 +41,7 @@ public sealed partial class GameConfigVars : CVars
 
     public static readonly CVarDef<string> GameDefaultMap =
         CVarDef.Create("game.default_map", "LargeField", CVar.SERVERONLY);
+
+    public static readonly CVarDef<float> SimulationSpeedup =
+        CVarDef.Create("simulation.speedup", 100f, CVar.SERVER | CVar.REPLICATED);
 }

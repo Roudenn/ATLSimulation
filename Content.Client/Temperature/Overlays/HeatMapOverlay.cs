@@ -54,8 +54,8 @@ public sealed class HeatMapOverlay : Overlay
                 var temperature = tile.ArchivedContainer.Temperature;
                 args.WorldHandle.DrawRect(box,
                     temperature >= 0
-                        ? ProgressColorHelpers.GradientWarm(temperature, 0f, 100f).WithAlpha(0.5f)
-                        : ProgressColorHelpers.GradientCold(temperature, 0f, -100f).WithAlpha(0.5f));
+                        ? ProgressColorHelpers.GradientWarm(temperature, PhysicalConstants.ZERO_CELCIUS + 100f, PhysicalConstants.ROOM_TEMPERATURE).WithAlpha(0.5f)
+                        : ProgressColorHelpers.GradientCold(temperature, PhysicalConstants.ZERO_CELCIUS, 0f).WithAlpha(0.5f));
             }
         }
     }

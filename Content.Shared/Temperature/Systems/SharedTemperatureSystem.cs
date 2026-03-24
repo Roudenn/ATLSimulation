@@ -10,9 +10,13 @@ public abstract class SharedTemperatureSystem : EntitySystem
     [ViewVariables]
     public bool TemperatureEnabled;
 
+    [ViewVariables]
+    public float TemperatureSpeedup;
+
     public override void Initialize()
     {
         base.Initialize();
         Subs.CVar(CfgManager, GameConfigVars.TemperatureEnabled, b => TemperatureEnabled = b, true);
+        Subs.CVar(CfgManager, GameConfigVars.SimulationSpeedup, f => TemperatureSpeedup = f, true);
     }
 }

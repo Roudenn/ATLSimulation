@@ -22,7 +22,6 @@ public sealed class TemperatureSystem : SharedTemperatureSystem
     }
 
     private Dictionary<Vector2i, SubGridChunk> _heatCache = new(64);
-    private TileHeat[] _chunkCache = new TileHeat[0];
     private TimeSpan _lastUpdate = TimeSpan.Zero;
 
     public void UpdateHeat()
@@ -30,12 +29,9 @@ public sealed class TemperatureSystem : SharedTemperatureSystem
         if (!TemperatureEnabled)
             return;
 
-        // TODO make this an event
-        Array.Resize(ref _chunkCache, _subGrid.SubGridChunkArea);
-
         var query = EntityQueryEnumerator<SubGridComponent>();
         var deltaTime = (float) (_timing.CurTime - _lastUpdate).TotalSeconds;
-        deltaTime = MathF.Min(deltaTime, 0.5f);
+        deltaTime = MathF.Min(deltaTime, 0.01f);
         _lastUpdate = _timing.CurTime;
         while (query.MoveNext(out var uid, out var comp))
         {
@@ -48,19 +44,31 @@ public sealed class TemperatureSystem : SharedTemperatureSystem
                 if (!_subgridChunkQuery.TryComp(chunkEnt, out var chunkComp))
                     continue;
 
+                var cache = new TileHeat[_subGrid.SubGridChunkArea];
                 for (var i = 0; i < chunkData.TemperatureMap.Length; i++)
                 {
                     var tile = chunkData.TemperatureMap[i];
                     if (!tile.Initialized)
                         continue;
 
-                    _chunkCache[i] = ProcessTile(tile, chunkIndices, i, deltaTime);
+                    cache[i] = ProcessTile(tile, chunkIndices, i, deltaTime);
                 }
 
-                chunkComp.ChunkData.TemperatureMap = _chunkCache;
+                chunkComp.ChunkData.TemperatureMap = cache;
             }
 
-            Dirty(uid, comp);
+            foreach (var (chunkIndices, _) in _heatCache)
+            {
+                var chunkEnt = comp.ChunkEntities[chunkIndices];
+                if (!_subgridChunkQuery.TryComp(chunkEnt, out var chunkComp))
+                    continue;
+
+                for (var index = 0; index < chunkComp.ChunkData.TemperatureMap.Length; index++)
+                {
+                    chunkComp.ChunkData.TemperatureMap[index].ArchivedContainer = chunkComp.ChunkData.TemperatureMap[index].Container;
+                }
+                Dirty(chunkEnt, chunkComp);
+            }
         }
     }
 
@@ -74,7 +82,7 @@ public sealed class TemperatureSystem : SharedTemperatureSystem
 
             // The coefficients for interaction get halved when going diagonally,
             // since Characteristic Length is multiplied by √2 and surface area is multiplied by √2/2.
-            var alteredTime = deltaTime;
+            var alteredTime = deltaTime * TemperatureSpeedup;
             if (!SharedSubGridSystem.Directions.Contains(dir))
                 alteredTime /= 2f;
 

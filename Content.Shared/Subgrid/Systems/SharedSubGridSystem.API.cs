@@ -123,6 +123,6 @@ public abstract partial class SharedSubGridSystem
             return false;
 
         found = chunk.TemperatureMap[targetLocalIndex];
-        return true;
+        return found.Value.Initialized;
     }
 }

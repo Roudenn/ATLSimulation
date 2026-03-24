@@ -48,7 +48,7 @@
   - type: IconSmooth
     base: reinf_over
   - type: Material
-    material: StainlessSteel
+    material: Silver
 
 - type: entity
   parent: WallReinforced
