@@ -8,8 +8,4 @@ public interface ISubGridTile
     /// False for "empty" subtiles and true for subtiles that can be generally used.
     /// </summary>
     bool Initialized { get; set; }
-
-    int CurrentTick { get; set; }
-
-    int LastTick { get; set; }
 }

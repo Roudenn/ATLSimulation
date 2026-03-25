@@ -95,7 +95,7 @@ public abstract partial class SharedSubGridSystem
             return false;
 
         found = chunk.AtmosphereMap[targetLocalIndex];
-        return true;
+        return found.Value.Initialized;
     }
 
     /// <summary>

@@ -37,6 +37,7 @@ public sealed class TemperatureSystem : SharedTemperatureSystem
         if (!TemperatureEnabled)
             return;
 
+        var sw = RStopwatch.StartNew();
         Array.Resize(ref _cache, _subGrid.SubGridChunkArea); // TODO nuke this
         var query = EntityQueryEnumerator<SubGridComponent>();
         var deltaTime = (float) (_timing.CurTime - _lastUpdate).TotalSeconds;
@@ -68,12 +69,15 @@ public sealed class TemperatureSystem : SharedTemperatureSystem
                     _cache[i] = ProcessTile(tile, chunkIndices, i, deltaTime);
                 }
 
-                // Write the values manually since with an equal sign it copies the reference to a cache instead of the cache itself.
+                // Write the values manually since with an equal sign it
+                // copies the reference to a cache instead of the cache itself.
                 for (int i = 0; i < chunkComp.ChunkData.TemperatureMap.Length; i++)
                 {
                     chunkComp.ChunkData.TemperatureMap[i] = _cache[i];
                 }
             }
+
+            //Log.Info($"Temperature processing done in: {sw.Elapsed}");
 
             foreach (var (chunkIndices, _) in _heatCache)
             {

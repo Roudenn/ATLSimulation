@@ -13,6 +13,12 @@ public sealed partial class SubGridChunk
     [DataField]
     public TileAtmos[] AtmosphereMap;
 
+    [ViewVariables]
+    public int CurrentTick;
+
+    [ViewVariables]
+    public int LastTick;
+
     public SubGridChunk(int chunkArea)
     {
         TemperatureMap = new TileHeat[chunkArea];

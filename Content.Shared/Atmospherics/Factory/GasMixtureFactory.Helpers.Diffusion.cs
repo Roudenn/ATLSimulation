@@ -17,6 +17,14 @@ public sealed partial class GasMixtureFactory
     }
 
     [PublicAPI]
+    public void DiffuseTiles(ref TileAtmos t1, ref TileAtmos t2, float cLength, float frameTime)
+    {
+        DiffuseMixturesQuery(ref t1.ArchivedMixture, ref t2.ArchivedMixture, ref GasBuffer3, ref GasBuffer4, cLength, frameTime);
+        TransferMoles(ref t1.Mixture, ref t2.Mixture, GasBuffer3, GasBuffer4);
+        ClearBuffer(ref GasBuffer3, ref GasBuffer4);
+    }
+
+    [PublicAPI]
     public void DiffuseMixturesArchived<T1, T2>(ref T1 m1, ref T2 m2, ref T1 m1Archived, ref T2 m2Archived, float cLength, float frameTime)
         where T1 : IGasMixture
         where T2 : IGasMixture

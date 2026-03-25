@@ -19,12 +19,6 @@ public partial struct TileHeat : IRobustCloneable<TileHeat>, ISubGridTile
     [DataField]
     public ConductiveHeatContainer ArchivedContainer;
 
-    [ViewVariables]
-    public int CurrentTick { get; set; }
-
-    [ViewVariables]
-    public int LastTick { get; set; }
-
     /// <summary>
     /// This is basically a hack that allows to distinct default
     /// uninitialized values in an array of structs from initialized tiles.
