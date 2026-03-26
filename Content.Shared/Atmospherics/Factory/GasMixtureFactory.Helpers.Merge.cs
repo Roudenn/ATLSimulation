@@ -80,12 +80,10 @@ public sealed partial class GasMixtureFactory
             var gasMixture = m; // TODO consider making all of Get() methods not by-ref
             totalHeatCapacity += GetHeatCapacity(ref gasMixture);
             totalEnergy += GetInternalEnergy(ref gasMixture);
-            NumericsHelpers.Add(GasBuffer1, gasMixture.Moles);
+            NumericsHelpers.Add(result.Moles, gasMixture.Moles);
         }
 
         result.Temperature = totalEnergy / totalHeatCapacity;
-        result.Moles = GasBuffer1;
-        ClearBuffer(ref GasBuffer1);
     }
 
     /// <summary>
@@ -108,13 +106,11 @@ public sealed partial class GasMixtureFactory
             totalHeatCapacity += GetHeatCapacity(ref gasMixture);
             totalEnergy += GetInternalEnergy(ref gasMixture);
             totalVolume += gasMixture.Volume;
-            NumericsHelpers.Add(GasBuffer1, gasMixture.Moles);
+            NumericsHelpers.Add(result.Moles, gasMixture.Moles);
         }
 
         result.Temperature = totalEnergy / totalHeatCapacity;
         result.Volume = totalVolume;
-        result.Moles = GasBuffer1;
-        ClearBuffer(ref GasBuffer1);
     }
 
         /// <summary>
@@ -182,13 +178,11 @@ public sealed partial class GasMixtureFactory
             totalHeatCapacity += GetHeatCapacity(ref gasMixture);
             totalEnergy += GetInternalEnergy(ref gasMixture);
             totalVelocity += gasMixture.Velocity;
-            NumericsHelpers.Add(GasBuffer1, gasMixture.Moles);
+            NumericsHelpers.Add(result.Moles, gasMixture.Moles);
         }
 
         result.Temperature = totalEnergy / totalHeatCapacity;
-        result.Moles = GasBuffer1;
         result.Velocity = totalVelocity;
-        ClearBuffer(ref GasBuffer1);
     }
 
     /// <summary>
@@ -201,23 +195,17 @@ public sealed partial class GasMixtureFactory
     {
         var totalHeatCapacity = 0f;
         var totalEnergy = 0f;
-        var totalVolume = 0f;
-        var totalVelocity = Vector2.Zero;
 
         foreach (var m in mN)
         {
             var gasMixture = m; // TODO consider making all of Get() methods not by-ref
             totalHeatCapacity += GetHeatCapacity(ref gasMixture);
             totalEnergy += GetInternalEnergy(ref gasMixture);
-            totalVolume += gasMixture.Volume;
-            totalVelocity += gasMixture.Velocity;
-            NumericsHelpers.Add(GasBuffer1, gasMixture.Moles);
+            result.Volume += gasMixture.Volume;
+            result.Velocity += gasMixture.Velocity;
+            NumericsHelpers.Add(result.Moles, gasMixture.Moles);
         }
 
         result.Temperature = totalEnergy / totalHeatCapacity;
-        result.Volume = totalVolume;
-        result.Moles = GasBuffer1;
-        result.Velocity = totalVelocity;
-        ClearBuffer(ref GasBuffer1);
     }
 }

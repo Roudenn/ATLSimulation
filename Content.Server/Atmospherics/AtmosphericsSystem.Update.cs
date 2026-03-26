@@ -9,7 +9,6 @@ namespace Content.Server.Atmospherics;
 public sealed partial class AtmosphericsSystem
 {
     private Dictionary<Vector2i, SubGridChunk> _atmosCache = new(64);
-    private TileAtmos[] _cache = new TileAtmos[0];
     private TimeSpan _lastUpdate = TimeSpan.Zero;
 
     public void UpdateAtmos()
@@ -18,7 +17,6 @@ public sealed partial class AtmosphericsSystem
             return;
 
         var sw = RStopwatch.StartNew();
-        Array.Resize(ref _cache, _subGrid.SubGridChunkArea); // TODO nuke this
         var query = EntityQueryEnumerator<SubGridComponent>();
         var deltaTime = (float) (_timing.CurTime - _lastUpdate).TotalSeconds;
         deltaTime = MathF.Min(deltaTime, 0.01f);
@@ -35,9 +33,9 @@ public sealed partial class AtmosphericsSystem
                     continue;
 
                 // Marking all previous tiles as not initialized is much faster than allocating a new array.
-                for (int i = 0; i < _cache.Length; i++)
+                for (int i = 0; i < _subGrid.AtmosChunkCache.Length; i++)
                 {
-                    _cache[i].Initialized = false;
+                    _subGrid.AtmosChunkCache[i].Initialized = false;
                 }
 
                 for (var i = 0; i < chunkData.AtmosphereMap.Length; i++)
@@ -46,14 +44,14 @@ public sealed partial class AtmosphericsSystem
                     if (!tile.Initialized)
                         continue;
 
-                    _cache[i] = ProcessTile(tile, chunkIndices, i, deltaTime);
+                    _subGrid.AtmosChunkCache[i] = ProcessTile(tile, chunkIndices, i, deltaTime);
                 }
 
                 // Write the values manually since with an equal sign it
                 // copies the reference to a cache instead of the cache itself.
                 for (int i = 0; i < chunkComp.ChunkData.AtmosphereMap.Length; i++)
                 {
-                    chunkComp.ChunkData.AtmosphereMap[i] = _cache[i];
+                    chunkComp.ChunkData.AtmosphereMap[i] = _subGrid.AtmosChunkCache[i];
                 }
             }
 

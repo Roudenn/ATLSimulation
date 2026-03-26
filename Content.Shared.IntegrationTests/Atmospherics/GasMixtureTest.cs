@@ -71,7 +71,7 @@ public sealed class GasMixtureTest
         var m2 = atmosSystem.ResolveMixture(secondMixture, 2.5f);
         var diffusion1 = new float[factory.ArraySize];
         var diffusion2 = new float[factory.ArraySize];
-        factory.DiffuseMixtures(ref m1, ref m2, ref diffusion1, ref diffusion2, 2.5f, 1f);
+        factory.DiffuseMixtures(ref m1, ref m2, diffusion1, diffusion2, 2.5f, 1f);
         string result = string.Empty;
         foreach (var d in diffusion1)
         {
@@ -102,7 +102,7 @@ public sealed class GasMixtureTest
         {
             var diffusion1 = new float[factory.ArraySize];
             var diffusion2 = new float[factory.ArraySize];
-            factory.DiffuseMixtures(ref m1, ref m2, ref diffusion1, ref diffusion2, 2.5f, 1f);
+            factory.DiffuseMixtures(ref m1, ref m2, diffusion1, diffusion2, 2.5f, 1f);
 
             if (iterations % 10 != 0)
                 continue;

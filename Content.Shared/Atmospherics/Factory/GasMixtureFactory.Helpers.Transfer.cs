@@ -15,7 +15,7 @@ public sealed partial class GasMixtureFactory
     /// <param name="secondMoles"></param>
     /// <returns>The amount of transferred energy.</returns>
     [PublicAPI]
-    public void TransferMoles<T1, T2>(ref T1 m1, ref T2 m2, float[] firstMoles, float[] secondMoles)
+    public void TransferMoles<T1, T2>(ref T1 m1, ref T2 m2, Span<float> firstMoles, Span<float> secondMoles)
         where T1 : IGasMixture
         where T2 : IGasMixture
     {
@@ -25,11 +25,14 @@ public sealed partial class GasMixtureFactory
         var secondOldTemperature = m2.Temperature;
 
         // Separate positive and negative heat capacity change into 2 buffers, then sum them up.
-        NumericsHelpers.Multiply(firstMoles, GasSpecificHeats, GasBuffer1);
-        NumericsHelpers.Multiply(secondMoles, GasSpecificHeats, GasBuffer2);
-        var heatCapacityToSharer = Math.Abs(NumericsHelpers.HorizontalAdd(GasBuffer1));
-        var heatCapacitySharerToThis = Math.Abs(NumericsHelpers.HorizontalAdd(GasBuffer2));
-        ClearBuffer(ref GasBuffer1, ref GasBuffer2);
+        var buffer1 = Pool.Rent();
+        var buffer2 = Pool.Rent();
+        NumericsHelpers.Multiply(firstMoles, GasSpecificHeats, buffer1);
+        NumericsHelpers.Multiply(secondMoles, GasSpecificHeats, buffer2);
+        var heatCapacityToSharer = Math.Abs(NumericsHelpers.HorizontalAdd(buffer1));
+        var heatCapacitySharerToThis = Math.Abs(NumericsHelpers.HorizontalAdd(buffer2));
+        Pool.Return(buffer1, true);
+        Pool.Return(buffer2, true);
 
         NumericsHelpers.Add(m1.Moles, secondMoles);
         NumericsHelpers.Add(m2.Moles, firstMoles);

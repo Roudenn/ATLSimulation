@@ -11,41 +11,37 @@ public sealed partial class GasMixtureFactory
         where T1 : IGasMixture
         where T2 : IGasMixture
     {
-        DiffuseMixturesQuery(ref m1, ref m2, ref GasBuffer3, ref GasBuffer4, cLength, frameTime);
-        TransferMoles(ref m1, ref m2, GasBuffer3, GasBuffer4);
-        ClearBuffer(ref GasBuffer3, ref GasBuffer4);
+        var buffer1 = Pool.Rent();
+        var buffer2 = Pool.Rent();
+        DiffuseMixturesQuery(ref m1, ref m2, buffer1, buffer2, cLength, frameTime);
+        TransferMoles(ref m1, ref m2, buffer1, buffer2);
+        Pool.Return(buffer1, true);
+        Pool.Return(buffer2, true);
     }
 
     [PublicAPI]
     public void DiffuseTiles(ref TileAtmos t1, ref TileAtmos t2, float cLength, float frameTime)
     {
-        DiffuseMixturesQuery(ref t1.ArchivedMixture, ref t2.ArchivedMixture, ref GasBuffer3, ref GasBuffer4, cLength, frameTime);
-        TransferMoles(ref t1.Mixture, ref t2.Mixture, GasBuffer3, GasBuffer4);
-        ClearBuffer(ref GasBuffer3, ref GasBuffer4);
-    }
-
-    [PublicAPI]
-    public void DiffuseMixturesArchived<T1, T2>(ref T1 m1, ref T2 m2, ref T1 m1Archived, ref T2 m2Archived, float cLength, float frameTime)
-        where T1 : IGasMixture
-        where T2 : IGasMixture
-    {
-        DiffuseMixturesQuery(ref m1, ref m2, ref GasBuffer3, ref GasBuffer4, cLength, frameTime);
-        TransferMoles(ref m1Archived, ref m2Archived, GasBuffer3, GasBuffer4);
-        ClearBuffer(ref GasBuffer3, ref GasBuffer4);
+        var buffer1 = Pool.Rent();
+        var buffer2 = Pool.Rent();
+        DiffuseMixturesQuery(ref t1.ArchivedMixture, ref t2.ArchivedMixture, buffer1, buffer2, cLength, frameTime);
+        TransferMoles(ref t1.Mixture, ref t2.Mixture, buffer1, buffer2);
+        Pool.Return(buffer1, true);
+        Pool.Return(buffer2, true);
     }
 
     [PublicAPI]
     public void DiffuseMixtures<T1, T2>(
         ref T1 m1,
         ref T2 m2,
-        ref float[] diffusion1,
-        ref float[] diffusion2,
+        Span<float> diffusion1,
+        Span<float> diffusion2,
         float cLength,
         float frameTime)
         where T1 : IGasMixture
         where T2 : IGasMixture
     {
-        DiffuseMixturesQuery(ref m1, ref m2, ref diffusion1, ref diffusion2, cLength, frameTime);
+        DiffuseMixturesQuery(ref m1, ref m2, diffusion1, diffusion2, cLength, frameTime);
         TransferMoles(ref m1, ref m2, diffusion1, diffusion2);
     }
 
@@ -83,15 +79,15 @@ public sealed partial class GasMixtureFactory
     public void DiffuseMixturesQuery<T1, T2>(
         ref T1 m1,
         ref T2 m2,
-        ref float[] diffusion1,
-        ref float[] diffusion2,
+        Span<float> diffusion1,
+        Span<float> diffusion2,
         float cLength,
         float frameTime)
         where T1 : IGasMixture
         where T2 : IGasMixture
     {
-        DiffuseMixtureQuery(ref m1, ref m2, ref diffusion1, cLength, frameTime);
-        DiffuseMixtureQuery(ref m2, ref m1, ref diffusion2, cLength, frameTime);
+        DiffuseMixtureQuery(ref m1, ref m2, diffusion1, cLength, frameTime);
+        DiffuseMixtureQuery(ref m2, ref m1, diffusion2, cLength, frameTime);
     }
 
     /// <summary>
@@ -122,29 +118,36 @@ public sealed partial class GasMixtureFactory
     /// 4. And then some elements cancel out, leaving this formula: ∆γ_i=2/3∙(VHt∆p_i)/(π^(3/2) d^2 N_A γ_i √(M_i RT))
     /// </remarks>
     [PublicAPI]
-    public void DiffuseMixtureQuery<T1, T2>(ref T1 m1, ref T2 m2, ref float[] diffusion, float cLength, float frameTime)
+    public void DiffuseMixtureQuery<T1, T2>(ref T1 m1, ref T2 m2, Span<float> diffusion, float cLength, float frameTime)
         where T1 : IGasMixture
         where T2 : IGasMixture
     {
-        // Find the difference in partial pressure of each gas.
-        // TODO calculate concentration here instead of partial pressure
-        var temperature = (m1.Temperature + m2.Temperature) / 2f;
-        GetPartialPressures(m1.Moles, temperature, m1.Volume, ref GasBufferResults1);
-        GetPartialPressures(m2.Moles, temperature, m2.Volume, ref GasBufferResults2);
-        NumericsHelpers.Sub(GasBufferResults1, GasBufferResults2, GasBufferResults1);
-        NumericsHelpers.Max(GasBufferResults1, 0f);
+        var buffer1 = Pool.Rent();
+        var buffer2 = Pool.Rent();
+        var buffer3 = Pool.Rent();
+
+        // Find the difference in concentration of each gas.
+        GetPartialPressures(m1.Moles, m1.Temperature, m1.Volume, buffer1);
+        NumericsHelpers.Divide(buffer1, PhysicalConstants.R * m1.Temperature * 0.001f);
+        GetPartialPressures(m2.Moles, m1.Temperature, m2.Volume, buffer2);
+        NumericsHelpers.Divide(buffer2, PhysicalConstants.R * m2.Temperature * 0.001f);
+
+        NumericsHelpers.Sub(buffer1, buffer2);
+        NumericsHelpers.Max(buffer1, 0f); // TODO Because of "Prevent division by zero" we have to calculate the thing twice
 
         // Calculate the partial result
-        NumericsHelpers.Multiply(GasBufferResults1,
-            m1.Volume * cLength * frameTime * MathF.Sqrt(PhysicalConstants.R * temperature)
-            / (PhysicalConstants.R * m1.Temperature) * 1000f);
+        NumericsHelpers.Multiply(buffer1,
+            m1.Volume * cLength * frameTime * MathF.Sqrt(PhysicalConstants.R * ((m1.Temperature + m2.Temperature) / 2f)));
 
         // Multiply moles by their beta sizes
-        NumericsHelpers.Multiply(GasAtomBetaSizes, m1.Moles, GasBuffer1);
-        NumericsHelpers.Max(GasBuffer1, SystemConstants.Epsilon); // Prevent division by zero
+        NumericsHelpers.Multiply(GasAtomBetaSizes, m1.Moles, buffer3);
+        NumericsHelpers.Max(buffer3, SystemConstants.Epsilon); // Prevent division by zero
 
         // Get the results
-        NumericsHelpers.Divide(GasBufferResults1, GasBuffer1, diffusion);
-        ClearBuffer(ref GasBuffer1, ref GasBufferResults1, ref GasBuffer2);
+        NumericsHelpers.Divide(buffer1, buffer3, diffusion);
+
+        Pool.Return(buffer1, true);
+        Pool.Return(buffer2, true);
+        Pool.Return(buffer3, true);
     }
 }

@@ -37,6 +37,7 @@ public sealed class AtmosCompositionOverlay : Overlay
         var boxVector = new Vector2i(SystemConstants.PvsChunkSize, SystemConstants.PvsChunkSize);
         var query = _entityManager.EntityQueryEnumerator<SubGridChunkComponent, TransformComponent>();
         var tileWorldSize = new Vector2(1f / _subGrid.SubGridTileSize);
+        var buffer = _gasManager.Pool.Rent();
         while (query.MoveNext(out var uid, out var subgrid, out var xform))
         {
             var worldPos = _xform.GetMapCoordinates(uid, xform);
@@ -53,18 +54,23 @@ public sealed class AtmosCompositionOverlay : Overlay
                 var pos = _subGrid.GetPositionFromIndex(subgrid.ChunkIndices, i);
                 var worldTilePos = _xform.ToMapCoordinates(new EntityCoordinates(subgrid.ParentGrid, pos));
                 var box = Box2.CenteredAround(worldTilePos.Position + tileWorldSize / 2f, tileWorldSize);
+
                 for (int j = 0; j < _gasManager.ArraySize; j++)
                 {
                     if (tile.ArchivedMixture.Moles[j] < SystemConstants.GasMinMoles)
                         continue;
 
                     var color = _gasManager[j].Color;
-                    _gasManager.GetMolesRatio(ref tile.ArchivedMixture, ref _gasManager.GasBuffer4);
-                    var alpha = _gasManager.GasBuffer4[j] / 4f;
+                    for (int k = 0; k < buffer.Length; k++)
+                    {
+                        buffer[k] = 0f;
+                    }
+                    _gasManager.GetMolesRatio(ref tile.ArchivedMixture, buffer);
+                    var alpha = buffer[j] / 4f;
                     args.WorldHandle.DrawRect(box, color.WithAlpha(alpha));
-                    _gasManager.ClearBuffer(ref _gasManager.GasBuffer4);
                 }
             }
         }
+        _gasManager.Pool.Return(buffer, true);
     }
 }

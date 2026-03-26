@@ -17,19 +17,11 @@ public sealed class TemperatureSystem : SharedTemperatureSystem
 
     private Dictionary<Vector2i, SubGridChunk> _heatCache = new(64);
     private TimeSpan _lastUpdate = TimeSpan.Zero;
-    private TileHeat[] _cache = new TileHeat[0];
 
     public override void Initialize()
     {
         base.Initialize();
-        SubscribeLocalEvent<SubGridResizedEvent>(OnResize);
-
         _subgridChunkQuery = GetEntityQuery<SubGridChunkComponent>();
-    }
-
-    private void OnResize(ref SubGridResizedEvent ev)
-    {
-        Array.Resize(ref _cache, _subGrid.SubGridChunkArea);
     }
 
     public void UpdateHeat()
@@ -38,7 +30,6 @@ public sealed class TemperatureSystem : SharedTemperatureSystem
             return;
 
         var sw = RStopwatch.StartNew();
-        Array.Resize(ref _cache, _subGrid.SubGridChunkArea); // TODO nuke this
         var query = EntityQueryEnumerator<SubGridComponent>();
         var deltaTime = (float) (_timing.CurTime - _lastUpdate).TotalSeconds;
         deltaTime = MathF.Min(deltaTime, 0.01f);
@@ -55,9 +46,9 @@ public sealed class TemperatureSystem : SharedTemperatureSystem
                     continue;
 
                 // Marking all previous tiles as not initialized is much faster than allocating a new array.
-                for (int i = 0; i < _cache.Length; i++)
+                for (int i = 0; i < _subGrid.HeatChunkCache.Length; i++)
                 {
-                    _cache[i].Initialized = false;
+                    _subGrid.HeatChunkCache[i].Initialized = false;
                 }
 
                 for (var i = 0; i < chunkData.TemperatureMap.Length; i++)
@@ -66,14 +57,14 @@ public sealed class TemperatureSystem : SharedTemperatureSystem
                     if (!tile.Initialized)
                         continue;
 
-                    _cache[i] = ProcessTile(tile, chunkIndices, i, deltaTime);
+                    _subGrid.HeatChunkCache[i] = ProcessTile(tile, chunkIndices, i, deltaTime);
                 }
 
                 // Write the values manually since with an equal sign it
                 // copies the reference to a cache instead of the cache itself.
                 for (int i = 0; i < chunkComp.ChunkData.TemperatureMap.Length; i++)
                 {
-                    chunkComp.ChunkData.TemperatureMap[i] = _cache[i];
+                    chunkComp.ChunkData.TemperatureMap[i] = _subGrid.HeatChunkCache[i];
                 }
             }
 

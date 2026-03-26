@@ -22,7 +22,6 @@ public sealed partial class AtmosphericsSystem : SharedAtmosphericsSystem
         base.Initialize();
         _mapGridQuery = GetEntityQuery<MapGridComponent>();
         _subgridChunkQuery = GetEntityQuery<SubGridChunkComponent>();
-        Array.Resize(ref _cache, _subGrid.SubGridChunkArea);
     }
 
     public override void AddHeatArea(Entity<SubGridComponent?, MapGridComponent?> grid, TileRef tile, float energy)
