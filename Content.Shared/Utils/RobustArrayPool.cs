@@ -9,9 +9,8 @@ namespace Content.Shared.Utils;
 /// Useful for cases where you need to easily manage large amounts of buffers to store objects.
 /// </summary>
 /// <remarks>
-/// This is different from the <see cref="ArrayPool{T}"/>
+/// This version doesn't violate sandbox checks, since it doesn't contain a Shared pool.
 /// </remarks>
-/// <typeparam name="T"></typeparam>
 public sealed class RobustArrayPool<T>
 {
     private readonly T[][] _buffer;
@@ -56,7 +55,6 @@ public sealed class RobustArrayPool<T>
     /// Takes an array from the pool.
     /// </summary>
     /// <returns>An array from the pool.</returns>
-    /// <exception cref="ArgumentOutOfRangeException">If the array pool no longer has available arrays.</exception>
     public T[] Rent()
     {
         ArgumentOutOfRangeException.ThrowIfNegative(Length);
@@ -86,10 +84,11 @@ public sealed class RobustArrayPool<T>
     /// Returns an array back to the pool.
     /// </summary>
     /// <remarks>
-    /// The array has to
+    /// The array size has to be equal to the <see cref="ArraySize"/> of the pool.
     /// </remarks>
-    /// <param name="obj"></param>
-    /// <param name="clearArray"></param>
+    /// <param name="obj">An array to return back.</param>
+    /// <param name="clearArray">If true, clears the contents of the array.
+    /// If <see cref="_factory"/> is not null, also initializes each element in the array.</param>
     public void Return(T[] obj, bool clearArray = false)
     {
         DebugTools.AssertEqual(obj.Length, ArraySize);
