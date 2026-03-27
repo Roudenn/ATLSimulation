@@ -140,7 +140,7 @@ public sealed partial class GasMixtureFactory
             m1.Volume * cLength * frameTime * MathF.Sqrt(PhysicalConstants.R * ((m1.Temperature + m2.Temperature) / 2f)));
 
         // Multiply moles by their beta sizes
-        NumericsHelpers.Multiply(GasAtomBetaSizes, m1.Moles, buffer3);
+        NumericsHelpers.Multiply(Prototypes.GasAtomBetaSizes, m1.Moles, buffer3);
         NumericsHelpers.Max(buffer3, SystemConstants.Epsilon); // Prevent division by zero
 
         // Get the results

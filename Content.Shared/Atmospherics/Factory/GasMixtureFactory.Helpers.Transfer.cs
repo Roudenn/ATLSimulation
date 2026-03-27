@@ -27,8 +27,8 @@ public sealed partial class GasMixtureFactory
         // Separate positive and negative heat capacity change into 2 buffers, then sum them up.
         var buffer1 = Pool.Rent();
         var buffer2 = Pool.Rent();
-        NumericsHelpers.Multiply(firstMoles, GasSpecificHeats, buffer1);
-        NumericsHelpers.Multiply(secondMoles, GasSpecificHeats, buffer2);
+        NumericsHelpers.Multiply(firstMoles, Prototypes.GasSpecificHeats, buffer1);
+        NumericsHelpers.Multiply(secondMoles, Prototypes.GasSpecificHeats, buffer2);
         var heatCapacityToSharer = Math.Abs(NumericsHelpers.HorizontalAdd(buffer1));
         var heatCapacitySharerToThis = Math.Abs(NumericsHelpers.HorizontalAdd(buffer2));
         Pool.Return(buffer1, true);

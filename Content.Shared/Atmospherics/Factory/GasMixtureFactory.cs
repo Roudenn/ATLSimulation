@@ -5,6 +5,9 @@ namespace Content.Shared.Atmospherics.Factory;
 
 public sealed partial class GasMixtureFactory : IGasMixtureFactory
 {
+    public RobustArrayPool<float> Pool = default!;
+    public GasPrototypesBuffer Prototypes = default!;
+
     private readonly List<GasPrototype> _gasDefs;
     private readonly Dictionary<string, GasPrototype> _gasNames;
 
@@ -17,7 +20,17 @@ public sealed partial class GasMixtureFactory : IGasMixtureFactory
     public void Initialize()
     {
         InitializeGases();
+    }
+
+    public void InitializeGases()
+    {
         Pool = new RobustArrayPool<float>(ArraySize, 16);
+        Prototypes = new GasPrototypesBuffer(ArraySize);
+
+        for (var i = 0; i < Count; i++)
+        {
+            Prototypes.RegisterPrototype(this[i]);
+        }
     }
 
     public void Register(GasPrototype gasDef)
