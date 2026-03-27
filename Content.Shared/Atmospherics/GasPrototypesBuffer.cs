@@ -30,6 +30,7 @@ public sealed class GasPrototypesBuffer
         Array.Resize(ref GasViscosities, arraySize);
         Array.Resize(ref GasThermalConductivities, arraySize);
         Array.Resize(ref GasMolarMassesSquareRoots, arraySize);
+        Array.Resize(ref GasAtomBetaSizes, arraySize);
     }
 
     public void RegisterPrototype(GasPrototype gas)
