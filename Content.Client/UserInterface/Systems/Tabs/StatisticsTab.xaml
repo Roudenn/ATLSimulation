@@ -11,8 +11,8 @@
 
                 <!-- Inspect tools -->
                 <Label Text="{Loc 'ui-viewport-header-inspect-tools'}" StyleClasses="LabelHeading"/>
-                <controls:GasInspectControl Name="GasInspector" Visible="False" Access="Public"/>
                 <controls:HeatInspectControl Name="HeatInspector" Visible="False" Access="Public"/>
+                <controls:GasInspectControl Name="GasInspector" Visible="False" Access="Public"/>
             </BoxContainer>
         </ScrollContainer>
     </BoxContainer>

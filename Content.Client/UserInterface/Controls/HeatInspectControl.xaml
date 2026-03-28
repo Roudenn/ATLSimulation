@@ -1,6 +1,5 @@
 <BoxContainer xmlns="https://spacestation14.io"
               xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls"
-              MinSize="270 420"
-              SetSize="360 420">
+              MinSize="250 150">
     <BoxContainer Name="DataContainer" Orientation="Vertical" Margin="5 5 5 5"/>
 </BoxContainer>

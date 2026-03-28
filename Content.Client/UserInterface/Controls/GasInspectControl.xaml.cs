@@ -170,6 +170,7 @@ public sealed partial class GasInspectControl : BoxContainer
         {
             var gas = gasMix.Gases[j];
             if (gas.Amount < SystemConstants.GasMinMoles)
+                continue;
 
             // Add to the table
             tableKey.AddChild(new Label
@@ -190,7 +191,7 @@ public sealed partial class GasInspectControl : BoxContainer
             });
 
             // Add to the gas bar //TODO: highlight the currently hover one
-            gasBar.AddEntry(gas.Amount,
+            gasBar.AddEntry(MathF.Min(gas.Amount, 0.01f),
                 gas.Color,
                 tooltip: Loc.GetString("gas-analyzer-window-molarity-percentage-text",
                     ("gasName", Loc.GetString(gas.Name)),
