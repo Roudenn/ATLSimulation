@@ -10,5 +10,7 @@ map-LargeField = Large room
 map-LargeField-desc = A large empty 10x10 room.
 map-Maze = Maze
 map-Maze-desc = An empty pathway that has an exit to space.
+map-HeatPoint = Heat point
+map-HeatPoint-desc = Full chunk of walls with a heated tile in the center.
 map-Thermos = Thermos
 map-Thermos-desc = A room surrounded by vacuum.

@@ -58,3 +58,21 @@
   components:
   - type: HeatContainer
     startingTemperature: 373.15
+
+- type: entity
+  parent: WallReinforced
+  id: WallReinforcedSuperHot
+  name: reinforced wall
+  suffix: Super hot, 1000 Celsius
+  components:
+  - type: HeatContainer
+    startingTemperature: 1273.15
+
+- type: entity
+  parent: WallReinforced
+  id: WallReinforcedCold
+  name: reinforced wall
+  suffix: Cold, -100 Celsius
+  components:
+  - type: HeatContainer
+    startingTemperature: 173.15

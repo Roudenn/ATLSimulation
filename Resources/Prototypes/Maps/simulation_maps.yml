@@ -22,6 +22,10 @@
   id: Maze
   path: /Maps/maze.yml
 
+- type: simulationMap
+  id: HeatPoint
+  path: /Maps/point.yml
+
 #- type: simulationMap
 #  id: Thermos
 #  path: /Maps/thermos.yml
