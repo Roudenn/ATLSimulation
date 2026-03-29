@@ -84,7 +84,16 @@ public sealed partial class AtmosphericsSystem
             // since Characteristic Length is multiplied by √2 and surface area is multiplied by √2/2.
             var alteredTime = deltaTime;
             if (!SharedSubGridSystem.Directions.Contains(dir))
+            {
                 alteredTime /= 2f;
+
+                // Diagonal movement is only possible if there are also neighbouring tiles.
+                if (!_subGrid.TryGetAtmosphereTileRelative(_atmosCache, chunkIndices, index, new Vector2i(dir.X, 0), out var foundFirst)
+                    || !_subGrid.TryGetAtmosphereTileRelative(_atmosCache, chunkIndices, index, new Vector2i(0, dir.Y), out var foundSecond)
+                    || !foundFirst.Value.Initialized
+                    || !foundSecond.Value.Initialized)
+                    continue;
+            }
 
             var foundTile = found.Value;
             GasManager.DiffuseTiles(
