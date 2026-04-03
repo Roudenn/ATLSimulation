@@ -31,7 +31,7 @@ public sealed class TemperatureSystem : SharedTemperatureSystem
 
     public void UpdateHeat()
     {
-        if (!TemperatureEnabled)
+        if (!HeatEnabled)
             return;
 
         var query = EntityQueryEnumerator<SubGridComponent>();
@@ -44,18 +44,21 @@ public sealed class TemperatureSystem : SharedTemperatureSystem
 
             _job.SubGrid = (uid, comp);
             _job.ChunkIndices = indicies;
-            _job.DeltaTime = deltaTime;
-            _parallel.ProcessNow(_job, indicies.Count);
-
-            foreach (var chunkIndices in indicies)
+            _job.DeltaTime = deltaTime / HeatSteps;
+            for (int i = 0; i < HeatSteps; i++)
             {
-                var chunkEnt = comp.ChunkEntities[chunkIndices];
-                if (!_subgridChunkQuery.TryComp(chunkEnt, out var chunkComp))
-                    continue;
+                _parallel.ProcessNow(_job, indicies.Count);
 
-                for (var index = 0; index < chunkComp.ChunkData.TemperatureMap.Length; index++)
+                foreach (var chunkIndices in indicies)
                 {
-                    chunkComp.ChunkData.TemperatureMap[index].ArchivedContainer = chunkComp.ChunkData.TemperatureMap[index].Container;
+                    var chunkEnt = comp.ChunkEntities[chunkIndices];
+                    if (!_subgridChunkQuery.TryComp(chunkEnt, out var chunkComp))
+                        continue;
+
+                    for (var index = 0; index < chunkComp.ChunkData.TemperatureMap.Length; index++)
+                    {
+                        chunkComp.ChunkData.TemperatureMap[index].ArchivedContainer = chunkComp.ChunkData.TemperatureMap[index].Container;
+                    }
                 }
             }
         }
@@ -107,7 +110,7 @@ public sealed class TemperatureSystem : SharedTemperatureSystem
 
             // The coefficients for interaction get halved when going diagonally,
             // since Characteristic Length is multiplied by √2 and surface area is multiplied by √2/2.
-            var alteredTime = deltaTime * TemperatureSpeedup;
+            var alteredTime = deltaTime * HeatSpeedup;
             if (!SharedSubGridSystem.Directions.Contains(dir))
             {
                 alteredTime /= 2f;

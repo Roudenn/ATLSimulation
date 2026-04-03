@@ -34,18 +34,21 @@ public sealed partial class AtmosphericsSystem
 
             _diffusionJob.SubGrid = (uid, comp);
             _diffusionJob.ChunkIndices = indicies;
-            _diffusionJob.DeltaTime = deltaTime;
-            _parallel.ProcessNow(_diffusionJob, indicies.Count);
-
-            foreach (var chunkIndices in indicies)
+            _diffusionJob.DeltaTime = deltaTime / AtmosSteps;
+            for (int i = 0; i < AtmosSteps; i++)
             {
-                var chunkEnt = comp.ChunkEntities[chunkIndices];
-                if (!_subgridChunkQuery.TryComp(chunkEnt, out var chunkComp))
-                    continue;
+                _parallel.ProcessNow(_diffusionJob, indicies.Count);
 
-                for (var index = 0; index < chunkComp.ChunkData.TemperatureMap.Length; index++)
+                foreach (var chunkIndices in indicies)
                 {
-                    chunkComp.ChunkData.AtmosphereMap[index].ArchivedMixture = chunkComp.ChunkData.AtmosphereMap[index].Mixture;
+                    var chunkEnt = comp.ChunkEntities[chunkIndices];
+                    if (!_subgridChunkQuery.TryComp(chunkEnt, out var chunkComp))
+                        continue;
+
+                    for (var index = 0; index < chunkComp.ChunkData.TemperatureMap.Length; index++)
+                    {
+                        chunkComp.ChunkData.AtmosphereMap[index].ArchivedMixture = chunkComp.ChunkData.AtmosphereMap[index].Mixture;
+                    }
                 }
             }
         }

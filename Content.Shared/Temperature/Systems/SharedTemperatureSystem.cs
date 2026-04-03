@@ -8,15 +8,19 @@ public abstract class SharedTemperatureSystem : EntitySystem
     [Dependency] protected readonly IConfigurationManager CfgManager = default!;
 
     [ViewVariables]
-    public bool TemperatureEnabled;
+    public bool HeatEnabled;
 
     [ViewVariables]
-    public float TemperatureSpeedup;
+    public float HeatSpeedup;
+
+    [ViewVariables]
+    public int HeatSteps;
 
     public override void Initialize()
     {
         base.Initialize();
-        Subs.CVar(CfgManager, GameConfigVars.TemperatureEnabled, b => TemperatureEnabled = b, true);
-        Subs.CVar(CfgManager, GameConfigVars.TemperatureSpeedup, f => TemperatureSpeedup = f, true);
+        Subs.CVar(CfgManager, GameConfigVars.HeatEnabled, b => HeatEnabled = b, true);
+        Subs.CVar(CfgManager, GameConfigVars.HeatSpeedup, f => HeatSpeedup = f, true);
+        Subs.CVar(CfgManager, GameConfigVars.HeatSteps, i => HeatSteps = i, true);
     }
 }

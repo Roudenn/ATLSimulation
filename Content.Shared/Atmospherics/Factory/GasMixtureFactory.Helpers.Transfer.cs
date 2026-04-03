@@ -28,8 +28,8 @@ public sealed partial class GasMixtureFactory
         where T1 : IGasMixture
         where T2 : IGasMixture
     {
-        var firstOldCapacity = GetHeatCapacity(ref m1);
-        var secondOldCapacity = GetHeatCapacity(ref m2);
+        var firstOldCapacity = GetHeatCapacity(ref m1, pool);
+        var secondOldCapacity = GetHeatCapacity(ref m2, pool);
         var firstOldTemperature = m1.Temperature;
         var secondOldTemperature = m2.Temperature;
 
@@ -54,10 +54,10 @@ public sealed partial class GasMixtureFactory
         // T_new = W_old - W_removed + W_added
         m1.Temperature =
             (firstOldCapacity * m1.Temperature - heatCapacityToSharer * m1.Temperature + heatCapacitySharerToThis * secondOldTemperature)
-            / GetHeatCapacity(ref m1);
+            / GetHeatCapacity(ref m1, pool);
         m2.Temperature =
             (secondOldCapacity * m2.Temperature - heatCapacitySharerToThis * m2.Temperature + heatCapacityToSharer * firstOldTemperature)
-            / GetHeatCapacity(ref m2);
+            / GetHeatCapacity(ref m2, pool);
     }
 
     [PublicAPI]
@@ -73,7 +73,7 @@ public sealed partial class GasMixtureFactory
         where T1 : IGasMixture
         where T2 : IGasMixture
     {
-        var firstOldCapacity = GetHeatCapacity(ref m1);
+        var firstOldCapacity = GetHeatCapacity(ref m1, pool);
         var secondOldTemperature = m2.Temperature;
 
         // Separate positive and negative heat capacity change into 2 buffers, then sum them up.
@@ -94,6 +94,6 @@ public sealed partial class GasMixtureFactory
         // T_new = W_old - W_removed + W_added
         m1.Temperature =
             (firstOldCapacity * m1.Temperature - heatCapacityToSharer * m1.Temperature + heatCapacitySharerToThis * secondOldTemperature)
-            / GetHeatCapacity(ref m1);
+            / GetHeatCapacity(ref m1, pool);
     }
 }
