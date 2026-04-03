@@ -1,4 +1,5 @@
 using Content.Shared.Constants;
+using Content.Shared.Subgrid.Systems;
 using Robust.Shared.Serialization;
 
 namespace Content.Shared.Temperature.HeatContainers;
@@ -40,6 +41,9 @@ public partial struct ConductiveHeatContainer : IRobustCloneable<ConductiveHeatC
     /// </summary>
     [DataField]
     public bool Immutable { get; set; }
+
+    [ViewVariables, Access(typeof(SharedSubGridSystem))]
+    public bool Initialized = true;
 
     /// <summary>
     /// The current temperature of the container in Celsius.

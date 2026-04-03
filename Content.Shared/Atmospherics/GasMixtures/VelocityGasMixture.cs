@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using Content.Shared.Atmospherics.Factory;
+using Content.Shared.Subgrid.Systems;
 using Content.Shared.Temperature;
 using Robust.Shared.Serialization;
 
@@ -50,6 +51,9 @@ public partial struct VelocityGasMixture : IGasMixture, IRobustCloneable<Velocit
     /// </summary>
     [DataField]
     public bool Immutable { get; set; }
+
+    [ViewVariables, Access(typeof(SharedSubGridSystem))]
+    public bool Initialized = true;
 
     /// <summary>
     /// Constructs a new gas mixture without any gas.

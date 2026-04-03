@@ -8,6 +8,7 @@ using Content.Shared.Maps;
 using Content.Shared.Subgrid;
 using Content.Shared.Subgrid.Components;
 using Content.Shared.Temperature;
+using Content.Shared.Temperature.HeatContainers;
 using Content.Shared.Utils;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
@@ -457,8 +458,9 @@ public sealed partial class SubGridSystem
         chunkComp.ParentGrid = grid.Owner;
         chunkComp.ChunkIndices = GetChunkIndicesTile(gridIndices);
 
-        // preallocate the memory
         chunkComp.ChunkData = new SubGridChunk(SubGridChunkSize);
+        chunkComp.AtmosBuffer = new VelocityGasMixture[SubGridChunkArea];
+        chunkComp.HeatBuffer = new ConductiveHeatContainer[SubGridChunkArea];
 
         grid.Comp.ChunkEntities.Add(chunkComp.ChunkIndices, chunk);
         grid.Comp.ChunkMapCaches.Add(chunkComp.ChunkIndices, new Dictionary<Vector2i, SubGridChunk>(9));

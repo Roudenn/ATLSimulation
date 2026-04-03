@@ -35,16 +35,29 @@ public sealed partial class SubGridChunk
         other.AtmosphereMap.AsSpan().CopyTo(AtmosphereMap);
     }
 
-    public SubGridChunk(VelocityGasMixture[] mixtures, ConductiveHeatContainer[] containers)
+    public void ApplyState(VelocityGasMixture[] mixtures, ConductiveHeatContainer[] containers)
     {
-        TemperatureMap = new TileHeat[containers.Length];
+        var tempSpan = TemperatureMap.AsSpan();
+        tempSpan.Clear();
+        tempSpan.CopyTo(TemperatureMap);
+
+        var atmosSpan = AtmosphereMap.AsSpan();
+        atmosSpan.Clear();
+        atmosSpan.CopyTo(AtmosphereMap);
+
         for (int i = 0; i < containers.Length; i++)
         {
+            if (!containers[i].Initialized)
+                continue;
+
             TemperatureMap[i] = new TileHeat(containers[i]);
         }
-        AtmosphereMap = new TileAtmos[mixtures.Length];
+
         for (int i = 0; i < mixtures.Length; i++)
         {
+            if (!mixtures[i].Initialized)
+                continue;
+
             AtmosphereMap[i] = new TileAtmos(mixtures[i]);
         }
     }
