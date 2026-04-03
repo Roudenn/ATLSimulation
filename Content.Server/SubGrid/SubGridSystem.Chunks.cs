@@ -1,12 +1,14 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using Content.Shared.Atmospherics;
+using Content.Shared.Atmospherics.Factory;
 using Content.Shared.Atmospherics.GasMixtures;
 using Content.Shared.Constants;
 using Content.Shared.Maps;
 using Content.Shared.Subgrid;
 using Content.Shared.Subgrid.Components;
 using Content.Shared.Temperature;
+using Content.Shared.Utils;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 
@@ -191,7 +193,7 @@ public sealed partial class SubGridSystem
 
                 if (_markerQuery.TryComp(anchored, out var markerComp))
                     mixture = (GasMixture) _proto.Index(markerComp.Mixture).Definition.CreateMixture(
-                        _gasFactory,
+                        GasFactory,
                         _proto,
                         SubGridTileVolume);
             }
@@ -247,7 +249,7 @@ public sealed partial class SubGridSystem
     {
         // Check if it is located near space, and add a boundary layer of atmosphere tiles.
         var spaceMix = _atmos.GetSpaceTileMixture();
-        _gasFactory.MarkImmutable(ref spaceMix);
+        GasFactory.MarkImmutable(ref spaceMix);
         foreach (var vecDir in DirectionsWithDiagonals)
         {
             var tileRef = MapSystem.GetTileRef(grid.Owner, grid.Comp2, gridIndices + vecDir);
@@ -342,6 +344,8 @@ public sealed partial class SubGridSystem
             return;
 
         subGrid.ChunkEntities.Remove(ent.Comp.ChunkIndices);
+        subGrid.ChunkMapCaches.Remove(ent.Comp.ChunkIndices);
+        subGrid.ChunkGasBuffers.Remove(ent.Comp.ChunkIndices);
     }
 
     /// <summary>
@@ -454,9 +458,12 @@ public sealed partial class SubGridSystem
         chunkComp.ChunkIndices = GetChunkIndicesTile(gridIndices);
 
         // preallocate the memory
-        chunkComp.ChunkData = new SubGridChunk(SubGridChunkArea);
+        chunkComp.ChunkData = new SubGridChunk(SubGridChunkSize);
 
         grid.Comp.ChunkEntities.Add(chunkComp.ChunkIndices, chunk);
+        grid.Comp.ChunkMapCaches.Add(chunkComp.ChunkIndices, new Dictionary<Vector2i, SubGridChunk>(9));
+        grid.Comp.ChunkGasBuffers.Add(chunkComp.ChunkIndices, new ConstantArrayPool<float>(GasFactory.ArraySize, GasMixtureFactory.BufferBucketSize));
+
         Log.Info($"Added chunk {ToPrettyString(chunk)} to grid {ToPrettyString(grid)} with chunkIndices {chunkComp.ChunkIndices}");
         Dirty(grid);
         return (chunk, chunkComp);

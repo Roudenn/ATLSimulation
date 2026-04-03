@@ -1,7 +1,6 @@
-﻿using Content.Shared.Atmospherics;
+﻿using Content.Shared.Atmospherics.Factory;
 using Content.Shared.Atmospherics.Systems;
 using Content.Shared.Subgrid.Components;
-using Content.Shared.Temperature;
 using Robust.Shared.Configuration;
 using Robust.Shared.Map.Components;
 
@@ -12,15 +11,12 @@ public abstract partial class SharedSubGridSystem : EntitySystem
     [Dependency] protected readonly IConfigurationManager CfgManager = default!;
     [Dependency] protected readonly SharedTransformSystem Xform = default!;
     [Dependency] protected readonly SharedMapSystem MapSystem = default!;
+    [Dependency] protected readonly GasMixtureFactory GasFactory = default!;
     [Dependency] private readonly SharedAtmosphericsSystem _atmospherics = default!;
 
     protected EntityQuery<MapGridComponent> MapGridQuery;
     protected EntityQuery<SubGridComponent> SubGridQuery;
     protected EntityQuery<SubGridChunkComponent> ChunkQuery;
-
-    // TODO array pooling
-    public TileHeat[] HeatChunkCache = new TileHeat[0];
-    public TileAtmos[] AtmosChunkCache = new TileAtmos[0];
 
     /// <inheritdoc/>
     public override void Initialize()
@@ -28,6 +24,7 @@ public abstract partial class SharedSubGridSystem : EntitySystem
         base.Initialize();
         InitializeCVars();
         InitializeUI();
+        InitializeNetwork();
 
         MapGridQuery = GetEntityQuery<MapGridComponent>();
         SubGridQuery = GetEntityQuery<SubGridComponent>();

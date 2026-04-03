@@ -5,7 +5,13 @@ namespace Content.Shared.Atmospherics.Factory;
 
 public sealed partial class GasMixtureFactory : IGasMixtureFactory
 {
-    public RobustArrayPool<float> Pool = default!;
+    /// <summary>
+    /// Default amount of arrays required for a buffer to have in order to
+    /// be able to use any gas mixture helpers of any complexity.
+    /// </summary>
+    public const int BufferBucketSize = 16;
+
+    public ConstantArrayPool<float> SharedPool = default!;
     public GasPrototypesBuffer Prototypes = default!;
 
     private readonly List<GasPrototype> _gasDefs;
@@ -24,7 +30,7 @@ public sealed partial class GasMixtureFactory : IGasMixtureFactory
 
     public void InitializeGases()
     {
-        Pool = new RobustArrayPool<float>(ArraySize, 16);
+        SharedPool = new ConstantArrayPool<float>(ArraySize, BufferBucketSize);
         Prototypes = new GasPrototypesBuffer(ArraySize);
 
         for (var i = 0; i < Count; i++)

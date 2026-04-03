@@ -37,7 +37,7 @@ public sealed class AtmosCompositionOverlay : Overlay
         var boxVector = new Vector2i(SystemConstants.PvsChunkSize, SystemConstants.PvsChunkSize);
         var query = _entityManager.EntityQueryEnumerator<SubGridChunkComponent, TransformComponent>();
         var tileWorldSize = new Vector2(1f / _subGrid.SubGridTileSize);
-        var buffer = _gasManager.Pool.Rent();
+        var buffer = _gasManager.SharedPool.Rent();
         while (query.MoveNext(out var uid, out var subgrid, out var xform))
         {
             var worldPos = _xform.GetMapCoordinates(uid, xform);
@@ -71,6 +71,6 @@ public sealed class AtmosCompositionOverlay : Overlay
                 }
             }
         }
-        _gasManager.Pool.Return(buffer, true);
+        _gasManager.SharedPool.Return(buffer, true);
     }
 }

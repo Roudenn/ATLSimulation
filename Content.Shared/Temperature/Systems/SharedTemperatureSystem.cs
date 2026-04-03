@@ -17,6 +17,6 @@ public abstract class SharedTemperatureSystem : EntitySystem
     {
         base.Initialize();
         Subs.CVar(CfgManager, GameConfigVars.TemperatureEnabled, b => TemperatureEnabled = b, true);
-        Subs.CVar(CfgManager, GameConfigVars.SimulationSpeedup, f => TemperatureSpeedup = f, true);
+        Subs.CVar(CfgManager, GameConfigVars.TemperatureSpeedup, f => TemperatureSpeedup = f, true);
     }
 }

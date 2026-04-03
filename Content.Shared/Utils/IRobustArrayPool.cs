@@ -1,0 +1,73 @@
+﻿using System.Buffers;
+using System.Diagnostics.CodeAnalysis;
+
+namespace Content.Shared.Utils;
+
+/// <summary>
+/// An interface for different types of array pools that have special functionality, similar to <see cref="ArrayPool{T}"/>.
+/// </summary>
+/// <remarks>
+/// This version doesn't violate sandbox checks, since it doesn't contain a Shared pool.
+/// </remarks>
+public interface IRobustArrayPool<T>
+{
+    /// <summary>
+    /// The buffer that contains the arrays.
+    /// </summary>
+    protected T[][] Buffer { get; set; }
+
+    /// <summary>
+    /// Pointer index to the latest initialized element in the buffer.
+    /// </summary>
+    int Length { get; protected set; }
+
+    /// <summary>
+    /// Factory that initializes elements in the array when they are first created or returned with a clear parameter.
+    /// </summary>
+    protected Func<T>? Factory { get; set; }
+
+    /// <summary>
+    /// Takes an array from the pool, without caring about its size.
+    /// </summary>
+    /// <returns>An array from the pool.</returns>
+    T[] Rent();
+
+    /// <summary>
+    /// Takes an array from the pool that has at least the specified size.
+    /// </summary>
+    /// <param name="minSize">Minimal size of an array.</param>
+    /// <returns>An array from the pool.</returns>
+    T[] Rent(int minSize);
+
+    /// <summary>
+    /// Takes an array from the pool, without caring about its size.
+    /// </summary>
+    /// <param name="obj">An available array from this pool.</param>
+    /// <returns>True if the array was found successfully.</returns>
+    bool TryRent([NotNullWhen(true)] out T[]? obj);
+
+    /// <summary>
+    /// Takes an array from the pool that has at least the specified size.
+    /// </summary>
+    /// <param name="minSize">Minimal size of an array.</param>
+    /// <param name="obj">An available array from this pool.</param>
+    /// <returns>True if the array was found successfully.</returns>
+    bool TryRent(int minSize, [NotNullWhen(true)] out T[]? obj);
+
+    /// <summary>
+    /// Returns an array back to the pool.
+    /// </summary>
+    /// <param name="obj">An array to return back.</param>
+    /// <param name="clearArray">If true, clears the contents of the array.
+    /// If <see cref="Factory"/> is not null, also initializes each element in the array.</param>
+    void Return(T[] obj, bool clearArray = false);
+
+    /// <summary>
+    /// Returns an array back to the pool.
+    /// </summary>
+    /// <returns>True if the array was successfully returned to the pool.</returns>
+    /// <param name="obj">An array to return back.</param>
+    /// <param name="clearArray">If true, clears the contents of the array.
+    /// If <see cref="Factory"/> is not null, also initializes each element in the array.</param>
+    bool TryReturn(T[] obj, bool clearArray = false);
+}

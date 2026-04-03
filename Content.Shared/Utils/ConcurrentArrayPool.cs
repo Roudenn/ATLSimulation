@@ -1,15 +1,10 @@
-﻿/*using System.Buffers;
-using System.Diagnostics.CodeAnalysis;
+﻿/*using System.Diagnostics.CodeAnalysis;
+using System.Threading;
 
 namespace Content.Shared.Utils;
 
-/// <summary>
-/// An engine version of <see cref="ArrayPool{T}"/> that pools a fixed amount of arrays with any size.
-/// </summary>
-/// <remarks>
-/// This version doesn't violate sandbox checks, since it doesn't contain a Shared pool.
-/// </remarks>
-public sealed class RobustArrayPool<T> : IRobustArrayPool<T>
+// TODO finish this
+public sealed class ConcurrentArrayPool<T> : IRobustArrayPool<T>
 {
     public T[][] Buffer { get; set; }
 
@@ -20,20 +15,29 @@ public sealed class RobustArrayPool<T> : IRobustArrayPool<T>
 
     public Func<T>? Factory { get; set; }
 
-    public RobustArrayPool(int startArraySize, int maxBucketSize, Func<T>? factory = null, bool init = false)
+    /// <summary>
+    /// Size of the pooled arrays.
+    /// </summary>
+    public int ArraySize { get; }
+
+    private readonly Lock _lock;
+
+    public ConcurrentArrayPool(int arraySize, int maxBucketSize, Func<T>? factory = null, bool init = false)
     {
         Buffer = new T[maxBucketSize][];
         Factory = factory;
         Length = maxBucketSize - 1;
+        _lock = new Lock();
+        ArraySize = arraySize;
 
         for (int i = 0; i < maxBucketSize; i++)
         {
-            Buffer[i] = new T[startArraySize];
+            Buffer[i] = new T[arraySize];
 
             if(!init || factory == null)
                 continue;
 
-            for (int j = 0; j < startArraySize; j++)
+            for (int j = 0; j < arraySize; j++)
             {
                 Buffer[j][i] = factory();
             }
@@ -46,23 +50,18 @@ public sealed class RobustArrayPool<T> : IRobustArrayPool<T>
     /// <returns>An array from the pool.</returns>
     public T[] Rent()
     {
-        ArgumentOutOfRangeException.ThrowIfNegative(Length);
-        var objectSelected = Buffer[Length];
-        Length--;
-        return objectSelected;
+        lock (_lock)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegative(Length);
+            var objectSelected = Buffer[Length];
+            Length--;
+            return objectSelected;
+        }
     }
 
     public T[] Rent(int minSize)
     {
-        for (int i = 0; i < Length; i++)
-        {
-            if (Buffer[i].Length < minSize)
-                continue;
-
-            return Buffer[i];
-        }
-
-        throw new ArgumentException("There was no available array that has at least specified size in the array pool.", nameof(minSize));
+        throw new NotImplementedException();
     }
 
     /// <summary>
@@ -73,19 +72,21 @@ public sealed class RobustArrayPool<T> : IRobustArrayPool<T>
     public bool TryRent([NotNullWhen(true)] out T[]? obj)
     {
         obj = null;
-        if (Length < 0)
-            return false;
+        lock (_lock)
+        {
+            if (Length < 0)
+                return false;
 
-        var objectSelected = Buffer[Length];
-        Length--;
-        obj = objectSelected;
-        return true;
+            var objectSelected = Buffer[Length];
+            Length--;
+            obj = objectSelected;
+            return true;
+        }
     }
 
     public bool TryRent(int minSize, [NotNullWhen(true)] out T[]? obj)
     {
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(minSize, ArraySize);
-        return TryRent(out obj);
+        throw new NotImplementedException();
     }
 
     /// <summary>
@@ -99,20 +100,23 @@ public sealed class RobustArrayPool<T> : IRobustArrayPool<T>
     /// If <see cref="Factory"/> is not null, also initializes each element in the array.</param>
     public void Return(T[] obj, bool clearArray = false)
     {
-        ArgumentOutOfRangeException.ThrowIfNotEqual(obj.Length, ArraySize);
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(Length + 1, ArraySize);
-
-        if (clearArray)
+        lock (_lock)
         {
-            var objSpan = obj.AsSpan();
-            objSpan.Clear();
-            if (Factory != null)
-                objSpan.Fill(Factory());
-            objSpan.CopyTo(obj);
-        }
+            ArgumentOutOfRangeException.ThrowIfNotEqual(obj.Length, ArraySize);
+            ArgumentOutOfRangeException.ThrowIfGreaterThan(Length + 1, ArraySize);
 
-        Length++;
-        Buffer[Length] = obj;
+            if (clearArray)
+            {
+                var objSpan = obj.AsSpan();
+                objSpan.Clear();
+                if (Factory != null)
+                    objSpan.Fill(Factory());
+                objSpan.CopyTo(obj);
+            }
+
+            Length++;
+            Buffer[Length] = obj;
+        }
     }
 
     /// <summary>
@@ -126,23 +130,25 @@ public sealed class RobustArrayPool<T> : IRobustArrayPool<T>
     /// If <see cref="Factory"/> is not null, also initializes each element in the array.</param>
     public bool TryReturn(T[] obj, bool clearArray = false)
     {
-        if (obj.Length != ArraySize
-            || Length >= ArraySize)
-            return false;
-
-        if (clearArray)
+        lock (_lock)
         {
-            var objSpan = obj.AsSpan();
-            objSpan.Clear();
-            if (Factory != null)
-                objSpan.Fill(Factory());
-            objSpan.CopyTo(obj);
+            if (obj.Length != ArraySize
+                || Length >= ArraySize)
+                return false;
+
+            if (clearArray)
+            {
+                var objSpan = obj.AsSpan();
+                objSpan.Clear();
+                if (Factory != null)
+                    objSpan.Fill(Factory());
+                objSpan.CopyTo(obj);
+            }
+
+            Length++;
+            Buffer[Length] = obj;
+            return true;
         }
-
-        Length++;
-        Buffer[Length] = obj;
-
-        return true;
     }
 }
 */

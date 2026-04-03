@@ -41,6 +41,13 @@ public partial struct TileAtmos : IRobustCloneable<TileAtmos>, ISubGridTile
     [ViewVariables]
     public int LastTick { get; set; }
 
+    public TileAtmos(VelocityGasMixture mixture)
+    {
+        Mixture = mixture;
+        ArchivedMixture = mixture;
+        MapAtmosphere = mixture.Immutable;
+    }
+
     public TileAtmos(GasMixture mixture)
     {
         Mixture = new VelocityGasMixture(mixture, Vector2.Zero);

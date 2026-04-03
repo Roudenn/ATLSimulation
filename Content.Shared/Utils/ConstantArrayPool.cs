@@ -1,15 +1,16 @@
-﻿/*using System.Buffers;
+﻿using System.Buffers;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Content.Shared.Utils;
 
 /// <summary>
-/// An engine version of <see cref="ArrayPool{T}"/> that pools a fixed amount of arrays with any size.
+/// A version of <see cref="ArrayPool{T}"/> that pools a fixed amount of arrays with a fixed size.
+/// Useful for cases where you need to easily manage large amounts of buffers to store objects.
 /// </summary>
 /// <remarks>
-/// This version doesn't violate sandbox checks, since it doesn't contain a Shared pool.
+/// Works similar to <see cref="RobustArrayPool{T}"/>, but has more strict checks that don't allow to return arrays with a wrong size.
 /// </remarks>
-public sealed class RobustArrayPool<T> : IRobustArrayPool<T>
+public sealed class ConstantArrayPool<T> : IRobustArrayPool<T>
 {
     public T[][] Buffer { get; set; }
 
@@ -20,20 +21,26 @@ public sealed class RobustArrayPool<T> : IRobustArrayPool<T>
 
     public Func<T>? Factory { get; set; }
 
-    public RobustArrayPool(int startArraySize, int maxBucketSize, Func<T>? factory = null, bool init = false)
+    /// <summary>
+    /// Size of the pooled arrays.
+    /// </summary>
+    public int ArraySize { get; }
+
+    public ConstantArrayPool(int arraySize, int maxBucketSize, Func<T>? factory = null, bool init = false)
     {
         Buffer = new T[maxBucketSize][];
         Factory = factory;
         Length = maxBucketSize - 1;
+        ArraySize = arraySize;
 
         for (int i = 0; i < maxBucketSize; i++)
         {
-            Buffer[i] = new T[startArraySize];
+            Buffer[i] = new T[arraySize];
 
             if(!init || factory == null)
                 continue;
 
-            for (int j = 0; j < startArraySize; j++)
+            for (int j = 0; j < arraySize; j++)
             {
                 Buffer[j][i] = factory();
             }
@@ -54,15 +61,8 @@ public sealed class RobustArrayPool<T> : IRobustArrayPool<T>
 
     public T[] Rent(int minSize)
     {
-        for (int i = 0; i < Length; i++)
-        {
-            if (Buffer[i].Length < minSize)
-                continue;
-
-            return Buffer[i];
-        }
-
-        throw new ArgumentException("There was no available array that has at least specified size in the array pool.", nameof(minSize));
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(minSize, ArraySize);
+        return Rent();
     }
 
     /// <summary>
@@ -145,4 +145,3 @@ public sealed class RobustArrayPool<T> : IRobustArrayPool<T>
         return true;
     }
 }
-*/

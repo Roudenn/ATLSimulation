@@ -93,6 +93,35 @@ public abstract partial class SharedSubGridSystem
         return new Vector2i(x, y);
     }
 
+    /// <summary>
+    /// Converts an (x,y) vector into an index inside a chunk.
+    /// </summary>
+    /// <returns>
+    /// An index in a 1D array of the chunk that represents a tile at a given (x, y) local position.
+    /// </returns>
+    public static int VectorToIndex(int x, int y, int subGridDivisions, int subGridChunkSize)
+    {
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(x, subGridChunkSize);
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(y, subGridChunkSize);
+        return x + (y << (subGridDivisions + 3));
+    }
+
+    /// <summary>
+    /// Converts an index into a (x,y) local position inside a chunk.
+    /// </summary>
+    /// <param name="index">An index of an element of a 1D array of a subgrid chunk.</param>
+    /// <returns>An (x,y) vector local position of that tile inside a chunk.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// If index is greater than or equal to the total amount of subgrid tiles in a single chunk (the index is out-of-bounds)
+    /// </exception>
+    public static Vector2i IndexToVector(int index, int subGridDivisions, int subGridChunkSize)
+    {
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(index, subGridChunkSize * subGridChunkSize);
+        var x = index & (subGridChunkSize - 1);
+        var y = index >> (subGridDivisions + 3);
+        return new Vector2i(x, y);
+    }
+
     /// <inheritdoc cref='TryGetChunk(Entity{SubGridComponent?}, Vector2, out Entity{SubGridChunkComponent}?)'/>
     public bool TryGetChunk(
         Entity<SubGridComponent?> grid,

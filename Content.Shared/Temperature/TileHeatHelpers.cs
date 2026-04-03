@@ -6,13 +6,13 @@ namespace Content.Shared.Temperature;
 public static class TileHeatHelpers
 {
     [PublicAPI]
-    public static float ConductHeatTiles(ref TileHeat tA, ref TileHeat tB, float deltaTime)
+    public static float ConductHeatTiles(ref TileHeat tA, TileHeat tB, float deltaTime)
     {
         return ConductHeatArchived(
             ref tA.ArchivedContainer,
-            ref tB.ArchivedContainer,
             ref tA.Container,
-            ref tB.Container,
+            tB.ArchivedContainer,
+            tB.Container,
             deltaTime);
     }
 
@@ -41,14 +41,13 @@ public static class TileHeatHelpers
     [PublicAPI]
     public static float ConductHeatArchived(
         ref ConductiveHeatContainer cA,
-        ref ConductiveHeatContainer cB,
         ref ConductiveHeatContainer cAUnarchived,
-        ref ConductiveHeatContainer cBUnarchived,
+        ConductiveHeatContainer cB,
+        ConductiveHeatContainer cBUnarchived,
         float deltaTime)
     {
         var dQ = cA.ConductHeatQuery(ref cB, deltaTime);
         HeatContainerHelpers.AddHeat(ref cAUnarchived, dQ);
-        HeatContainerHelpers.AddHeat(ref cBUnarchived, -dQ);
         return dQ;
     }
 }

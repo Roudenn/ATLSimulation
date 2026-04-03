@@ -1,6 +1,7 @@
 ﻿using Content.Shared.Atmospherics.Factory;
 using Content.Shared.Atmospherics.Systems;
 using Content.Shared.Constants;
+using Content.Shared.Utils;
 
 namespace Content.Shared.IntegrationTests.Atmospherics;
 

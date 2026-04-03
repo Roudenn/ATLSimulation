@@ -47,10 +47,14 @@ public abstract partial class SharedSubGridSystem
     [ViewVariables]
     public int SubGridChunkArea { get; private set; }
 
+    [ViewVariables]
+    public int SubGridNetFrequency { get; private set; }
+
     private void InitializeCVars()
     {
         Subs.CVar(CfgManager, GameConfigVars.SubGridHeight, OnHeightChanged, true);
         Subs.CVar(CfgManager, GameConfigVars.SubGridSize, OnSubGridSizeChanged, true);
+        Subs.CVar(CfgManager, GameConfigVars.SubGridNetFrequency, f => SubGridNetFrequency = f, true);
     }
 
     private void OnHeightChanged(float f)
@@ -75,7 +79,6 @@ public abstract partial class SharedSubGridSystem
         SubGridChunkSize = SystemConstants.PvsChunkSize * (1 << num);
         SubGridChunkArea = SystemConstants.PvsChunkSize * (1 << num) * SystemConstants.PvsChunkSize * (1 << num);
         UpdateVolumeValue();
-        UpdateArrayPools();
 
         var ev = new SubGridResizedEvent();
         RaiseLocalEvent(ref ev);
@@ -84,11 +87,5 @@ public abstract partial class SharedSubGridSystem
     private void UpdateVolumeValue()
     {
         SubGridTileVolume = SubGridWorldSize * SubGridWorldSize * SubGridHeight;
-    }
-
-    private void UpdateArrayPools()
-    {
-        Array.Resize(ref HeatChunkCache, SubGridChunkArea);
-        Array.Resize(ref AtmosChunkCache, SubGridChunkArea);
     }
 }
