@@ -6,6 +6,7 @@ using Content.Shared.Atmospherics.GasMixtures;
 using Content.Shared.Constants;
 using Content.Shared.Maps;
 using Content.Shared.Subgrid;
+using Content.Shared.Subgrid.Chunks;
 using Content.Shared.Subgrid.Components;
 using Content.Shared.Temperature;
 using Content.Shared.Temperature.HeatContainers;
@@ -345,8 +346,6 @@ public sealed partial class SubGridSystem
             return;
 
         subGrid.ChunkEntities.Remove(ent.Comp.ChunkIndices);
-        subGrid.ChunkMapCaches.Remove(ent.Comp.ChunkIndices);
-        subGrid.ChunkGasBuffers.Remove(ent.Comp.ChunkIndices);
     }
 
     /// <summary>
@@ -457,14 +456,13 @@ public sealed partial class SubGridSystem
         // TODO this is shitcode
         chunkComp.ParentGrid = grid.Owner;
         chunkComp.ChunkIndices = GetChunkIndicesTile(gridIndices);
-
         chunkComp.ChunkData = new SubGridChunk(SubGridChunkSize);
-        chunkComp.AtmosBuffer = new VelocityGasMixture[SubGridChunkArea];
+        chunkComp.AtmosBuffer = new GasMixture[SubGridChunkArea];
         chunkComp.HeatBuffer = new ConductiveHeatContainer[SubGridChunkArea];
+        chunkComp.ChunkBuffer = new Dictionary<Vector2i, SubGridChunk>(9);
+        chunkComp.GasArrayPool = new ConstantArrayPool<float>(GasFactory.ArraySize, GasMixtureFactory.BufferBucketSize);
 
         grid.Comp.ChunkEntities.Add(chunkComp.ChunkIndices, chunk);
-        grid.Comp.ChunkMapCaches.Add(chunkComp.ChunkIndices, new Dictionary<Vector2i, SubGridChunk>(9));
-        grid.Comp.ChunkGasBuffers.Add(chunkComp.ChunkIndices, new ConstantArrayPool<float>(GasFactory.ArraySize, GasMixtureFactory.BufferBucketSize));
 
         Log.Info($"Added chunk {ToPrettyString(chunk)} to grid {ToPrettyString(grid)} with chunkIndices {chunkComp.ChunkIndices}");
         Dirty(grid);

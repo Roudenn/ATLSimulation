@@ -1,5 +1,8 @@
-﻿using Content.Shared.Atmospherics.GasMixtures;
+﻿using Content.Shared.Atmospherics.Factory;
+using Content.Shared.Atmospherics.GasMixtures;
+using Content.Shared.Subgrid.Chunks;
 using Content.Shared.Temperature.HeatContainers;
+using Content.Shared.Utils;
 using Robust.Shared.GameStates;
 using Robust.Shared.Serialization;
 
@@ -19,8 +22,24 @@ public sealed partial class SubGridChunkComponent : Component
     [DataField]
     public SubGridChunk ChunkData;
 
-    public VelocityGasMixture[] AtmosBuffer = new VelocityGasMixture[0];
+    /// <summary>
+    /// Chunk buffer used for storing references to neighbouring chunks.
+    /// </summary>
+    public Dictionary<Vector2i, SubGridChunk> ChunkBuffer = new();
 
+    /// <summary>
+    /// Array pool used for <see cref="GasMixtureFactory"/> calculations.
+    /// </summary>
+    public ConstantArrayPool<float> GasArrayPool;
+
+    /// <summary>
+    /// A buffer used when serializing the full state on server side.
+    /// </summary>
+    public GasMixture[] AtmosBuffer = new GasMixture[0];
+
+    /// <summary>
+    /// A buffer used when serializing the full state on server side.
+    /// </summary>
     public ConductiveHeatContainer[] HeatBuffer = new ConductiveHeatContainer[0];
 }
 
@@ -29,10 +48,10 @@ public sealed partial class SubGridChunkComponentState : ComponentState
 {
     public NetEntity ParentGrid;
     public Vector2i ChunkIndices;
-    public VelocityGasMixture[] AtmosData;
+    public GasMixture[] AtmosData;
     public ConductiveHeatContainer[] HeatData;
 
-    public SubGridChunkComponentState(NetEntity parentGrid, Vector2i chunkIndices, VelocityGasMixture[] atmosData, ConductiveHeatContainer[] heatData)
+    public SubGridChunkComponentState(NetEntity parentGrid, Vector2i chunkIndices, GasMixture[] atmosData, ConductiveHeatContainer[] heatData)
     {
         ParentGrid = parentGrid;
         ChunkIndices = chunkIndices;
@@ -54,7 +73,7 @@ public sealed partial class SubGridChunkComponentDeltaState(NetEntity parentGrid
 
     public SubGridChunkComponentState CreateNewFullState(SubGridChunkComponentState fullState)
     {
-        var atmos = new VelocityGasMixture[fullState.AtmosData.Length];
+        var atmos = new GasMixture[fullState.AtmosData.Length];
         fullState.AtmosData.AsSpan().CopyTo(atmos);
         var heat = new ConductiveHeatContainer[fullState.HeatData.Length];
         fullState.HeatData.AsSpan().CopyTo(heat);

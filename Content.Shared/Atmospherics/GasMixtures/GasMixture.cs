@@ -1,4 +1,5 @@
 ﻿using Content.Shared.Atmospherics.Factory;
+using Content.Shared.Subgrid.Systems;
 using Content.Shared.Temperature;
 using Robust.Shared.Serialization;
 
@@ -43,6 +44,10 @@ public partial struct GasMixture : IGasMixture, IRobustCloneable<GasMixture>
     /// </summary>
     [DataField]
     public bool Immutable { get; set; }
+
+    // TODO this is a workaround until actually good serialization is made
+    [ViewVariables, Access(typeof(SharedSubGridSystem))]
+    public bool Initialized = true;
 
     /// <summary>
     /// Constructs a new gas mixture without any gas.

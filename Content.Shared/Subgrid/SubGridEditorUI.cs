@@ -27,17 +27,9 @@ public sealed class SubGridAddMolesMessage(
     public float Moles { get; } = moles;
 }
 
-[Serializable, NetSerializable]
-public sealed class SubGridSetVolumeMessage(NetEntity targetGrid, Vector2i tileIndices, float volume) : BoundUserInterfaceMessage
-{
-    public NetEntity TargetGrid { get; } = targetGrid;
-    public Vector2i TileIndices { get; } = tileIndices;
-    public float Volume { get; } = volume;
-}
-
 [ByRefEvent]
 public record struct InspectSubGridAtmosphereTile(
-    VelocityGasMixture? GasMixture,
+    GasMixture? GasMixture,
     EntityUid Grid,
     Vector2i ChunkIndices,
     int Index);

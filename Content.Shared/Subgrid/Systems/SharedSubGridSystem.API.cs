@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Content.Shared.Atmospherics;
+using Content.Shared.Subgrid.Chunks;
 using Content.Shared.Subgrid.Components;
 using Content.Shared.Temperature;
 using JetBrains.Annotations;

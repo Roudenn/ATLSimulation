@@ -1,10 +1,11 @@
 ﻿using System.Linq;
 using Content.Server.SubGrid;
-using Content.Shared.Subgrid;
+using Content.Shared.Subgrid.Chunks;
 using Content.Shared.Subgrid.Components;
 using Content.Shared.Subgrid.Systems;
 using Content.Shared.Temperature;
 using Content.Shared.Temperature.Systems;
+using Robust.Shared.Collections;
 using Robust.Shared.Threading;
 using Robust.Shared.Timing;
 
@@ -36,28 +37,31 @@ public sealed class TemperatureSystem : SharedTemperatureSystem
 
         var query = EntityQueryEnumerator<SubGridComponent>();
         var deltaTime = (float) (_timing.CurTime - _lastUpdate).TotalSeconds;
-        deltaTime = MathF.Min(deltaTime, 0.01f);
+        deltaTime = MathF.Min(deltaTime, 0.05f);
         _lastUpdate = _timing.CurTime;
         while (query.MoveNext(out var uid, out var comp))
         {
-            var indicies = comp.ChunkEntities.Keys.ToList();
+            var chunks = new ValueList<Entity<SubGridChunkComponent>>(comp.ChunkEntities.Count);
+            foreach (var ent in comp.ChunkEntities.Values)
+            {
+                if (!_subgridChunkQuery.TryComp(ent, out var chunkComp))
+                    continue;
+
+                chunks.Add((ent, chunkComp));
+            }
 
             _job.SubGrid = (uid, comp);
-            _job.ChunkIndices = indicies;
+            _job.Chunks = chunks;
             _job.DeltaTime = deltaTime / HeatSteps;
             for (int i = 0; i < HeatSteps; i++)
             {
-                _parallel.ProcessNow(_job, indicies.Count);
+                _parallel.ProcessNow(_job, comp.ChunkEntities.Count);
 
-                foreach (var chunkIndices in indicies)
+                foreach (var chunk in chunks)
                 {
-                    var chunkEnt = comp.ChunkEntities[chunkIndices];
-                    if (!_subgridChunkQuery.TryComp(chunkEnt, out var chunkComp))
-                        continue;
-
-                    for (var index = 0; index < chunkComp.ChunkData.TemperatureMap.Length; index++)
+                    for (var index = 0; index < chunk.Comp.ChunkData.TemperatureMap.Length; index++)
                     {
-                        chunkComp.ChunkData.TemperatureMap[index].ArchivedContainer = chunkComp.ChunkData.TemperatureMap[index].Container;
+                        chunk.Comp.ChunkData.TemperatureMap[index].ArchivedContainer = chunk.Comp.ChunkData.TemperatureMap[index].Container;
                     }
                 }
             }
@@ -74,14 +78,14 @@ public sealed class TemperatureSystem : SharedTemperatureSystem
 
         public Entity<SubGridComponent> SubGrid;
 
-        public List<Vector2i> ChunkIndices = new();
+        public ValueList<Entity<SubGridChunkComponent>> Chunks = new();
 
         public float DeltaTime;
 
         public void Execute(int index)
         {
-            var indices = ChunkIndices[index];
-            var chunkBuffer = SubGrid.Comp.ChunkMapCaches[indices];
+            var indices = Chunks[index].Comp.ChunkIndices;
+            var chunkBuffer = Chunks[index].Comp.ChunkBuffer;
             chunkBuffer.Clear();
             SubGridSystem.ResolveMapRelativeToChunk(SubGrid, ref chunkBuffer, indices);
             TemperatureSystem.ProcessChunk(chunkBuffer, indices, DeltaTime);

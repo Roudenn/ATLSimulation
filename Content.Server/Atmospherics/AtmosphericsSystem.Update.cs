@@ -1,9 +1,9 @@
-﻿using System.Linq;
-using Content.Shared.Atmospherics;
-using Content.Shared.Subgrid;
+﻿using Content.Shared.Atmospherics;
+using Content.Shared.Subgrid.Chunks;
 using Content.Shared.Subgrid.Components;
 using Content.Shared.Subgrid.Systems;
 using Content.Shared.Utils;
+using Robust.Shared.Collections;
 using Robust.Shared.Threading;
 
 namespace Content.Server.Atmospherics;
@@ -26,28 +26,31 @@ public sealed partial class AtmosphericsSystem
 
         var query = EntityQueryEnumerator<SubGridComponent>();
         var deltaTime = (float) (_timing.CurTime - _lastUpdate).TotalSeconds;
-        deltaTime = MathF.Min(deltaTime, 0.01f);
+        deltaTime = MathF.Min(deltaTime, 0.05f);
         _lastUpdate = _timing.CurTime;
         while (query.MoveNext(out var uid, out var comp))
         {
-            var indicies = comp.ChunkEntities.Keys.ToList();
+            var chunks = new ValueList<Entity<SubGridChunkComponent>>(comp.ChunkEntities.Count);
+            foreach (var ent in comp.ChunkEntities.Values)
+            {
+                if (!_subgridChunkQuery.TryComp(ent, out var chunkComp))
+                    continue;
+
+                chunks.Add((ent, chunkComp));
+            }
 
             _diffusionJob.SubGrid = (uid, comp);
-            _diffusionJob.ChunkIndices = indicies;
+            _diffusionJob.Chunks = chunks;
             _diffusionJob.DeltaTime = deltaTime / AtmosSteps;
             for (int i = 0; i < AtmosSteps; i++)
             {
-                _parallel.ProcessNow(_diffusionJob, indicies.Count);
+                _parallel.ProcessNow(_diffusionJob, comp.ChunkEntities.Count);
 
-                foreach (var chunkIndices in indicies)
+                foreach (var chunk in chunks)
                 {
-                    var chunkEnt = comp.ChunkEntities[chunkIndices];
-                    if (!_subgridChunkQuery.TryComp(chunkEnt, out var chunkComp))
-                        continue;
-
-                    for (var index = 0; index < chunkComp.ChunkData.TemperatureMap.Length; index++)
+                    for (var index = 0; index < chunk.Comp.ChunkData.TemperatureMap.Length; index++)
                     {
-                        chunkComp.ChunkData.AtmosphereMap[index].ArchivedMixture = chunkComp.ChunkData.AtmosphereMap[index].Mixture;
+                        chunk.Comp.ChunkData.AtmosphereMap[index].ArchivedMixture = chunk.Comp.ChunkData.AtmosphereMap[index].Mixture;
                     }
                 }
             }
@@ -64,15 +67,15 @@ public sealed partial class AtmosphericsSystem
 
         public Entity<SubGridComponent> SubGrid;
 
-        public List<Vector2i> ChunkIndices = new();
+        public ValueList<Entity<SubGridChunkComponent>> Chunks = new();
 
         public float DeltaTime;
 
         public void Execute(int index)
         {
-            var indices = ChunkIndices[index];
-            var chunkBuffer = SubGrid.Comp.ChunkMapCaches[indices];
-            var chunkGasBuffer = SubGrid.Comp.ChunkGasBuffers[indices];
+            var indices = Chunks[index].Comp.ChunkIndices;
+            var chunkBuffer = Chunks[index].Comp.ChunkBuffer;
+            var chunkGasBuffer = Chunks[index].Comp.GasArrayPool;
             chunkBuffer.Clear();
             SubGridSystem.ResolveMapRelativeToChunk(SubGrid, ref chunkBuffer, indices);
             AtmosphericsSystem.ProcessChunk(chunkBuffer, indices, DeltaTime, chunkGasBuffer);

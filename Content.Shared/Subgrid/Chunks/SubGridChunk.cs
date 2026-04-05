@@ -1,18 +1,24 @@
 ﻿using Content.Shared.Atmospherics;
 using Content.Shared.Atmospherics.GasMixtures;
+using Content.Shared.Constants;
 using Content.Shared.Temperature;
 using Content.Shared.Temperature.HeatContainers;
-using Robust.Shared.Serialization;
 
-namespace Content.Shared.Subgrid;
+namespace Content.Shared.Subgrid.Chunks;
 
-[DataDefinition, Serializable, NetSerializable]
-public sealed partial class SubGridChunk
+public sealed class SubGridChunk
 {
-    [DataField]
+    [ViewVariables]
+    public readonly int ChunkSize;
+
+    public int ChunkArea => ChunkSize * ChunkSize;
+
+    public int TileSize => ChunkSize / SystemConstants.PvsChunkSize;
+
+    [ViewVariables]
     public TileHeat[] TemperatureMap;
 
-    [DataField]
+    [ViewVariables]
     public TileAtmos[] AtmosphereMap;
 
     [ViewVariables]
@@ -23,6 +29,8 @@ public sealed partial class SubGridChunk
 
     public SubGridChunk(int chunkSize)
     {
+        ChunkSize = chunkSize;
+
         TemperatureMap = new TileHeat[chunkSize * chunkSize];
         AtmosphereMap = new TileAtmos[chunkSize * chunkSize];
     }
@@ -35,7 +43,12 @@ public sealed partial class SubGridChunk
         other.AtmosphereMap.AsSpan().CopyTo(AtmosphereMap);
     }
 
-    public void ApplyState(VelocityGasMixture[] mixtures, ConductiveHeatContainer[] containers)
+    /// <summary>
+    /// Sets the state of all arrays to this subgrid chunk, also clearing all previous values.
+    /// </summary>
+    /// <param name="mixtures"></param>
+    /// <param name="containers"></param>
+    public void ApplyState(GasMixture[] mixtures, ConductiveHeatContainer[] containers)
     {
         var tempSpan = TemperatureMap.AsSpan();
         tempSpan.Clear();

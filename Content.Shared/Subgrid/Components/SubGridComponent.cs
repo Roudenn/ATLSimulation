@@ -1,5 +1,4 @@
-﻿using Content.Shared.Utils;
-using Robust.Shared.GameStates;
+﻿using Robust.Shared.GameStates;
 
 namespace Content.Shared.Subgrid.Components;
 
@@ -14,14 +13,4 @@ public sealed partial class SubGridComponent : Component
     /// </summary>
     [DataField, AutoNetworkedField]
     public Dictionary<Vector2i, EntityUid> ChunkEntities = new();
-
-    /// <summary>
-    /// Cache for each chunk and its neighbours.
-    /// </summary>
-    public readonly Dictionary<Vector2i, Dictionary<Vector2i, SubGridChunk>> ChunkMapCaches = new();
-
-    /// <summary>
-    /// Cache for each chunk and its gas buffer.
-    /// </summary>
-    public readonly Dictionary<Vector2i, ConstantArrayPool<float>> ChunkGasBuffers = new();
 }

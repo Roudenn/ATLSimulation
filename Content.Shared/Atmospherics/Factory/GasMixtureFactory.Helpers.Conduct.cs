@@ -96,7 +96,7 @@ public sealed partial class GasMixtureFactory
     }
 
     [PublicAPI]
-    public float ConductHeatVelocity<T>(ref T c, ref VelocityGasMixture m, float cLength, float heatG, float deltaTime) where T : IHeatContainer
+    public float ConductHeatVelocity<T>(ref T c, ref GasMixture m, float cLength, float heatG, float deltaTime) where T : IHeatContainer
     {
         var dQ = ConductHeatQuery(ref c, ref m, cLength, cLength, deltaTime);
         HeatContainerHelpers.AddHeat(ref c, dQ);
@@ -127,7 +127,7 @@ public sealed partial class GasMixtureFactory
     /// integration steps with adaptive step size.
     /// </remarks>
     [PublicAPI]
-    public float ConductHeatVelocityQuery<T>(ref T c, ref VelocityGasMixture m, float cLength, float heatG, float deltaTime) where T : IHeatContainer
+    public float ConductHeatVelocityQuery<T>(ref T c, ref GasMixture m, float cLength, float heatG, float deltaTime) where T : IHeatContainer
     {
         // The harmonic mean is used because conductance adds up inversely proportional.
         var mixtureG = GetThermalConductivity(ref m) * cLength;
@@ -141,7 +141,7 @@ public sealed partial class GasMixtureFactory
     }
 
     [PublicAPI]
-    public float ConductHeatVelocity(ref ConductiveHeatContainer c, ref VelocityGasMixture m, float cLength, float surfaceArea, float deltaTime)
+    public float ConductHeatVelocity(ref ConductiveHeatContainer c, ref GasMixture m, float cLength, float surfaceArea, float deltaTime)
     {
         var dQ = ConductHeatQuery(ref c, ref m, cLength, cLength, deltaTime);
         HeatContainerHelpers.AddHeat(ref c, dQ);
@@ -157,6 +157,7 @@ public sealed partial class GasMixtureFactory
     /// <param name="m">The <see cref="IGasMixture"/> to conduct heat to.</param>
     /// <param name="cLength">Characteristic length of a gas mixture</param>
     /// <param name="surfaceArea">Surface area of the gas flow and </param>
+    /// <param name="speed">Speed of the gas that hits the solid surface.</param>
     /// <param name="deltaTime">
     /// The amount of time that the heat is allowed to conduct, in seconds.
     /// This value should be small such that deltaTime &lt;&lt; C / g where C is the heat capacity of the container.
@@ -168,14 +169,11 @@ public sealed partial class GasMixtureFactory
     /// The calculations are done according to Newton's law of cooling.
     /// </remarks>
     [PublicAPI]
-    public float ConductHeatVelocityQuery(ref ConductiveHeatContainer c, ref VelocityGasMixture m, float cLength, float surfaceArea, float deltaTime)
+    public float ConductHeatVelocityQuery(ref ConductiveHeatContainer c, ref GasMixture m, float cLength, float surfaceArea, float speed, float deltaTime)
     {
         // The harmonic mean is used because conductance adds up inversely proportional.
         var mixtureG = GetThermalConductivity(ref m) * cLength;
         var g = 2f * c.ThermalConductance * mixtureG / (c.ThermalConductance + mixtureG);
-
-        // TODO improve conversion to a scalar here
-        var speed = m.Velocity.Length();
 
         // Calculate Reynold's number: Re = √(ρvL / μ)
         // Multiplying on 1/1000 because viscosity is measured in µPa·s, which is 10e-6, or 10e-3 after the square root.
