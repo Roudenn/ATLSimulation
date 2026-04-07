@@ -11,5 +11,6 @@
         <tabs:StatisticsTab Name="Statistics" Access="Public"/>
         <tabs:VisualsTab Name="Visuals" Access="Public"/>
         <tabs:SimulationOptionsTab Name="SimulationOptions" Access="Public"/>
+        <tabs:SubgridEditorTab Name="Editor" Access="Public"/>
     </TabContainer>
 </widgets:GameTabContainer>

@@ -21,4 +21,6 @@ public static class ContentKeyFunctions
         public static readonly BoundKeyFunction InspectServerComponent = "InspectServerComponent";
         public static readonly BoundKeyFunction InspectClientComponent = "InspectClientComponent";
         public static readonly BoundKeyFunction InspectSubgridElement = "InspectSubgridElement";
+        public static readonly BoundKeyFunction AdjustSubgridElement = "AdjustSubgridElement";
+        public static readonly BoundKeyFunction ReduceSubgridElement = "ReduceSubgridElement";
 }

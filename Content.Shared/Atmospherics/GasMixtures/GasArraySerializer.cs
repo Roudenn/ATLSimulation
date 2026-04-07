@@ -1,4 +1,5 @@
 using Content.Shared.Atmospherics.Factory;
+using Content.Shared.Constants;
 using Robust.Shared.Serialization;
 using Robust.Shared.Serialization.Manager;
 using Robust.Shared.Serialization.Markdown;
@@ -101,7 +102,7 @@ public sealed class GasArraySerializer : ITypeSerializer<float[], SequenceDataNo
 
         for (var i = 0; i < gasMan.ArraySize; i++)
         {
-            if (value[i] == 0f)
+            if (value[i] <= SystemConstants.GasMinMoles)
                 continue; // Skip empty entries, they don't matter.
 
             var gas = gasMan[i];

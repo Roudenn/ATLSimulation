@@ -197,6 +197,8 @@ namespace Content.Client.Options.UI.Tabs
             AddButton(ContentKeyFunctions.InspectServerComponent);
             AddButton(ContentKeyFunctions.InspectClientComponent);
             AddButton(ContentKeyFunctions.InspectSubgridElement);
+            AddButton(ContentKeyFunctions.AdjustSubgridElement);
+            AddButton(ContentKeyFunctions.ReduceSubgridElement);
 
             AddHeader("ui-options-header-text-cursor");
             AddButton(EngineKeyFunctions.TextCursorLeft);

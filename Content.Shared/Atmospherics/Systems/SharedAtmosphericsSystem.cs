@@ -9,7 +9,6 @@ namespace Content.Shared.Atmospherics.Systems;
 
 public abstract partial class SharedAtmosphericsSystem : EntitySystem
 {
-    // TODO port stuff needed from the server system to here
     [Dependency] private readonly IPrototypeManager _protoMan = default!;
     [Dependency] private readonly IConfigurationManager _config = default!;
     [Dependency] protected readonly GasMixtureFactory GasManager = default!;

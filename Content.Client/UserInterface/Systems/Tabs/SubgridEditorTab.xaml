@@ -1,0 +1,11 @@
+﻿<visuals:SubgridEditorTab xmlns="https://spacestation14.io"
+          xmlns:visuals="clr-namespace:Content.Client.UserInterface.Systems.Tabs">
+    <BoxContainer Orientation="Vertical">
+        <ScrollContainer VerticalExpand="True">
+            <BoxContainer Name="Editor" Orientation="Vertical" Margin="8 8 8 8">
+                <OptionButton Name="EditorModes"/>
+                <OptionButton Name="GasOptions"/>
+            </BoxContainer>
+        </ScrollContainer>
+    </BoxContainer>
+</visuals:SubgridEditorTab>

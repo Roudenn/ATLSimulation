@@ -1,5 +1,6 @@
 ﻿using System.Buffers;
 using System.Diagnostics.CodeAnalysis;
+using JetBrains.Annotations;
 
 namespace Content.Shared.Utils;
 
@@ -30,6 +31,7 @@ public interface IRobustArrayPool<T>
     /// Takes an array from the pool, without caring about its size.
     /// </summary>
     /// <returns>An array from the pool.</returns>
+    [Pure]
     T[] Rent();
 
     /// <summary>
@@ -37,6 +39,7 @@ public interface IRobustArrayPool<T>
     /// </summary>
     /// <param name="minSize">Minimal size of an array.</param>
     /// <returns>An array from the pool.</returns>
+    [Pure]
     T[] Rent(int minSize);
 
     /// <summary>

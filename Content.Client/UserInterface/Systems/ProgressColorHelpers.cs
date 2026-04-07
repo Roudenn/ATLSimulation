@@ -16,6 +16,29 @@ public static class ProgressColorHelpers
         return Color.FromHsv(new Vector4(hue, 1f, 0.75f, 1f));
     }
 
+    private static readonly Color[] HeatColors = new Color[]
+    {
+        Color.Purple,
+        Color.Violet,
+        Color.Blue,
+        Color.Cyan,
+        Color.Green,
+        Color.Lime,
+        Color.Yellow,
+        Color.Orange,
+        Color.Red,
+        Color.White,
+    };
+
+    public static Color GradientHeatVisor(float value, float min, float max)
+    {
+        value = (value - min) / (max - min);
+        var firstColor = (int) MathF.Floor(HeatColors.Length * value);
+        var secondColor = firstColor + 1;
+        var progress = secondColor - HeatColors.Length * value;
+        return Color.InterpolateBetween(HeatColors[firstColor], HeatColors[secondColor], progress);
+    }
+
     /// <summary>
     /// Simple yellow -> orange -> red gradient.
     /// </summary>

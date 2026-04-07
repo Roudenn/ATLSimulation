@@ -32,6 +32,8 @@ public static class ContentContexts
         common.AddFunction(ContentKeyFunctions.ToggleEntitySpawningWindow);
         common.AddFunction(ContentKeyFunctions.ToggleTileSpawningWindow);
         common.AddFunction(ContentKeyFunctions.InspectSubgridElement);
+        common.AddFunction(ContentKeyFunctions.AdjustSubgridElement);
+        common.AddFunction(ContentKeyFunctions.ReduceSubgridElement);
 
         // Editor
         common.AddFunction(ContentKeyFunctions.EditorCopyObject);

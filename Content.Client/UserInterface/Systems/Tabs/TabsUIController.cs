@@ -10,6 +10,7 @@ public sealed class TabsUIController : UIController
     [Dependency] private readonly StatisticsTabUIController _statistics = default!;
     [Dependency] private readonly VisualsTabUIController _visuals = default!;
     [Dependency] private readonly SimulationTabUIController _simulation = default!;
+    [Dependency] private readonly SubgridEditorTabUIController _editor = default!;
 
     public override void Initialize()
     {
@@ -25,6 +26,7 @@ public sealed class TabsUIController : UIController
         _statistics.LoadButton();
         _visuals.LoadButton();
         _simulation.LoadButton();
+        _editor.LoadButton();
     }
 
     public void UnloadButtons()
@@ -32,5 +34,6 @@ public sealed class TabsUIController : UIController
         _statistics.UnloadButton();
         _visuals.UnloadButton();
         _simulation.UnloadButton();
+        _editor.UnloadButton();
     }
 }

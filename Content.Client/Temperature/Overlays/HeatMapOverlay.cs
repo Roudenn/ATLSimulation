@@ -53,9 +53,11 @@ public sealed class HeatMapOverlay : Overlay
                 var box = Box2.CenteredAround(worldTilePos.Position + tileWorldSize / 2, tileWorldSize);
                 var temperature = tile.ArchivedContainer.Temperature;
                 args.WorldHandle.DrawRect(box,
-                    temperature >= 0
-                        ? ProgressColorHelpers.GradientWarm(temperature, PhysicalConstants.ZERO_CELCIUS + 100f, PhysicalConstants.ROOM_TEMPERATURE).WithAlpha(0.5f)
-                        : ProgressColorHelpers.GradientCold(temperature, PhysicalConstants.ZERO_CELCIUS, 0f).WithAlpha(0.5f));
+                    ProgressColorHelpers.GradientHeatVisor(
+                            temperature,
+                            PhysicalConstants.TCMB,
+                            PhysicalConstants.ZERO_CELCIUS + 1000f)
+                        .WithAlpha(0.5f));
             }
         }
     }

@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using Content.Server.SubGrid;
+﻿using Content.Server.SubGrid;
 using Content.Shared.Subgrid.Chunks;
 using Content.Shared.Subgrid.Components;
 using Content.Shared.Subgrid.Systems;
