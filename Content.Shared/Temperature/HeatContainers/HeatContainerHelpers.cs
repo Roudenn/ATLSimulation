@@ -18,7 +18,7 @@ public static partial class HeatContainerHelpers
     [PublicAPI]
     public static void AddHeat<T>(ref T c, float dQ) where T : IHeatContainer
     {
-        c.Temperature = AddHeatQuery(ref c, dQ);
+        c.Temperature = c.Immutable ? c.Temperature : AddHeatQuery(ref c, dQ);
     }
 
     /// <summary>
@@ -49,6 +49,9 @@ public static partial class HeatContainerHelpers
     public static void SetHeatCapacity<T>(ref T c, float newHeatCapacity) where T : IHeatContainer
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(c.HeatCapacity);
+        if (c.Immutable)
+            return;
+
         var currentEnergy = c.InternalEnergy;
         c.HeatCapacity = newHeatCapacity;
         c.Temperature = currentEnergy / c.HeatCapacity;

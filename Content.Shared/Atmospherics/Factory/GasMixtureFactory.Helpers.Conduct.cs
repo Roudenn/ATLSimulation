@@ -13,8 +13,8 @@ public sealed partial class GasMixtureFactory
         where T2 : IGasMixture
     {
         var dQ = ConductHeatQuery(ref cA, ref cB, cLength, cLength, deltaTime);
-        HeatContainerHelpers.AddHeat(ref cA, dQ);
-        AddHeat(ref cB, -dQ);
+        HeatContainerHelpers.AddHeat(ref cA, cA.Immutable ? 0f : dQ);
+        AddHeat(ref cB, cB.Immutable ? 0f : -dQ);
         return dQ;
     }
 
@@ -58,8 +58,8 @@ public sealed partial class GasMixtureFactory
     public float ConductHeat<T>(ref ConductiveHeatContainer c, ref T m, float cLength, float deltaTime) where T : IGasMixture
     {
         var dQ = ConductHeatQuery(ref c, ref m, cLength, cLength, deltaTime);
-        HeatContainerHelpers.AddHeat(ref c, dQ);
-        AddHeat(ref m, -dQ);
+        HeatContainerHelpers.AddHeat(ref c, c.Immutable ? 0f : dQ);
+        AddHeat(ref m, m.Immutable ? 0f : -dQ);
         return dQ;
     }
 
@@ -93,60 +93,6 @@ public sealed partial class GasMixtureFactory
 
         // Clamp the transferred heat amount in case we are overshooting the equilibrium temperature because our time step was too large.
         return Math.Clamp(dQ, -dQMax, dQMax);
-    }
-
-    [PublicAPI]
-    public float ConductHeatVelocity<T>(ref T c, ref GasMixture m, float cLength, float heatG, float deltaTime) where T : IHeatContainer
-    {
-        var dQ = ConductHeatQuery(ref c, ref m, cLength, cLength, deltaTime);
-        HeatContainerHelpers.AddHeat(ref c, dQ);
-        AddHeat(ref m, -dQ);
-        return dQ;
-    }
-
-    /// <summary>
-    /// Calculates the amount of heat that would be conducted between two <see cref="IHeatContainer"/>s,
-    /// given some time delta. Does not modify the containers.
-    /// </summary>
-    /// <param name="c">The <see cref="IHeatContainer"/> to conduct heat to.</param>
-    /// <param name="m">The <see cref="IGasMixture"/> to conduct heat to.</param>
-    /// <param name="cLength">Characteristic length of a gas mixture</param>
-    /// <param name="heatG">The thermal conductance of the heat container in watt per kelvin.</param>
-    /// <param name="deltaTime">
-    /// The amount of time that the heat is allowed to conduct, in seconds.
-    /// This value should be small such that deltaTime &lt;&lt; C / g where C is the heat capacity of the container.
-    /// If you need to simulate a larger time step split it into several smaller ones.
-    /// </param>
-    /// <returns>The amount of heat in joules that would be exchanged between the bodies.</returns>
-    /// <example>A positive value indicates heat transfer from a hot c2 to a cold c1.</example>
-    /// <remarks>
-    /// This performs a single step using the Euler method for solving the Fourier heat equation
-    /// \frac{dQ}{dt} = g \Delta T.
-    /// If we need more precision in the future consider using a higher order integration scheme.
-    /// If we need support for larger time steps in the future consider adding a method to split the time delta into several
-    /// integration steps with adaptive step size.
-    /// </remarks>
-    [PublicAPI]
-    public float ConductHeatVelocityQuery<T>(ref T c, ref GasMixture m, float cLength, float heatG, float deltaTime) where T : IHeatContainer
-    {
-        // The harmonic mean is used because conductance adds up inversely proportional.
-        var mixtureG = GetThermalConductivity(ref m) * cLength;
-        var g = 2f * heatG * mixtureG / (heatG + mixtureG);
-        var dQ = g * (m.Temperature - c.Temperature) * deltaTime;
-        var dQMax = Math.Min(Math.Abs(HeatContainerHelpers.ConductHeatToTempQuery(ref c, m.Temperature)),
-            Math.Abs(ConductHeatToTempQuery(ref m, c.Temperature)));
-
-        // Clamp the transferred heat amount in case we are overshooting the equilibrium temperature because our time step was too large.
-        return Math.Clamp(dQ, -dQMax, dQMax);
-    }
-
-    [PublicAPI]
-    public float ConductHeatVelocity(ref ConductiveHeatContainer c, ref GasMixture m, float cLength, float surfaceArea, float deltaTime)
-    {
-        var dQ = ConductHeatQuery(ref c, ref m, cLength, cLength, deltaTime);
-        HeatContainerHelpers.AddHeat(ref c, dQ);
-        AddHeat(ref m, -dQ);
-        return dQ;
     }
 
     /// <summary>

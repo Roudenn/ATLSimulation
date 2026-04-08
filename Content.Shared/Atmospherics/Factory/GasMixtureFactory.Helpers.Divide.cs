@@ -23,6 +23,7 @@ public sealed partial class GasMixtureFactory
         NumericsHelpers.Sub(c.Moles, cSplit.Moles);
 
         cSplit.Temperature = c.Temperature;
+        cSplit.Immutable = c.Immutable;
     }
 
     /// <summary>

@@ -15,7 +15,7 @@ public sealed partial class GasMixtureFactory
     [PublicAPI]
     public void AddHeat<T>(ref T m, float dQ) where T : IGasMixture
     {
-        m.Temperature = AddHeatQuery(ref m, dQ);
+        m.Temperature = m.Immutable ? m.Temperature : AddHeatQuery(ref m, dQ);
     }
 
     /// <summary>

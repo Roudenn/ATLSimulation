@@ -19,6 +19,9 @@ public sealed partial class GasMixtureFactory
         where T1 : IGasMixture
         where T2 : IGasMixture
     {
+        if (mA.Immutable)
+            return;
+
         var combinedHeatCapacity = GetHeatCapacity(ref mA) + GetHeatCapacity(ref mB);
         var temp = (GetInternalEnergy(ref mA) + GetHeatCapacity(ref mB)) / combinedHeatCapacity;
         mA.Temperature = temp;
@@ -35,6 +38,9 @@ public sealed partial class GasMixtureFactory
         where T1 : IGasMixture
         where T2 : IGasMixture
     {
+        if (mA.Immutable)
+            return;
+
         Merge(ref mA, ref mB);
         mA.Volume += mB.Volume;
     }
@@ -71,6 +77,9 @@ public sealed partial class GasMixtureFactory
         where T1 : IGasMixture
         where T2 : IGasMixture
     {
+        if (result.Immutable)
+            return;
+
         var totalHeatCapacity = 0f;
         var totalEnergy = 0f;
 
@@ -95,6 +104,9 @@ public sealed partial class GasMixtureFactory
         where T1 : IGasMixture
         where T2 : IGasMixture
     {
+        if (result.Immutable)
+            return;
+
         var totalHeatCapacity = 0f;
         var totalEnergy = 0f;
         var totalVolume = 0f;

@@ -38,7 +38,10 @@ public sealed partial class AtmosphericsSystem : SharedAtmosphericsSystem
 
         foreach (var index in indexes)
         {
-            GasManager.AddHeat(ref chunk.Value.Comp.ChunkData.AtmosphereMap[index].Mixture, energy);
+            if (!chunk.Value.Comp.ChunkData.AtmosphereMap[index].Initialized)
+                continue;
+
+            GasManager.AddHeat(ref chunk.Value.Comp.ChunkData.AtmosphereMap[index].ArchivedMixture, energy);
         }
     }
 
@@ -53,7 +56,10 @@ public sealed partial class AtmosphericsSystem : SharedAtmosphericsSystem
 
         foreach (var index in indexes)
         {
-            GasManager.AddMoles(ref chunk.Value.Comp.ChunkData.AtmosphereMap[index].Mixture, gas, moles);
+            if (!chunk.Value.Comp.ChunkData.AtmosphereMap[index].Initialized)
+                continue;
+
+            GasManager.AddMoles(ref chunk.Value.Comp.ChunkData.AtmosphereMap[index].ArchivedMixture, gas, moles);
         }
     }
 }
