@@ -17,6 +17,7 @@ public abstract partial class SharedSubGridSystem
 
         var tile = MapSystem.GetTileRef(grid, gridComp, args.TileIndices);
         _atmospherics.AddHeatArea((grid, subGridComp, gridComp), tile, args.Energy);
+        _temperature.AddHeatArea((grid, subGridComp, gridComp), tile, args.Energy);
     }
 
     private void OnAddMoles(SubGridAddMolesMessage args)

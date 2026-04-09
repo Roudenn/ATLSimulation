@@ -32,7 +32,7 @@ public sealed partial class SubGridSystem
         SubscribeLocalEvent<SubGridChunkComponent, SubGridChunkInitializeEvent>(OnChunkInit);
         SubscribeLocalEvent<SubGridChunkComponent, EntityTerminatingEvent>(OnChunkDeleted);
 
-        SubscribeLocalEvent<SubGridResizedEvent>(OnGridResized);
+        //SubscribeLocalEvent<SubGridResizedEvent>(OnGridResized);
         SubscribeLocalEvent<SubGridHeightChangedEvent>(OnGridHeightChanged);
     }
 
@@ -41,14 +41,26 @@ public sealed partial class SubGridSystem
         var chunkQuery = EntityQueryEnumerator<SubGridChunkComponent>();
         while (chunkQuery.MoveNext(out var chunk, out var chunkComp))
         {
-            foreach (var atmosTile in chunkComp.ChunkData.AtmosphereMap)
+            var newAtmosphere = new TileAtmos[SubGridChunkArea];
+            var newTemperature = new TileHeat[SubGridChunkArea];
+
+            // Handle division of the subgrid
+            if (SubGridDivisions - ev.OldDivisions > 0)
             {
+                var divisions = 1 << (SubGridDivisions - ev.OldDivisions);
+                var atmosDivisionBuffer = new GasMixture[divisions];
+                var bufferMix = _atmos.GetEmptyMixture();
 
-            }
+                foreach (var atmosTile in chunkComp.ChunkData.AtmosphereMap)
+                {
+                    GasFactory.Divide(atmosTile.ArchivedMixture, ref bufferMix, atmosDivisionBuffer, (uint) divisions);
 
-            foreach (var heatTile in chunkComp.ChunkData.TemperatureMap)
-            {
+                }
 
+                foreach (var heatTile in chunkComp.ChunkData.TemperatureMap)
+                {
+
+                }
             }
         }
     }
@@ -214,7 +226,7 @@ public sealed partial class SubGridSystem
         SubGridChunk chunk,
         GasMixture? mixture = null)
     {
-        mixture ??= _atmos.GetSpaceTileMixture();
+        mixture ??= _atmos.GetEmptyMixture();
         var subTiles = GetAreaTileIndexesAtTile(chunkIndices, gridIndices, grid.Comp2.TileSizeVector);
         foreach (var index in subTiles)
         {
@@ -250,7 +262,7 @@ public sealed partial class SubGridSystem
         Dictionary<Vector2i, SubGridChunk> nearChunks)
     {
         // Check if it is located near space, and add a boundary layer of atmosphere tiles.
-        var spaceMix = _atmos.GetSpaceTileMixture();
+        var spaceMix = _atmos.GetEmptyMixture();
         GasFactory.MarkImmutable(ref spaceMix);
         foreach (var vecDir in DirectionsWithDiagonals)
         {
@@ -320,7 +332,7 @@ public sealed partial class SubGridSystem
             var material = _proto.Index(materialComp.Material);
             temperature = tempContainer.StartingTemperature;
             // Volume * Density = Mass, SpecificHeatCapacity * Mass = HeatCapacity.
-            heatCapacity = material.SpecificHeatCapacity * SubGridTileVolume * material.Density;
+            heatCapacity = material.SpecificHeatCapacity / 100f * SubGridTileVolume * material.Density;
             // Conductance = ThermalConductivity * Characteristic Length.
             // Height is taken because of how Fourier's Law is canceled out for rectangular prisms.
             conductance = material.ThermalConductivity * SubGridHeight;

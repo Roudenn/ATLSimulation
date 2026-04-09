@@ -1,6 +1,7 @@
 ﻿using Content.Shared.Atmospherics.Factory;
 using Content.Shared.Atmospherics.Systems;
 using Content.Shared.Subgrid.Components;
+using Content.Shared.Temperature.Systems;
 using Robust.Shared.Configuration;
 using Robust.Shared.Map.Components;
 
@@ -13,6 +14,7 @@ public abstract partial class SharedSubGridSystem : EntitySystem
     [Dependency] protected readonly SharedMapSystem MapSystem = default!;
     [Dependency] protected readonly GasMixtureFactory GasFactory = default!;
     [Dependency] private readonly SharedAtmosphericsSystem _atmospherics = default!;
+    [Dependency] private readonly SharedTemperatureSystem _temperature = default!;
 
     protected EntityQuery<MapGridComponent> MapGridQuery;
     protected EntityQuery<SubGridComponent> SubGridQuery;

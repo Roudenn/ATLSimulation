@@ -7,7 +7,7 @@ namespace Content.Shared.Subgrid;
 /// variable is changed for other systems to handle it.
 /// </summary>
 [ByRefEvent]
-public record struct SubGridResizedEvent();
+public record struct SubGridResizedEvent(int OldDivisions);
 
 /// <summary>
 /// Event that is raised when <see cref="GameConfigVars.SubGridHeight"/>

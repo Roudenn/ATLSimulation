@@ -22,7 +22,7 @@ public abstract partial class SharedAtmosphericsSystem
     [PublicAPI]
     public GasMixture GetGridMixture(EntityUid grid)
     {
-        var mixture = GetSpaceTileMixture();
+        var mixture = GetEmptyMixture();
         if (_atmosGridQuery.TryComp(grid, out var gridComp))
             mixture = (GasMixture) _protoMan.Index(gridComp.Mixture)
                 .Definition.CreateMixture(
@@ -33,7 +33,7 @@ public abstract partial class SharedAtmosphericsSystem
     }
 
     [PublicAPI]
-    public GasMixture GetSpaceTileMixture()
+    public GasMixture GetEmptyMixture()
     {
         return new GasMixture(GasManager.ArraySize, _subGrid.SubGridTileVolume, PhysicalConstants.TCMB);
     }

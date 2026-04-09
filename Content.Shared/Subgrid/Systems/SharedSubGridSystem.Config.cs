@@ -73,6 +73,7 @@ public abstract partial class SharedSubGridSystem
         if (num < 0 || num > 5)
             num = Math.Clamp(num, 0, 5);
 
+        var oldDivisions = SubGridDivisions;
         SubGridDivisions = num;
         SubGridTileSize = 1 << num; // Equivalent to Math.Pow(2, num)
         SubGridWorldSize = 1 / (float) (1 << num);
@@ -80,7 +81,7 @@ public abstract partial class SharedSubGridSystem
         SubGridChunkArea = SystemConstants.PvsChunkSize * (1 << num) * SystemConstants.PvsChunkSize * (1 << num);
         UpdateVolumeValue();
 
-        var ev = new SubGridResizedEvent();
+        var ev = new SubGridResizedEvent(oldDivisions);
         RaiseLocalEvent(ref ev);
     }
 

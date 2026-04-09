@@ -1,5 +1,8 @@
 ﻿using Content.Shared.GameCVars;
+using Content.Shared.Subgrid.Components;
 using Robust.Shared.Configuration;
+using Robust.Shared.Map;
+using Robust.Shared.Map.Components;
 
 namespace Content.Shared.Temperature.Systems;
 
@@ -23,4 +26,6 @@ public abstract class SharedTemperatureSystem : EntitySystem
         Subs.CVar(CfgManager, GameConfigVars.HeatSpeedup, f => HeatSpeedup = f, true);
         Subs.CVar(CfgManager, GameConfigVars.HeatSteps, i => HeatSteps = i, true);
     }
+
+    public virtual void AddHeatArea(Entity<SubGridComponent?, MapGridComponent?> grid, TileRef tile, float energy) { }
 }

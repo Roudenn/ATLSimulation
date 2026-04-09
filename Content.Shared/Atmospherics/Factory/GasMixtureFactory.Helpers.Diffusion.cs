@@ -20,12 +20,12 @@ public sealed partial class GasMixtureFactory
         where T1 : IGasMixture
         where T2 : IGasMixture
     {
-        var buffer1 = SharedPool.Rent();
-        var buffer2 = SharedPool.Rent();
+        var buffer1 = pool.Rent();
+        var buffer2 = pool.Rent();
         DiffuseMixturesQuery(ref m1, ref m2, buffer1, buffer2, cLength, frameTime);
         TransferMoles(ref m1, ref m2, buffer1, buffer2);
-        SharedPool.Return(buffer1, true);
-        SharedPool.Return(buffer2, true);
+        pool.Return(buffer1, true);
+        pool.Return(buffer2, true);
     }
 
     [PublicAPI]

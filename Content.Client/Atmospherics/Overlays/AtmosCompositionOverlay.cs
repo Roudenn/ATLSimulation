@@ -36,7 +36,7 @@ public sealed class AtmosCompositionOverlay : Overlay
         var viewport = _eyeManager.GetWorldViewport();
         var boxVector = new Vector2i(SystemConstants.PvsChunkSize, SystemConstants.PvsChunkSize);
         var query = _entityManager.EntityQueryEnumerator<SubGridChunkComponent, TransformComponent>();
-        var tileWorldSize = new Vector2(1f / _subGrid.SubGridTileSize);
+        var tileWorldSize = new Vector2(_subGrid.SubGridWorldSize);
         var buffer = _gasManager.SharedPool.Rent();
         while (query.MoveNext(out var uid, out var subgrid, out var xform))
         {

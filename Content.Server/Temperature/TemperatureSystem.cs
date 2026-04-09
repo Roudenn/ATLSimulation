@@ -3,8 +3,11 @@ using Content.Shared.Subgrid.Chunks;
 using Content.Shared.Subgrid.Components;
 using Content.Shared.Subgrid.Systems;
 using Content.Shared.Temperature;
+using Content.Shared.Temperature.HeatContainers;
 using Content.Shared.Temperature.Systems;
 using Robust.Shared.Collections;
+using Robust.Shared.Map;
+using Robust.Shared.Map.Components;
 using Robust.Shared.Threading;
 using Robust.Shared.Timing;
 
@@ -17,6 +20,7 @@ public sealed class TemperatureSystem : SharedTemperatureSystem
     [Dependency] private readonly IParallelManager _parallel = default!;
 
     private EntityQuery<SubGridChunkComponent> _subgridChunkQuery;
+    private EntityQuery<MapGridComponent> _mapGridQuery;
 
     private TimeSpan _lastUpdate = TimeSpan.Zero;
 
@@ -26,6 +30,7 @@ public sealed class TemperatureSystem : SharedTemperatureSystem
     {
         base.Initialize();
         _subgridChunkQuery = GetEntityQuery<SubGridChunkComponent>();
+        _mapGridQuery = GetEntityQuery<MapGridComponent>();
         _job = new(_subGrid, this);
     }
 
@@ -130,5 +135,23 @@ public sealed class TemperatureSystem : SharedTemperatureSystem
         }
 
         return tile;
+    }
+
+    public override void AddHeatArea(Entity<SubGridComponent?, MapGridComponent?> grid, TileRef tile, float energy)
+    {
+        if (!_mapGridQuery.Resolve(grid.Owner, ref grid.Comp2)
+            || !_subGrid.TryGetChunk(grid, tile, out var chunk))
+            return;
+
+        var indexes = _subGrid.GetAreaTileIndexesAtTile(chunk.Value.Comp.ChunkIndices, tile.GridIndices, grid.Comp2.TileSizeVector);
+        energy /= indexes.Length;
+
+        foreach (var index in indexes)
+        {
+            if (!chunk.Value.Comp.ChunkData.TemperatureMap[index].Initialized)
+                continue;
+
+            HeatContainerHelpers.AddHeat(ref chunk.Value.Comp.ChunkData.TemperatureMap[index].ArchivedContainer, energy);
+        }
     }
 }

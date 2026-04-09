@@ -8,7 +8,7 @@ public sealed partial class GameConfigVars
         CVarDef.Create("heat.enabled", false, CVar.SERVER | CVar.REPLICATED | CVar.ARCHIVE);
 
     public static readonly CVarDef<float> HeatSpeedup =
-        CVarDef.Create("heat.speedup", 100f, CVar.SERVER | CVar.REPLICATED);
+        CVarDef.Create("heat.speedup", 1f, CVar.SERVER | CVar.REPLICATED);
 
     public static readonly CVarDef<int> HeatSteps =
         CVarDef.Create("heat.steps", 3, CVar.SERVER | CVar.REPLICATED);

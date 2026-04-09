@@ -18,16 +18,16 @@ public static class ProgressColorHelpers
 
     private static readonly Color[] HeatColors = new Color[]
     {
-        Color.Purple,
-        Color.Violet,
-        Color.Blue,
-        Color.Cyan,
-        Color.Green,
-        Color.Lime,
-        Color.Yellow,
-        Color.Orange,
-        Color.Red,
         Color.White,
+        Color.Red,
+        Color.Orange,
+        Color.Yellow,
+        Color.Lime,
+        Color.Green,
+        Color.Cyan,
+        Color.Blue,
+        Color.Violet,
+        Color.Purple,
     };
 
     public static Color GradientHeatVisor(float value, float min, float max)
