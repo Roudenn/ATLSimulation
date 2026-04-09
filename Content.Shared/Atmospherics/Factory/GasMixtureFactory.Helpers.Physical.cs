@@ -60,7 +60,7 @@ public sealed partial class GasMixtureFactory
         var buffer = pool.Rent();
         NumericsHelpers.Multiply(m.Moles, Prototypes.GasSpecificHeats, buffer);
         var result = MathF.Max(NumericsHelpers.HorizontalAdd(buffer), SystemConstants.Epsilon);
-        pool.Return(buffer, true);
+        pool.Return(buffer);
         return result;
     }
 
@@ -84,8 +84,8 @@ public sealed partial class GasMixtureFactory
         GetMolesRatio(ref m, buffer1);
         NumericsHelpers.Multiply(buffer1, Prototypes.GasSpecificHeats, buffer2);
         var result = MathF.Max(NumericsHelpers.HorizontalAdd(buffer2), SystemConstants.Epsilon);
-        pool.Return(buffer1, true);
-        pool.Return(buffer2, true);
+        pool.Return(buffer1);
+        pool.Return(buffer2);
         return result;
     }
 
@@ -110,8 +110,8 @@ public sealed partial class GasMixtureFactory
         NumericsHelpers.Multiply(buffer1, Prototypes.GasThermalConductivities, buffer2);
         var bottomPart = NumericsHelpers.HorizontalAdd(buffer1);
         var topPart = NumericsHelpers.HorizontalAdd(buffer2);
-        pool.Return(buffer1, true);
-        pool.Return(buffer2, true);
+        pool.Return(buffer1);
+        pool.Return(buffer2);
         return topPart / MathF.Max(bottomPart, SystemConstants.Epsilon);
     }
 
@@ -127,7 +127,7 @@ public sealed partial class GasMixtureFactory
         var buffer = pool.Rent();
         NumericsHelpers.Multiply(m.Moles, Prototypes.GasMolarMasses, buffer);
         var result = NumericsHelpers.HorizontalAdd(buffer) / 1000f;
-        pool.Return(buffer, true);
+        pool.Return(buffer);
         return result;
     }
 
@@ -158,8 +158,8 @@ public sealed partial class GasMixtureFactory
         NumericsHelpers.Multiply(buffer1, Prototypes.GasViscosities, buffer2);
         var bottomPart = NumericsHelpers.HorizontalAdd(buffer1);
         var topPart = NumericsHelpers.HorizontalAdd(buffer2);
-        pool.Return(buffer1, true);
-        pool.Return(buffer2, true);
+        pool.Return(buffer1);
+        pool.Return(buffer2);
         return topPart / MathF.Max(bottomPart, SystemConstants.Epsilon) * 10e-7f;
     }
 

@@ -71,6 +71,6 @@ public sealed class AtmosCompositionOverlay : Overlay
                 }
             }
         }
-        _gasManager.SharedPool.Return(buffer, true);
+        _gasManager.SharedPool.Return(buffer);
     }
 }

@@ -24,8 +24,8 @@ public sealed partial class GasMixtureFactory
         var buffer2 = pool.Rent();
         DiffuseMixturesQuery(ref m1, ref m2, buffer1, buffer2, cLength, frameTime);
         TransferMoles(ref m1, ref m2, buffer1, buffer2);
-        pool.Return(buffer1, true);
-        pool.Return(buffer2, true);
+        pool.Return(buffer1);
+        pool.Return(buffer2);
     }
 
     [PublicAPI]
@@ -41,8 +41,8 @@ public sealed partial class GasMixtureFactory
         var buffer2 = pool.Rent();
         DiffuseMixturesQuery(ref t1.ArchivedMixture, ref t2.ArchivedMixture, buffer1, buffer2, cLength, frameTime, pool);
         TransferMoles(ref t1.Mixture, ref t2.Mixture, buffer1, buffer2, pool);
-        pool.Return(buffer1, true);
-        pool.Return(buffer2, true);
+        pool.Return(buffer1);
+        pool.Return(buffer2);
     }
 
     [PublicAPI]
@@ -257,8 +257,8 @@ public sealed partial class GasMixtureFactory
         // Get the results
         NumericsHelpers.Divide(buffer1, buffer3, diffusion);
 
-        pool.Return(buffer1, true);
-        pool.Return(buffer2, true);
-        pool.Return(buffer3, true);
+        pool.Return(buffer1);
+        pool.Return(buffer2);
+        pool.Return(buffer3);
     }
 }

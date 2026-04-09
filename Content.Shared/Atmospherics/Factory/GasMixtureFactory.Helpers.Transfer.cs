@@ -11,7 +11,7 @@ public sealed partial class GasMixtureFactory
         var buffer = pool.Rent();
         ShareTilesQuery(ref m1.ArchivedMixture, m2.ArchivedMixture, cLength, deltaTime, k, buffer, pool);
         TransferMoles(ref m1.Mixture, m2.ArchivedMixture, buffer, pool);
-        pool.Return(buffer, true);
+        pool.Return(buffer);
     }
 
     public void ShareTilesQuery<T1, T2>(
@@ -32,8 +32,8 @@ public sealed partial class GasMixtureFactory
         GetPartialPressures(ref m2, buffer2);
         NumericsHelpers.Sub(buffer1, buffer2, moles);
         NumericsHelpers.Multiply(moles, deltaTime * cLength * k);
-        pool.Return(buffer1, true);
-        pool.Return(buffer2, true);
+        pool.Return(buffer1);
+        pool.Return(buffer2);
     }
 
     /// <summary>
@@ -70,8 +70,8 @@ public sealed partial class GasMixtureFactory
         NumericsHelpers.Multiply(secondMoles, Prototypes.GasSpecificHeats, buffer2);
         var heatCapacityToSharer = Math.Abs(NumericsHelpers.HorizontalAdd(buffer1));
         var heatCapacitySharerToThis = Math.Abs(NumericsHelpers.HorizontalAdd(buffer2));
-        pool.Return(buffer1, true);
-        pool.Return(buffer2, true);
+        pool.Return(buffer1);
+        pool.Return(buffer2);
 
         if (!m1.Immutable)
         {
@@ -120,8 +120,8 @@ public sealed partial class GasMixtureFactory
         NumericsHelpers.Multiply(secondMoles, Prototypes.GasSpecificHeats, buffer2);
         var heatCapacityToSharer = Math.Abs(NumericsHelpers.HorizontalAdd(buffer1));
         var heatCapacitySharerToThis = Math.Abs(NumericsHelpers.HorizontalAdd(buffer2));
-        pool.Return(buffer1, true);
-        pool.Return(buffer2, true);
+        pool.Return(buffer1);
+        pool.Return(buffer2);
 
         if (!m1.Immutable)
         {
@@ -161,8 +161,8 @@ public sealed partial class GasMixtureFactory
         NumericsHelpers.Multiply(buffer2, -1f);
         var heatCapacityToSharer = Math.Abs(NumericsHelpers.HorizontalAdd(buffer1));
         var heatCapacitySharerToThis = Math.Abs(NumericsHelpers.HorizontalAdd(buffer2));
-        pool.Return(buffer1, true);
-        pool.Return(buffer2, true);
+        pool.Return(buffer1);
+        pool.Return(buffer2);
 
         if (!m1.Immutable)
         {
