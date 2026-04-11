@@ -1,5 +1,5 @@
 ﻿using System.Numerics;
-using Content.Shared.Atmospherics.Factory;
+using Content.Client.UserInterface.Systems;
 using Content.Shared.Constants;
 using Content.Shared.Subgrid.Components;
 using Content.Shared.Subgrid.Systems;
@@ -10,21 +10,19 @@ using Robust.Shared.Map;
 namespace Content.Client.Atmospherics.Overlays;
 
 /// <summary>
-/// Shows gas composition of the atmosphere.
+/// Shows the temperature of all heat containers on the map.
 /// </summary>
-public sealed class AtmosCompositionOverlay : Overlay
+public sealed class AtmosHeatMapOverlay : Overlay
 {
     private readonly IEntityManager _entityManager;
     private readonly IEyeManager _eyeManager;
-    private readonly GasMixtureFactory _gasManager;
     private readonly SharedTransformSystem _xform;
     private readonly SharedSubGridSystem _subGrid;
 
-    public AtmosCompositionOverlay(IEntityManager entityManager, IEyeManager eyeManager, GasMixtureFactory gasManager, SharedTransformSystem xform, SharedSubGridSystem subGrid)
+    public AtmosHeatMapOverlay(IEntityManager entityManager, IEyeManager eyeManager, SharedTransformSystem xform, SharedSubGridSystem subGrid)
     {
         _entityManager = entityManager;
         _eyeManager = eyeManager;
-        _gasManager = gasManager;
         _xform = xform;
         _subGrid = subGrid;
     }
@@ -37,7 +35,6 @@ public sealed class AtmosCompositionOverlay : Overlay
         var boxVector = new Vector2i(SystemConstants.PvsChunkSize, SystemConstants.PvsChunkSize);
         var query = _entityManager.EntityQueryEnumerator<SubGridChunkComponent, TransformComponent>();
         var tileWorldSize = new Vector2(_subGrid.SubGridWorldSize);
-        var buffer = _gasManager.SharedPool.Rent();
         while (query.MoveNext(out var uid, out var subgrid, out var xform))
         {
             var worldPos = _xform.GetMapCoordinates(uid, xform);
@@ -53,24 +50,15 @@ public sealed class AtmosCompositionOverlay : Overlay
 
                 var pos = _subGrid.GetPositionFromIndex(subgrid.ChunkIndices, i);
                 var worldTilePos = _xform.ToMapCoordinates(new EntityCoordinates(subgrid.ParentGrid, pos));
-                var box = Box2.CenteredAround(worldTilePos.Position + tileWorldSize / 2f, tileWorldSize);
-
-                for (int j = 0; j < _gasManager.ArraySize; j++)
-                {
-                    if (tile.Mixture.Moles[j] < SystemConstants.GasMinMoles)
-                        continue;
-
-                    var color = _gasManager[j].Color;
-                    for (int k = 0; k < buffer.Length; k++)
-                    {
-                        buffer[k] = 0f;
-                    }
-                    _gasManager.GetMolesRatio(ref tile.Mixture, buffer);
-                    var alpha = buffer[j] / 4f;
-                    args.WorldHandle.DrawRect(box, color.WithAlpha(alpha));
-                }
+                var box = Box2.CenteredAround(worldTilePos.Position + tileWorldSize / 2, tileWorldSize);
+                var temperature = tile.CachedMixture.Temperature;
+                args.WorldHandle.DrawRect(box,
+                    ProgressColorHelpers.GradientWarm(
+                            temperature,
+                            PhysicalConstants.TCMB,
+                            PhysicalConstants.ZERO_CELCIUS + 1000f)
+                        .WithAlpha(0.3f));
             }
         }
-        _gasManager.SharedPool.Return(buffer);
     }
 }

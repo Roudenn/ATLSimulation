@@ -12,17 +12,17 @@ public partial struct TileAtmos : IRobustCloneable<TileAtmos>, ISubGridTile
     /// </summary>
     /// <remarks>
     /// This is write-only data when calculating the new atmos state.
-    /// If you need to get safe information about the mixture, check <see cref="ArchivedMixture"/>
+    /// If you need to get safe information about the mixture, check <see cref="Mixture"/>
     /// </remarks>
     [DataField]
-    public GasMixture Mixture;
+    public GasMixture CachedMixture;
 
     /// <summary>
     /// Contains the state of tile's gas mixture on the previous atmos tick.
-    /// When the tile is first created, it's the same as the basic <see cref="Mixture"/>.
+    /// When the tile is first created, it's the same as the basic <see cref="CachedMixture"/>.
     /// </summary>
     [DataField]
-    public GasMixture ArchivedMixture;
+    public GasMixture Mixture;
 
     /// <summary>
     /// If true, this tile shares the mixture of air with the parent map.
@@ -40,17 +40,17 @@ public partial struct TileAtmos : IRobustCloneable<TileAtmos>, ISubGridTile
     [ViewVariables]
     public int LastTick { get; set; }
 
-    public TileAtmos(GasMixture mixture)
+    public TileAtmos(GasMixture cachedMixture)
     {
-        Mixture = mixture;
-        ArchivedMixture = mixture;
-        MapAtmosphere = mixture.Immutable;
+        CachedMixture = cachedMixture;
+        Mixture = cachedMixture;
+        MapAtmosphere = cachedMixture.Immutable;
     }
 
     public TileAtmos(TileAtmos c)
     {
+        CachedMixture = c.CachedMixture;
         Mixture = c.Mixture;
-        ArchivedMixture = c.ArchivedMixture;
         MapAtmosphere = c.MapAtmosphere;
     }
 

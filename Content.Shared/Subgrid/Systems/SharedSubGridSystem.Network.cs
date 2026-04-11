@@ -30,7 +30,7 @@ public abstract partial class SharedSubGridSystem
             if (!atmosMap[i].Initialized)
                 continue;
 
-            ent.Comp.AtmosBuffer[i] = atmosMap[i].ArchivedMixture;
+            ent.Comp.AtmosBuffer[i] = atmosMap[i].Mixture;
         }
 
         var tempMap = ent.Comp.ChunkData.TemperatureMap;
@@ -39,7 +39,7 @@ public abstract partial class SharedSubGridSystem
             if (!tempMap[i].Initialized)
                 continue;
 
-            ent.Comp.HeatBuffer[i] = tempMap[i].ArchivedContainer;
+            ent.Comp.HeatBuffer[i] = tempMap[i].Container;
         }
 
         args.State = new SubGridChunkComponentState(GetNetEntity(ent.Comp.ParentGrid), ent.Comp.ChunkIndices, ent.Comp.AtmosBuffer, ent.Comp.HeatBuffer);

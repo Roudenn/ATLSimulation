@@ -8,15 +8,13 @@
                 <!-- Atmosphere -->
                 <Label Text="{Loc 'ui-viewport-header-atmosphere'}" StyleClasses="LabelKeyText"/>
                 <CheckBox Name="AtmosphereVisibilityCheckBox" Text="{Loc 'ui-viewport-tabs-visuals-atmosphere-visibility'}" Access="Public"/>
+                <CheckBox Name="AtmosphereTemperatureCheckBox" Text="{Loc 'ui-viewport-tabs-visuals-atmosphere-temperature'}" Access="Public"/>
                 <CheckBox Name="AtmospherePressureCheckBox" Text="{Loc 'ui-viewport-tabs-visuals-atmosphere-pressure'}" Access="Public"/>
-                <CheckBox Name="AtmosphereSpeedCheckBox" Text="{Loc 'ui-viewport-tabs-visuals-atmosphere-speed'}" Access="Public"/>
+                <!--<CheckBox Name="AtmosphereSpeedCheckBox" Text="{Loc 'ui-viewport-tabs-visuals-atmosphere-speed'}" Access="Public"/>-->
 
                 <!-- Temperature & Solids -->
                 <Label Text="{Loc 'ui-viewport-header-temperature'}" StyleClasses="LabelKeyText"/>
                 <CheckBox Name="TemperatureVisibilityCheckBox" Text="{Loc 'ui-viewport-tabs-visuals-temperature-visibility'}" Access="Public"/>
-
-                <CheckBox Name="SolidsHeatCapacityCheckBox" Text="{Loc 'ui-viewport-tabs-visuals-solids-heat-capacity'}" Access="Public"/>
-                <CheckBox Name="SolidsConductivityCheckBox" Text="{Loc 'ui-viewport-tabs-visuals-solids-conductivity'}" Access="Public"/>
                 <CheckBox Name="SolidsInternalEnergyCheckBox" Text="{Loc 'ui-viewport-tabs-visuals-solids-internal-energy'}" Access="Public"/>
 
                 <!-- Debug -->

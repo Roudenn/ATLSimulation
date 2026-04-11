@@ -1,11 +1,20 @@
 ﻿using Content.Shared.Atmospherics.GasMixtures;
+using Content.Shared.Temperature;
 using Content.Shared.Temperature.HeatContainers;
+using Content.Shared.Utils;
 using JetBrains.Annotations;
 
 namespace Content.Shared.Atmospherics.Factory;
 
 public sealed partial class GasMixtureFactory
 {
+    public void ConductTiles(ref TileAtmos m, ref TileHeat c, float cLength, float deltaTime, float k, IRobustArrayPool<float> pool)
+    {
+        var dQ = ConductHeatQuery(ref c.Container, ref m.Mixture, cLength, cLength, deltaTime);
+        HeatContainerHelpers.AddHeat(ref c.CachedContainer, dQ);
+        AddHeat(ref m.CachedMixture, -dQ);
+    }
+
     /// <inheritdoc cref="ConductHeatQuery{T1,T2}"/>
     [PublicAPI]
     public float ConductHeat<T1, T2>(ref T1 cA, ref T2 cB, float cLength, float heatG, float deltaTime)
@@ -13,8 +22,8 @@ public sealed partial class GasMixtureFactory
         where T2 : IGasMixture
     {
         var dQ = ConductHeatQuery(ref cA, ref cB, cLength, cLength, deltaTime);
-        HeatContainerHelpers.AddHeat(ref cA, cA.Immutable ? 0f : dQ);
-        AddHeat(ref cB, cB.Immutable ? 0f : -dQ);
+        HeatContainerHelpers.AddHeat(ref cA, dQ);
+        AddHeat(ref cB, -dQ);
         return dQ;
     }
 

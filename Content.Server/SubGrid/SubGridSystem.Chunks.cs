@@ -53,7 +53,7 @@ public sealed partial class SubGridSystem
 
                 foreach (var atmosTile in chunkComp.ChunkData.AtmosphereMap)
                 {
-                    GasFactory.Divide(atmosTile.ArchivedMixture, ref bufferMix, atmosDivisionBuffer, (uint) divisions);
+                    GasFactory.Divide(atmosTile.Mixture, ref bufferMix, atmosDivisionBuffer, (uint) divisions);
 
                 }
 

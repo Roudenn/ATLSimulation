@@ -16,5 +16,14 @@ public sealed partial class DebugOverlayViewerComponent : Component
     public bool HeatMapOverlay;
 
     [DataField]
+    public bool InternalEnergyOverlay;
+
+    [DataField]
     public bool AtmosCompositionOverlay;
+
+    [DataField]
+    public bool AtmosPressureOverlay;
+
+    [DataField]
+    public bool AtmosTemperatureOverlay;
 }

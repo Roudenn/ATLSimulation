@@ -39,11 +39,11 @@ public sealed partial class GasInspectControl : BoxContainer
         });
         volBox.AddChild(new Label
         {
-            Text = Loc.GetString("gas-analyzer-window-volume-val-text", ("volume", $"{gasMix.Volume:0.##}")),
+            Text = Loc.GetString("gas-analyzer-window-volume-val-text", ("volume", $"{gasMix.Volume:0.####}")),
             Align = Label.AlignMode.Right,
             HorizontalExpand = true
         });
-        DataContainer.AddChild(volBox);
+        CEnvironmentMix.AddChild(volBox);
 
         // Pressure label
         var presBox = new BoxContainer { Orientation = LayoutOrientation.Horizontal };
@@ -63,7 +63,27 @@ public sealed partial class GasInspectControl : BoxContainer
             Align = Label.AlignMode.Right,
             HorizontalExpand = true
         });
-        DataContainer.AddChild(presBox);
+        CEnvironmentMix.AddChild(presBox);
+
+        // Temperature label
+        var tempBox = new BoxContainer { Orientation = LayoutOrientation.Horizontal };
+
+        tempBox.AddChild(new Label
+        {
+            Text = Loc.GetString("gas-analyzer-window-temperature-text")
+        });
+        tempBox.AddChild(new Control
+        {
+            MinSize = new Vector2(10, 0),
+            HorizontalExpand = true
+        });
+        tempBox.AddChild(new Label
+        {
+            Text = Loc.GetString("gas-analyzer-window-temperature-val-text", ("temperature", $"{gasMix.Temperature:0.00}")),
+            Align = Label.AlignMode.Right,
+            HorizontalExpand = true
+        });
+        CEnvironmentMix.AddChild(tempBox);
 
         // If there is no gas, it doesn't really have a temperature, so skip displaying it
         if (gasMix.Pressure > SystemConstants.GasMinMoles)
@@ -74,13 +94,13 @@ public sealed partial class GasInspectControl : BoxContainer
         if (gasMix.Gases == null || gasMix.Gases?.Length == 0)
         {
             // Separator
-            DataContainer.AddChild(new Control
+            CEnvironmentMix.AddChild(new Control
             {
                 MinSize = new Vector2(0, 10)
             });
 
             // Add a label that there are no gases so it's less confusing
-            DataContainer.AddChild(new Label
+            CEnvironmentMix.AddChild(new Label
             {
                 Text = Loc.GetString("gas-analyzer-window-no-gas-text"),
                 FontColorOverride = Color.Gray
@@ -90,7 +110,7 @@ public sealed partial class GasInspectControl : BoxContainer
         }
 
         // Separator
-        DataContainer.AddChild(new Control
+        CEnvironmentMix.AddChild(new Control
         {
             MinSize = new Vector2(0, 10)
         });
@@ -108,7 +128,7 @@ public sealed partial class GasInspectControl : BoxContainer
         {
             Orientation = LayoutOrientation.Vertical
         };
-        DataContainer.AddChild(new BoxContainer
+        CEnvironmentMix.AddChild(new BoxContainer
         {
             Orientation = LayoutOrientation.Horizontal,
             Children =
@@ -136,7 +156,7 @@ public sealed partial class GasInspectControl : BoxContainer
             MinBarSize = new Vector2(12, 1)
         };
         // Separator
-        DataContainer.AddChild(new Control
+        CEnvironmentMix.AddChild(new Control
         {
             MinSize = new Vector2(0, 10),
             VerticalExpand = true
@@ -186,19 +206,19 @@ public sealed partial class GasInspectControl : BoxContainer
             tablePercent.AddChild(new Label
             {
                 Text = Loc.GetString("gas-analyzer-window-percentage-text",
-                    ("percentage", $"{(gas.Amount / totalGasAmount * 100):0.0}")),
+                    ("percentage", $"{(gas.Amount / totalGasAmount * 100f):0.0}")),
                 Align = Label.AlignMode.Right
             });
 
             // Add to the gas bar //TODO: highlight the currently hover one
-            gasBar.AddEntry(MathF.Min(gas.Amount, 0.01f),
+            gasBar.AddEntry(MathF.Max(gas.Amount / totalGasAmount * 100f, 1f),
                 gas.Color,
                 tooltip: Loc.GetString("gas-analyzer-window-molarity-percentage-text",
                     ("gasName", Loc.GetString(gas.Name)),
-                    ("amount", $"{gas.Amount:0.##}"),
-                    ("percentage", $"{(gas.Amount / totalGasAmount * 100):0.#}")));
+                    ("amount", $"{gas.Amount:0.####}"),
+                    ("percentage", $"{(gas.Amount / totalGasAmount * 100f):0.#}")));
         }
 
-        DataContainer.AddChild(gasBar);
+        CEnvironmentMix.AddChild(gasBar);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Content.Shared.Atmospherics.GasMixtures;
+using Content.Shared.Constants;
 using Content.Shared.Utils;
 using JetBrains.Annotations;
 
@@ -8,19 +9,22 @@ public sealed partial class GasMixtureFactory
 {
     public void ShareTiles(ref TileAtmos m1, TileAtmos m2, float cLength, float deltaTime, float k, IRobustArrayPool<float> pool)
     {
-        var buffer = pool.Rent();
-        ShareTilesQuery(ref m1.ArchivedMixture, m2.ArchivedMixture, cLength, deltaTime, k, buffer, pool);
-        TransferMoles(ref m1.Mixture, m2.ArchivedMixture, buffer, pool);
-        pool.Return(buffer);
+        var buffer1 = pool.Rent();
+        var buffer2 = pool.Rent();
+        ShareTilesQuery(ref m1.Mixture, ref m2.Mixture, cLength, deltaTime, k, buffer1, buffer2, pool);
+        TransferMoles(ref m1.CachedMixture, m2.CachedMixture, buffer1, buffer2, pool);
+        pool.Return(buffer1);
+        pool.Return(buffer2);
     }
 
     public void ShareTilesQuery<T1, T2>(
         ref T1 m1,
-        T2 m2,
+        ref T2 m2,
         float cLength,
         float deltaTime,
         float k,
-        Span<float> moles,
+        Span<float> firstMoles,
+        Span<float> secondMoles,
         IRobustArrayPool<float> pool)
         where T1 : IGasMixture
         where T2 : IGasMixture
@@ -30,8 +34,10 @@ public sealed partial class GasMixtureFactory
         // Partial pressure difference
         GetPartialPressures(ref m1, buffer1);
         GetPartialPressures(ref m2, buffer2);
-        NumericsHelpers.Sub(buffer1, buffer2, moles);
-        NumericsHelpers.Multiply(moles, deltaTime * cLength * k);
+        NumericsHelpers.Sub(buffer1, buffer2, firstMoles);
+        NumericsHelpers.Sub(buffer2, buffer1, secondMoles);
+        NumericsHelpers.Multiply(firstMoles, deltaTime * cLength * k);
+        NumericsHelpers.Multiply(secondMoles, deltaTime * cLength * k);
         pool.Return(buffer1);
         pool.Return(buffer2);
     }
@@ -58,6 +64,12 @@ public sealed partial class GasMixtureFactory
         where T1 : IGasMixture
         where T2 : IGasMixture
     {
+        // A safety mechanism against floating point errors
+        // TODO find a faster method
+        if (NumericsHelpers.HorizontalAdd(firstMoles) < SystemConstants.Epsilon
+            || NumericsHelpers.HorizontalAdd(secondMoles) < SystemConstants.Epsilon)
+            return;
+
         var firstOldCapacity = GetHeatCapacity(ref m1, pool);
         var secondOldCapacity = GetHeatCapacity(ref m2, pool);
         var firstOldTemperature = m1.Temperature;
@@ -132,48 +144,8 @@ public sealed partial class GasMixtureFactory
 
         // Transfer of thermal energy (via changed heat capacity) between self and sharer:
         // T_new = W_old - W_removed + W_added
-        m1.Temperature = m1.Immutable ? m1.Temperature :
+        /*m1.Temperature = m1.Immutable ? m1.Temperature :
             (firstOldCapacity * m1.Temperature - heatCapacityToSharer * m1.Temperature + heatCapacitySharerToThis * secondOldTemperature)
-            / GetHeatCapacity(ref m1, pool);
-    }
-
-    [PublicAPI]
-    public void TransferMoles<T1, T2>(ref T1 m1, T2 m2, Span<float> moles)
-        where T1 : IGasMixture
-        where T2 : IGasMixture
-    {
-        TransferMoles(ref m1, m2, moles, SharedPool);
-    }
-
-    [PublicAPI]
-    public void TransferMoles<T1, T2>(ref T1 m1, T2 m2, Span<float> moles, IRobustArrayPool<float> pool)
-        where T1 : IGasMixture
-        where T2 : IGasMixture
-    {
-        var firstOldCapacity = GetHeatCapacity(ref m1, pool);
-        var secondOldTemperature = m2.Temperature;
-
-        // Separate positive and negative heat capacity change into 2 buffers, then sum them up.
-        var buffer1 = pool.Rent();
-        var buffer2 = pool.Rent();
-        NumericsHelpers.Multiply(moles, Prototypes.GasSpecificHeats, buffer1);
-        buffer1.AsSpan().CopyTo(buffer2);
-        NumericsHelpers.Multiply(buffer2, -1f);
-        var heatCapacityToSharer = Math.Abs(NumericsHelpers.HorizontalAdd(buffer1));
-        var heatCapacitySharerToThis = Math.Abs(NumericsHelpers.HorizontalAdd(buffer2));
-        pool.Return(buffer1);
-        pool.Return(buffer2);
-
-        if (!m1.Immutable)
-        {
-            NumericsHelpers.Sub(m1.Moles, moles);
-            NumericsHelpers.Max(m1.Moles, 0f);
-        }
-
-        // Transfer of thermal energy (via changed heat capacity) between self and sharer:
-        // T_new = W_old - W_removed + W_added
-        m1.Temperature = m1.Immutable ? m1.Temperature :
-            (firstOldCapacity * m1.Temperature - heatCapacityToSharer * m1.Temperature + heatCapacitySharerToThis * secondOldTemperature)
-            / GetHeatCapacity(ref m1, pool);
+            / GetHeatCapacity(ref m1, pool);*/
     }
 }

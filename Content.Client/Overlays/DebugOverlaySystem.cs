@@ -1,7 +1,6 @@
 ﻿using Content.Client.Atmospherics.Overlays;
 using Content.Client.Subgrid.Overlays;
 using Content.Client.Temperature.Overlays;
-using Content.Shared.Atmospherics;
 using Content.Shared.Atmospherics.Factory;
 using Content.Shared.Subgrid.Systems;
 using Robust.Client.Graphics;
@@ -10,6 +9,7 @@ using Robust.Shared.Player;
 
 namespace Content.Client.Overlays;
 
+// TODO this is horrible
 public sealed class DebugOverlaySystem : EntitySystem
 {
     [Dependency] private readonly IEyeManager _eyeManager = default!;
@@ -23,6 +23,9 @@ public sealed class DebugOverlaySystem : EntitySystem
     private SubGridTileOverlay _subGridTileOverlay = default!;
     private HeatMapOverlay _heatMapOverlay = default!;
     private AtmosCompositionOverlay _atmosCompositionOverlay = default!;
+    private AtmosPressureOverlay _atmosPressureOverlay = default!;
+    private AtmosHeatMapOverlay _atmosHeatMapOverlay = default!;
+    private InternalEnergyOverlay _internalEnergyOverlay = default!;
 
     /// <inheritdoc/>
     public override void Initialize()
@@ -36,6 +39,9 @@ public sealed class DebugOverlaySystem : EntitySystem
         _subGridTileOverlay = new(EntityManager, _eyeManager, _xform, _subGrid);
         _heatMapOverlay = new(EntityManager, _eyeManager, _xform, _subGrid);
         _atmosCompositionOverlay = new(EntityManager, _eyeManager, _gasManager, _xform, _subGrid);
+        _atmosPressureOverlay = new(EntityManager, _eyeManager, _gasManager, _xform, _subGrid);
+        _atmosHeatMapOverlay = new(EntityManager, _eyeManager, _xform, _subGrid);
+        _internalEnergyOverlay = new(EntityManager, _eyeManager, _xform, _subGrid);
     }
 
     public void UpdateOverlays(Entity<DebugOverlayViewerComponent?> ent)
@@ -83,6 +89,12 @@ public sealed class DebugOverlaySystem : EntitySystem
             _overlayMan.AddOverlay(_heatMapOverlay);
         if (ent.Comp.AtmosCompositionOverlay)
             _overlayMan.AddOverlay(_atmosCompositionOverlay);
+        if (ent.Comp.AtmosPressureOverlay)
+            _overlayMan.AddOverlay(_atmosPressureOverlay);
+        if (ent.Comp.AtmosTemperatureOverlay)
+            _overlayMan.AddOverlay(_atmosHeatMapOverlay);
+        if (ent.Comp.InternalEnergyOverlay)
+            _overlayMan.AddOverlay(_internalEnergyOverlay);
     }
 
     private void RemoveOverlays()
@@ -91,5 +103,8 @@ public sealed class DebugOverlaySystem : EntitySystem
         _overlayMan.RemoveOverlay(_subGridTileOverlay);
         _overlayMan.RemoveOverlay(_heatMapOverlay);
         _overlayMan.RemoveOverlay(_atmosCompositionOverlay);
+        _overlayMan.RemoveOverlay(_atmosPressureOverlay);
+        _overlayMan.RemoveOverlay(_atmosHeatMapOverlay);
+        _overlayMan.RemoveOverlay(_internalEnergyOverlay);
     }
 }

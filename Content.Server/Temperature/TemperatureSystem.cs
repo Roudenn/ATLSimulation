@@ -65,7 +65,7 @@ public sealed class TemperatureSystem : SharedTemperatureSystem
                 {
                     for (var index = 0; index < chunk.Comp.ChunkData.TemperatureMap.Length; index++)
                     {
-                        chunk.Comp.ChunkData.TemperatureMap[index].ArchivedContainer = chunk.Comp.ChunkData.TemperatureMap[index].Container;
+                        chunk.Comp.ChunkData.TemperatureMap[index].Container = chunk.Comp.ChunkData.TemperatureMap[index].CachedContainer;
                     }
                 }
             }
@@ -151,7 +151,7 @@ public sealed class TemperatureSystem : SharedTemperatureSystem
             if (!chunk.Value.Comp.ChunkData.TemperatureMap[index].Initialized)
                 continue;
 
-            HeatContainerHelpers.AddHeat(ref chunk.Value.Comp.ChunkData.TemperatureMap[index].ArchivedContainer, energy);
+            HeatContainerHelpers.AddHeat(ref chunk.Value.Comp.ChunkData.TemperatureMap[index].Container, energy);
         }
     }
 }

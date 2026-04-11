@@ -16,6 +16,7 @@ ui-viewport-tabs-statistics-tile-count = Tile count: { $value }
 
 # Visuals tab
 ui-viewport-tabs-visuals-atmosphere-visibility = Gas visibility
+ui-viewport-tabs-visuals-atmosphere-temperature = Gas temperature
 ui-viewport-tabs-visuals-atmosphere-pressure = Gas pressure overlay
 ui-viewport-tabs-visuals-atmosphere-speed = Gas speed overlay
 

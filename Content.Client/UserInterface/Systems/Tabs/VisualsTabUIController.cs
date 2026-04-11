@@ -26,7 +26,10 @@ public sealed class VisualsTabUIController : UIController
         VisualsTab.DebugSubGridChunksCheckBox.OnPressed += DebugSubGridChunksOnPressed;
         VisualsTab.DebugSubGridTilesCheckBox.OnPressed += DebugSubGridTilesOnPressed;
         VisualsTab.AtmosphereVisibilityCheckBox.OnPressed += AtmosCompositionOnPressed;
+        VisualsTab.AtmospherePressureCheckBox.OnPressed += AtmosPressureOnPressed;
         VisualsTab.TemperatureVisibilityCheckBox.OnPressed += HeatMapOnPressed;
+        VisualsTab.AtmosphereTemperatureCheckBox.OnPressed += AtmosTemperatureOnPressed;
+        VisualsTab.SolidsInternalEnergyCheckBox.OnPressed += InternalEnergyOnPressed;
     }
 
     public void UnloadButton()
@@ -38,10 +41,16 @@ public sealed class VisualsTabUIController : UIController
         VisualsTab.DebugSubGridTilesCheckBox.Pressed = false;
         VisualsTab.AtmosphereVisibilityCheckBox.Pressed = false;
         VisualsTab.TemperatureVisibilityCheckBox.Pressed = false;
+        VisualsTab.AtmospherePressureCheckBox.Pressed = false;
+        VisualsTab.AtmosphereTemperatureCheckBox.Pressed = false;
+        VisualsTab.SolidsInternalEnergyCheckBox.Pressed = false;
         VisualsTab.DebugSubGridChunksCheckBox.OnPressed -= DebugSubGridChunksOnPressed;
         VisualsTab.DebugSubGridTilesCheckBox.OnPressed -= DebugSubGridTilesOnPressed;
         VisualsTab.AtmosphereVisibilityCheckBox.OnPressed -= AtmosCompositionOnPressed;
+        VisualsTab.AtmospherePressureCheckBox.OnPressed -= AtmosPressureOnPressed;
         VisualsTab.TemperatureVisibilityCheckBox.OnPressed -= HeatMapOnPressed;
+        VisualsTab.AtmosphereTemperatureCheckBox.OnPressed -= AtmosTemperatureOnPressed;
+        VisualsTab.SolidsInternalEnergyCheckBox.OnPressed -= InternalEnergyOnPressed;
     }
 
     private void DebugSubGridChunksOnPressed(BaseButton.ButtonEventArgs args)
@@ -77,6 +86,33 @@ public sealed class VisualsTabUIController : UIController
             return;
 
         ent.Value.Comp.AtmosCompositionOverlay = args.Button.Pressed;
+        _debugOverlay.UpdateOverlays(ent.Value.AsNullable());
+    }
+
+    private void AtmosPressureOnPressed(BaseButton.ButtonEventArgs args)
+    {
+        if (!TryGetViewerEnt(out var ent))
+            return;
+
+        ent.Value.Comp.AtmosPressureOverlay = args.Button.Pressed;
+        _debugOverlay.UpdateOverlays(ent.Value.AsNullable());
+    }
+
+    private void AtmosTemperatureOnPressed(BaseButton.ButtonEventArgs args)
+    {
+        if (!TryGetViewerEnt(out var ent))
+            return;
+
+        ent.Value.Comp.AtmosTemperatureOverlay = args.Button.Pressed;
+        _debugOverlay.UpdateOverlays(ent.Value.AsNullable());
+    }
+
+    private void InternalEnergyOnPressed(BaseButton.ButtonEventArgs args)
+    {
+        if (!TryGetViewerEnt(out var ent))
+            return;
+
+        ent.Value.Comp.InternalEnergyOverlay = args.Button.Pressed;
         _debugOverlay.UpdateOverlays(ent.Value.AsNullable());
     }
 

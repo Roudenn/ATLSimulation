@@ -11,13 +11,13 @@ public partial struct TileHeat : IRobustCloneable<TileHeat>, ISubGridTile
     /// The main container of this temperature tile.
     /// </summary>
     [DataField]
-    public ConductiveHeatContainer Container;
+    public ConductiveHeatContainer CachedContainer;
 
     /// <summary>
     /// The main container of this temperature tile.
     /// </summary>
     [DataField]
-    public ConductiveHeatContainer ArchivedContainer;
+    public ConductiveHeatContainer Container;
 
     /// <summary>
     /// This is basically a hack that allows to distinct default
@@ -29,20 +29,20 @@ public partial struct TileHeat : IRobustCloneable<TileHeat>, ISubGridTile
 
     public TileHeat(float heatCapacity, float temperature, float thermalConductance, bool immutable = false)
     {
+        CachedContainer = new ConductiveHeatContainer(heatCapacity, temperature, thermalConductance, immutable);
         Container = new ConductiveHeatContainer(heatCapacity, temperature, thermalConductance, immutable);
-        ArchivedContainer = new ConductiveHeatContainer(heatCapacity, temperature, thermalConductance, immutable);
     }
 
-    public TileHeat(ConductiveHeatContainer container)
+    public TileHeat(ConductiveHeatContainer cachedContainer)
     {
-        Container = container;
-        ArchivedContainer = container;
+        CachedContainer = cachedContainer;
+        Container = cachedContainer;
     }
 
     public TileHeat(TileHeat c)
     {
+        CachedContainer = c.CachedContainer;
         Container = c.Container;
-        ArchivedContainer = c.ArchivedContainer;
     }
 
     public TileHeat Clone()

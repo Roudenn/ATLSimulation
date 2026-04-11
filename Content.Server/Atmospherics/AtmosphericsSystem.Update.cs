@@ -52,8 +52,8 @@ public sealed partial class AtmosphericsSystem
                     {
                         for (var index = 0; index < chunk.Comp.ChunkData.TemperatureMap.Length; index++)
                         {
-                            chunk.Comp.ChunkData.AtmosphereMap[index].ArchivedMixture =
-                                chunk.Comp.ChunkData.AtmosphereMap[index].Mixture;
+                            chunk.Comp.ChunkData.AtmosphereMap[index].Mixture =
+                                chunk.Comp.ChunkData.AtmosphereMap[index].CachedMixture;
                         }
                     }
                 }
@@ -73,8 +73,8 @@ public sealed partial class AtmosphericsSystem
                     {
                         for (var index = 0; index < chunk.Comp.ChunkData.TemperatureMap.Length; index++)
                         {
-                            chunk.Comp.ChunkData.AtmosphereMap[index].ArchivedMixture =
-                                chunk.Comp.ChunkData.AtmosphereMap[index].Mixture;
+                            chunk.Comp.ChunkData.AtmosphereMap[index].Mixture =
+                                chunk.Comp.ChunkData.AtmosphereMap[index].CachedMixture;
                         }
                     }
                 }
@@ -206,6 +206,63 @@ public sealed partial class AtmosphericsSystem
     }
 
     private TileAtmos ProcessSimpleAtmosMovementChunkTile(
+        TileAtmos tile,
+        int index,
+        Dictionary<Vector2i, SubGridChunk> chunkBuffer,
+        Vector2i chunkIndices,
+        float deltaTime,
+        IRobustArrayPool<float> pool)
+    {
+        foreach (var dir in SharedSubGridSystem.DirectionsWithDiagonals)
+        {
+            if (!_subGrid.TryGetAtmosphereTileRelative(chunkBuffer, chunkIndices, index, dir, out var found))
+                continue;
+
+            // The coefficients for interaction get halved when going diagonally,
+            // since Characteristic Length is multiplied by √2 and surface area is multiplied by √2/2.
+            var alteredTime = deltaTime * AtmosSpeedup;
+            if (!SharedSubGridSystem.Directions.Contains(dir))
+            {
+                alteredTime /= 2f;
+
+                // Diagonal movement is only possible if there are also neighbouring tiles.
+                if (!_subGrid.TryGetAtmosphereTileRelative(chunkBuffer, chunkIndices, index, new Vector2i(dir.X, 0), out var foundFirst)
+                    || !_subGrid.TryGetAtmosphereTileRelative(chunkBuffer, chunkIndices, index, new Vector2i(0, dir.Y), out var foundSecond)
+                    || !foundFirst.Value.Initialized
+                    || !foundSecond.Value.Initialized)
+                    continue;
+            }
+
+            GasManager.ShareTiles(
+                ref tile,
+                found.Value,
+                _subGrid.SubGridWorldSize,
+                alteredTime,
+                AtmosTransferCoefficient,
+                pool);
+        }
+
+        return tile;
+    }
+
+    public void ProcessAtmosHeatConductionChunk(
+        Dictionary<Vector2i, SubGridChunk> chunkBuffer,
+        Vector2i indices,
+        float deltaTime,
+        IRobustArrayPool<float> pool)
+    {
+        var chunkData = chunkBuffer[indices];
+        for (var i = 0; i < chunkData.AtmosphereMap.Length; i++)
+        {
+            var tile = chunkData.AtmosphereMap[i];
+            if (!tile.Initialized)
+                continue;
+
+            chunkData.AtmosphereMap[i] = ProcessAtmosHeatConductionTile(tile, i, chunkBuffer, indices, deltaTime, pool);
+        }
+    }
+
+    private TileAtmos ProcessAtmosHeatConductionTile(
         TileAtmos tile,
         int index,
         Dictionary<Vector2i, SubGridChunk> chunkBuffer,

@@ -39,8 +39,8 @@ public sealed partial class GasMixtureFactory
     {
         var buffer1 = pool.Rent();
         var buffer2 = pool.Rent();
-        DiffuseMixturesQuery(ref t1.ArchivedMixture, ref t2.ArchivedMixture, buffer1, buffer2, cLength, frameTime, pool);
-        TransferMoles(ref t1.Mixture, ref t2.Mixture, buffer1, buffer2, pool);
+        DiffuseMixturesQuery(ref t1.Mixture, ref t2.Mixture, buffer1, buffer2, cLength, frameTime, pool);
+        TransferMoles(ref t1.CachedMixture, ref t2.CachedMixture, buffer1, buffer2, pool);
         pool.Return(buffer1);
         pool.Return(buffer2);
     }

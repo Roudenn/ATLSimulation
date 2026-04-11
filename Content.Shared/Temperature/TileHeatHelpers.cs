@@ -9,10 +9,10 @@ public static class TileHeatHelpers
     public static float ConductHeatTiles(ref TileHeat tA, TileHeat tB, float deltaTime)
     {
         return ConductHeatArchived(
-            ref tA.ArchivedContainer,
             ref tA.Container,
-            tB.ArchivedContainer,
+            ref tA.CachedContainer,
             tB.Container,
+            tB.CachedContainer,
             deltaTime);
     }
 

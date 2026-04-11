@@ -51,14 +51,16 @@ public sealed class HeatMapOverlay : Overlay
                 var pos = _subGrid.GetPositionFromIndex(subgrid.ChunkIndices, i);
                 var worldTilePos = _xform.ToMapCoordinates(new EntityCoordinates(subgrid.ParentGrid, pos));
                 var box = Box2.CenteredAround(worldTilePos.Position + tileWorldSize / 2, tileWorldSize);
-                var temperature = tile.ArchivedContainer.Temperature;
+                var temperature = tile.Container.Temperature;
                 args.WorldHandle.DrawRect(box,
                     ProgressColorHelpers.GradientHeatVisor(
                             temperature,
                             PhysicalConstants.TCMB,
                             PhysicalConstants.ZERO_CELCIUS + 1000f)
-                        .WithAlpha(0.5f));
+                        .WithAlpha(1f));
             }
+
+
         }
     }
 }
