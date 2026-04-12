@@ -38,22 +38,22 @@
   #  tags:
   #  - Wall
 
+# Carbon steel
 - type: entity
   parent: BaseWall
   id: WallReinforced
-  name: reinforced wall
+  name: carbon steel wall
   components:
   - type: Sprite
     sprite: Structures/Walls/solid.rsi
   - type: IconSmooth
     base: reinf_over
   - type: Material
-    material: Silver
+    material: CarbonSteel
 
 - type: entity
   parent: WallReinforced
   id: WallReinforcedHot
-  name: reinforced wall
   suffix: Hot, 100 Celsius
   components:
   - type: HeatContainer
@@ -62,7 +62,6 @@
 - type: entity
   parent: WallReinforced
   id: WallReinforcedSuperHot
-  name: reinforced wall
   suffix: Super hot, 1000 Celsius
   components:
   - type: HeatContainer
@@ -71,7 +70,209 @@
 - type: entity
   parent: WallReinforced
   id: WallReinforcedCold
-  name: reinforced wall
+  suffix: Cold, -100 Celsius
+  components:
+  - type: HeatContainer
+    startingTemperature: 173.15
+
+# Stone
+- type: entity
+  parent: BaseWall
+  id: WallStone
+  name: stone wall
+  components:
+  - type: Sprite
+    sprite: Structures/Walls/cobblebrick.rsi
+  - type: IconSmooth
+    base: cobblebrick
+  - type: Material
+    material: Stone
+
+- type: entity
+  parent: WallStone
+  id: WallStoneHot
+  suffix: Hot, 100 Celsius
+  components:
+  - type: HeatContainer
+    startingTemperature: 373.15
+
+- type: entity
+  parent: WallStone
+  id: WallStoneCold
+  suffix: Cold, -100 Celsius
+  components:
+  - type: HeatContainer
+    startingTemperature: 173.15
+
+# Glass
+- type: entity
+  parent: BaseWall
+  id: WindowGlass
+  name: glass window
+  components:
+  - type: Sprite
+    sprite: Structures/Walls/reinforced_window.rsi
+  - type: IconSmooth
+    base: rwindow
+  - type: Material
+    material: Glass
+
+- type: entity
+  parent: WindowGlass
+  id: WindowGlassHot
+  suffix: Hot, 100 Celsius
+  components:
+  - type: HeatContainer
+    startingTemperature: 373.15
+
+- type: entity
+  parent: WindowGlass
+  id: WindowGlassCold
+  suffix: Cold, -100 Celsius
+  components:
+  - type: HeatContainer
+    startingTemperature: 173.15
+
+# Wood
+- type: entity
+  parent: BaseWall
+  id: WallWood
+  name: wood wall
+  components:
+  - type: Sprite
+    sprite: Structures/Walls/wood.rsi
+  - type: IconSmooth
+    base: wood
+  - type: Material
+    material: Wood
+
+- type: entity
+  parent: WallWood
+  id: WallWoodHot
+  suffix: Hot, 100 Celsius
+  components:
+  - type: HeatContainer
+    startingTemperature: 373.15
+
+- type: entity
+  parent: WallWood
+  id: WallWoodCold
+  suffix: Cold, -100 Celsius
+  components:
+  - type: HeatContainer
+    startingTemperature: 173.15
+
+# Plastic
+- type: entity
+  parent: BaseWall
+  id: WallPlastic
+  name: plastic wall
+  components:
+  - type: Sprite
+    sprite: Structures/Walls/plastic.rsi
+  - type: IconSmooth
+    base: plastic
+  - type: Material
+    material: Plastic
+
+- type: entity
+  parent: WallPlastic
+  id: WallPlasticHot
+  suffix: Hot, 100 Celsius
+  components:
+  - type: HeatContainer
+    startingTemperature: 373.15
+
+- type: entity
+  parent: WallPlastic
+  id: WallPlasticCold
+  suffix: Cold, -100 Celsius
+  components:
+  - type: HeatContainer
+    startingTemperature: 173.15
+
+# Silver
+- type: entity
+  parent: BaseWall
+  id: WallSilver
+  name: silver wall
+  components:
+  - type: Sprite
+    sprite: Structures/Walls/silver.rsi
+  - type: IconSmooth
+    base: silver
+  - type: Material
+    material: Silver
+
+- type: entity
+  parent: WallSilver
+  id: WallSilverHot
+  suffix: Hot, 100 Celsius
+  components:
+  - type: HeatContainer
+    startingTemperature: 373.15
+
+- type: entity
+  parent: WallSilver
+  id: WallSilverCold
+  suffix: Cold, -100 Celsius
+  components:
+  - type: HeatContainer
+    startingTemperature: 173.15
+
+# Gold
+- type: entity
+  parent: BaseWall
+  id: WallGold
+  name: gold wall
+  components:
+  - type: Sprite
+    sprite: Structures/Walls/gold.rsi
+  - type: IconSmooth
+    base: gold
+  - type: Material
+    material: Gold
+
+- type: entity
+  parent: WallGold
+  id: WallGoldHot
+  suffix: Hot, 100 Celsius
+  components:
+  - type: HeatContainer
+    startingTemperature: 373.15
+
+- type: entity
+  parent: WallGold
+  id: WallGoldCold
+  suffix: Cold, -100 Celsius
+  components:
+  - type: HeatContainer
+    startingTemperature: 173.15
+
+# Uranium
+- type: entity
+  parent: BaseWall
+  id: WallUranium
+  name: uranium wall
+  components:
+  - type: Sprite
+    sprite: Structures/Walls/uranium.rsi
+  - type: IconSmooth
+    base: uranium
+  - type: Material
+    material: Uranium
+
+- type: entity
+  parent: WallUranium
+  id: WallUraniumHot
+  suffix: Hot, 100 Celsius
+  components:
+  - type: HeatContainer
+    startingTemperature: 373.15
+
+- type: entity
+  parent: WallUranium
+  id: WallUraniumCold
   suffix: Cold, -100 Celsius
   components:
   - type: HeatContainer

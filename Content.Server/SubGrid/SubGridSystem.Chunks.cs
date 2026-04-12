@@ -9,6 +9,7 @@ using Content.Shared.Subgrid;
 using Content.Shared.Subgrid.Chunks;
 using Content.Shared.Subgrid.Components;
 using Content.Shared.Temperature;
+using Content.Shared.Temperature.Components;
 using Content.Shared.Temperature.HeatContainers;
 using Content.Shared.Utils;
 using Robust.Shared.Map;
@@ -32,8 +33,60 @@ public sealed partial class SubGridSystem
         SubscribeLocalEvent<SubGridChunkComponent, SubGridChunkInitializeEvent>(OnChunkInit);
         SubscribeLocalEvent<SubGridChunkComponent, EntityTerminatingEvent>(OnChunkDeleted);
 
+        SubscribeLocalEvent<HeatContainerComponent, MapInitEvent>(OnHeatContainerInit);
+        SubscribeLocalEvent<HeatContainerComponent, EntityTerminatingEvent>(OnHeatContainerShutdown);
+
         //SubscribeLocalEvent<SubGridResizedEvent>(OnGridResized);
         SubscribeLocalEvent<SubGridHeightChangedEvent>(OnGridHeightChanged);
+    }
+
+    private void OnHeatContainerInit(Entity<HeatContainerComponent> ent, ref MapInitEvent args)
+    {
+        var xform = Transform(ent.Owner);
+        if (!MapGridQuery.TryComp(xform.GridUid, out var gridComp)
+            || !SubGridQuery.TryComp(xform.GridUid, out var subGrid))
+            return;
+
+        var tilePos = Xform.GetGridOrMapTilePosition(ent.Owner, xform);
+        if (!TryGetChunk((xform.GridUid.Value, subGrid), tilePos, out var chunk)
+            || !_temperatureQuery.TryComp(ent.Owner, out var tempContainer)
+            || !_materialQuery.TryComp(ent.Owner, out var materialComp))
+            return;
+
+        var material = _proto.Index(materialComp.Material);
+        var temperature = tempContainer.StartingTemperature;
+        // Volume * Density = Mass, SpecificHeatCapacity * Mass = HeatCapacity.
+        var heatCapacity = material.SpecificHeatCapacity / 100f * SubGridTileVolume * material.Density;
+        // Conductance = ThermalConductivity * Characteristic Length.
+        // Height is taken because of how Fourier's Law is canceled out for rectangular prisms.
+        var conductance = material.ThermalConductivity * SubGridHeight;
+
+        var indexes = GetAreaTileIndexesAtTile(chunk.Value.Comp.ChunkIndices, tilePos, gridComp.TileSizeVector);
+        foreach (var i in indexes)
+        {
+            chunk.Value.Comp.ChunkData.AtmosphereMap[i].Initialized = false;
+            chunk.Value.Comp.ChunkData.TemperatureMap[i] = new TileHeat(heatCapacity, temperature, conductance);
+        }
+    }
+
+    private void OnHeatContainerShutdown(Entity<HeatContainerComponent> ent, ref EntityTerminatingEvent args)
+    {
+        var xform = Transform(ent.Owner);
+        if (!MapGridQuery.TryComp(xform.GridUid, out var gridComp)
+            || !SubGridQuery.TryComp(xform.GridUid, out var subGrid))
+            return;
+
+        var tilePos = Xform.GetGridOrMapTilePosition(ent.Owner, xform);
+        if (!TryGetChunk((xform.GridUid.Value, subGrid), tilePos, out var chunk))
+            return;
+
+        var mixture = _atmos.GetEmptyMixture();
+        var indexes = GetAreaTileIndexesAtTile(chunk.Value.Comp.ChunkIndices, tilePos, gridComp.TileSizeVector);
+        foreach (var i in indexes)
+        {
+            chunk.Value.Comp.ChunkData.TemperatureMap[i].Initialized = false;
+            chunk.Value.Comp.ChunkData.AtmosphereMap[i] = new TileAtmos(mixture);
+        }
     }
 
     private void OnGridResized(ref SubGridResizedEvent ev)

@@ -32,7 +32,7 @@ public sealed partial class GasMixtureFactory
         var buffer1 = pool.Rent();
         var buffer2 = pool.Rent();
         // Total pressure difference because the diffusion is already implemented.
-        var deltaPressure = (GetPressure(ref m1) - GetPressure(ref m2));
+        var deltaPressure = GetPressure(ref m1) - GetPressure(ref m2);
         var molesMoved = deltaPressure * deltaTime * cLength * k;
         GetMolesRatio(ref m1, buffer1);
         GetMolesRatio(ref m2, buffer2);
