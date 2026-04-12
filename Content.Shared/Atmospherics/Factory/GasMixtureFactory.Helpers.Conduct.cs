@@ -67,8 +67,8 @@ public sealed partial class GasMixtureFactory
     public float ConductHeat<T>(ref ConductiveHeatContainer c, ref T m, float cLength, float deltaTime) where T : IGasMixture
     {
         var dQ = ConductHeatQuery(ref c, ref m, cLength, cLength, deltaTime);
-        HeatContainerHelpers.AddHeat(ref c, c.Immutable ? 0f : dQ);
-        AddHeat(ref m, m.Immutable ? 0f : -dQ);
+        HeatContainerHelpers.AddHeat(ref c, dQ);
+        AddHeat(ref m, -dQ);
         return dQ;
     }
 

@@ -31,9 +31,4 @@ public interface IHeatContainer
     /// The current thermal energy of the container in Joules.
     /// </summary>
     float InternalEnergy => Temperature * HeatCapacity;
-
-    /// <summary>
-    /// If true, the temperature of the heat container cannot be changed.
-    /// </summary>
-    bool Immutable { get; set; }
 }

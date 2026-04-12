@@ -15,9 +15,6 @@ public sealed partial class GasMixtureFactory
     [PublicAPI]
     public void AddMoles<T>(ref T m, ProtoId<GasPrototype> gasProtoId, float moles) where T : IGasMixture
     {
-        if (m.Immutable)
-            return;
-
         var gasId = this[gasProtoId].GasId;
         m.Moles[gasId] += moles;
     }
@@ -31,9 +28,6 @@ public sealed partial class GasMixtureFactory
     [PublicAPI]
     public void AddMoles<T>(ref T m, int gasId, float moles) where T : IGasMixture
     {
-        if (m.Immutable)
-            return;
-
         m.Moles[gasId] += moles;
     }
 
@@ -45,9 +39,6 @@ public sealed partial class GasMixtureFactory
     [PublicAPI]
     public void AddMoles<T>(ref T m, ref float[] moles) where T : IGasMixture
     {
-        if (m.Immutable)
-            return;
-
         NumericsHelpers.Add(m.Moles, moles);
     }
 
@@ -59,18 +50,7 @@ public sealed partial class GasMixtureFactory
     [PublicAPI]
     public void SetVolume<T>(ref T m, float volume) where T : IGasMixture
     {
-        if (m.Immutable)
-            return;
-
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(volume);
         m.Volume = volume;
     }
-
-    /// <summary>
-    /// Marks the mixture as immutable.
-    /// After it was marked, it can't be made mutable again.
-    /// </summary>
-    [PublicAPI]
-    public void MarkImmutable<T>(ref T m) where T : IGasMixture
-        => m.Immutable = true;
 }

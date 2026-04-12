@@ -38,13 +38,6 @@ public partial struct GasMixture : IGasMixture, IRobustCloneable<GasMixture>
     [ViewVariables]
     public float TemperatureC => TemperatureHelpers.KelvinToCelsius(Temperature);
 
-    /// <summary>
-    /// If true, any attempts to modify the mixture will be cancelled.
-    /// Immutable fixtures are the main reason why first law of thermodynamics is technically violated.
-    /// </summary>
-    [DataField]
-    public bool Immutable { get; set; }
-
     // TODO this is a workaround until actually good serialization is made
     [ViewVariables, Access(typeof(SharedSubGridSystem))]
     public bool Initialized = true;
@@ -52,12 +45,11 @@ public partial struct GasMixture : IGasMixture, IRobustCloneable<GasMixture>
     /// <summary>
     /// Constructs a new gas mixture without any gas.
     /// </summary>
-    public GasMixture(int size, float volume, float temperature, bool immutable = false)
+    public GasMixture(int size, float volume, float temperature)
     {
         Moles = new float[size];
         Volume = volume;
         Temperature = temperature;
-        Immutable = immutable;
     }
 
     /// <summary>
@@ -66,12 +58,11 @@ public partial struct GasMixture : IGasMixture, IRobustCloneable<GasMixture>
     /// <remarks>
     /// Ensure that the array size is correct and heat container has correct heat capacity relatively to the <see cref="Moles"/> array.
     /// </remarks>
-    public GasMixture(float[] moles, float volume, float temperature, bool immutable = false)
+    public GasMixture(float[] moles, float volume, float temperature)
     {
         Moles = moles;
         Volume = volume;
         Temperature = temperature;
-        Immutable = immutable;
     }
 
     public GasMixture(GasMixture m)
@@ -79,7 +70,6 @@ public partial struct GasMixture : IGasMixture, IRobustCloneable<GasMixture>
         Moles = m.Moles;
         Volume = m.Volume;
         Temperature = m.Temperature;
-        Immutable = m.Immutable;
     }
 
     public GasMixture Clone()

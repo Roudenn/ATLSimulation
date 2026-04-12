@@ -244,7 +244,7 @@ public sealed partial class GasMixtureFactory
         NumericsHelpers.Divide(buffer2, PhysicalConstants.R * m2.Temperature * 0.001f);
 
         NumericsHelpers.Sub(buffer1, buffer2);
-        NumericsHelpers.Max(buffer1, 0f); // TODO Because of "Prevent division by zero" we have to calculate the thing twice
+        NumericsHelpers.Max(buffer1, 0f);
 
         // Calculate the partial result
         NumericsHelpers.Multiply(buffer1,

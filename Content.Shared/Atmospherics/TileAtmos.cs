@@ -29,7 +29,7 @@ public partial struct TileAtmos : IRobustCloneable<TileAtmos>, ISubGridTile
     /// It also makes the GasMixture immutable.
     /// </summary>
     [DataField]
-    public bool MapAtmosphere;
+    public bool Immutable;
 
     [ViewVariables]
     public bool Initialized { get; set; } = true;
@@ -40,18 +40,18 @@ public partial struct TileAtmos : IRobustCloneable<TileAtmos>, ISubGridTile
     [ViewVariables]
     public int LastTick { get; set; }
 
-    public TileAtmos(GasMixture cachedMixture)
+    public TileAtmos(GasMixture cachedMixture, bool immutable = false)
     {
         CachedMixture = cachedMixture;
         Mixture = cachedMixture;
-        MapAtmosphere = cachedMixture.Immutable;
+        Immutable = immutable;
     }
 
     public TileAtmos(TileAtmos c)
     {
         CachedMixture = c.CachedMixture;
         Mixture = c.Mixture;
-        MapAtmosphere = c.MapAtmosphere;
+        Immutable = c.Immutable;
     }
 
     public TileAtmos Clone()

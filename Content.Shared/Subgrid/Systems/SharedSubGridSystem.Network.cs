@@ -52,7 +52,7 @@ public abstract partial class SharedSubGridSystem
             case SubGridChunkComponentState fullState:
                 ent.Comp.ParentGrid = GetEntity(fullState.ParentGrid);
                 ent.Comp.ChunkIndices = fullState.ChunkIndices;
-                ent.Comp.ChunkData ??= new SubGridChunk(SubGridChunkSize);
+                ent.Comp.ChunkData ??= new SubGridChunk(SubGridChunkSize); // TODO I don't know how to initialize this properly beforehand...
                 ent.Comp.ChunkData.ApplyState(fullState.AtmosData, fullState.HeatData);
                 break;
             default:

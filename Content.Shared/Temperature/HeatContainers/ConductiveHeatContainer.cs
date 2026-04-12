@@ -37,15 +37,6 @@ public partial struct ConductiveHeatContainer : IRobustCloneable<ConductiveHeatC
     public float ThermalConductance { get; set; }
 
     /// <summary>
-    /// If true, the temperature of the heat container cannot be changed.
-    /// </summary>
-    [DataField]
-    public bool Immutable { get; set; }
-
-    [ViewVariables, Access(typeof(SharedSubGridSystem))]
-    public bool Initialized = true;
-
-    /// <summary>
     /// The current temperature of the container in Celsius.
     /// Ideal if you just need to read the temperature for UI.
     /// Do not perform computations in Celsius/set this value, use Kelvin instead.
@@ -59,12 +50,15 @@ public partial struct ConductiveHeatContainer : IRobustCloneable<ConductiveHeatC
     [ViewVariables]
     public float InternalEnergy => Temperature * HeatCapacity;
 
-    public ConductiveHeatContainer(float heatCapacity, float temperature, float thermalConductance, bool immutable = false)
+    // TODO this is a workaround until actually good serialization is made
+    [ViewVariables, Access(typeof(SharedSubGridSystem))]
+    public bool Initialized = true;
+
+    public ConductiveHeatContainer(float heatCapacity, float temperature, float thermalConductance)
     {
         HeatCapacity = heatCapacity;
         Temperature = temperature;
         ThermalConductance = thermalConductance;
-        Immutable = immutable;
     }
 
     public ConductiveHeatContainer(HeatContainer c, float thermalConductance)
@@ -72,7 +66,6 @@ public partial struct ConductiveHeatContainer : IRobustCloneable<ConductiveHeatC
         HeatCapacity = c.HeatCapacity;
         Temperature = c.Temperature;
         ThermalConductance = thermalConductance;
-        Immutable = c.Immutable;
     }
 
     private ConductiveHeatContainer(ConductiveHeatContainer c)
@@ -80,7 +73,6 @@ public partial struct ConductiveHeatContainer : IRobustCloneable<ConductiveHeatC
         HeatCapacity = c.HeatCapacity;
         Temperature = c.Temperature;
         ThermalConductance = c.ThermalConductance;
-        Immutable = c.Immutable;
     }
 
     public ConductiveHeatContainer Clone()

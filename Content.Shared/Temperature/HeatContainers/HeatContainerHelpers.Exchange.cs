@@ -71,8 +71,8 @@ public static partial class HeatContainerHelpers
         where T2 : IHeatContainer
     {
         var tFinal = EquilibriumTemperatureQuery(ref cA, ref cB);
-        cA.Temperature = cA.Immutable ? cA.Temperature : tFinal;
-        cB.Temperature = cB.Immutable ? cB.Temperature : tFinal;
+        cA.Temperature = tFinal;
+        cB.Temperature = tFinal;
     }
 
     /// <summary>
@@ -88,8 +88,8 @@ public static partial class HeatContainerHelpers
     {
         var tInitialA = cA.Temperature;
         var tFinal = EquilibriumTemperatureQuery(ref cA, ref cB);
-        cA.Temperature = cA.Immutable ? cA.Temperature : tFinal;
-        cB.Temperature = cB.Immutable ? cB.Temperature : tFinal;
+        cA.Temperature = tFinal;
+        cB.Temperature = tFinal;
         // Guarded against div/0 in EquilibriumTemperatureQuery: totalHeatCapacity > 0.
         dQ = (tInitialA - tFinal) / cA.HeatCapacity;
     }
@@ -108,7 +108,7 @@ public static partial class HeatContainerHelpers
         var tF = EquilibriumTemperatureQuery(cN);
         for (var i = 0; i < cN.Length; i++)
         {
-            cN[i].Temperature = cN[i].Immutable ? cN[i].Temperature : tF;
+            cN[i].Temperature = tF;
         }
     }
 
@@ -128,7 +128,7 @@ public static partial class HeatContainerHelpers
         cA.Temperature = tF;
         for (var i = 0; i < cN.Length; i++)
         {
-            cN[i].Temperature = cN[i].Immutable ? cN[i].Temperature : tF;
+            cN[i].Temperature = tF;
         }
     }
 

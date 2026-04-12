@@ -33,10 +33,4 @@ public interface IGasMixture
     /// Do not perform computations in Celsius/set this value, use Kelvin instead.
     /// </summary>
     float TemperatureC => TemperatureHelpers.KelvinToCelsius(Temperature);
-
-    /// <summary>
-    /// If true, any attempts to modify the mixture will be cancelled.
-    /// Immutable fixtures are the main reason why first law of thermodynamics is technically violated.
-    /// </summary>
-    bool Immutable { get; set; }
 }

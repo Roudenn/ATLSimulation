@@ -29,12 +29,6 @@ public partial struct HeatContainer : IRobustCloneable<HeatContainer>, IHeatCont
     public float Temperature { get; set; } = PhysicalConstants.ROOM_TEMPERATURE;
 
     /// <summary>
-    /// If true, the temperature of the heat container cannot be changed.
-    /// </summary>
-    [DataField]
-    public bool Immutable { get; set; }
-
-    /// <summary>
     /// The current temperature of the container in Celsius.
     /// Ideal if you just need to read the temperature for UI.
     /// Do not perform computations in Celsius/set this value, use Kelvin instead.

@@ -117,7 +117,7 @@ public sealed partial class AtmosphericsSystem
         for (var i = 0; i < chunkData.AtmosphereMap.Length; i++)
         {
             var tile = chunkData.AtmosphereMap[i];
-            if (!tile.Initialized)
+            if (!tile.Initialized || tile.Immutable)
                 continue;
 
             chunkData.AtmosphereMap[i] = ProcessDiffusionTile(tile, i, chunkBuffer, indices, deltaTime, pool);
@@ -213,6 +213,9 @@ public sealed partial class AtmosphericsSystem
         float deltaTime,
         IRobustArrayPool<float> pool)
     {
+        if (tile.Immutable) // No need to process immutable tiles
+            return tile;
+
         foreach (var dir in SharedSubGridSystem.DirectionsWithDiagonals)
         {
             if (!_subGrid.TryGetAtmosphereTileRelative(chunkBuffer, chunkIndices, index, dir, out var found))
@@ -270,31 +273,21 @@ public sealed partial class AtmosphericsSystem
         float deltaTime,
         IRobustArrayPool<float> pool)
     {
-        foreach (var dir in SharedSubGridSystem.DirectionsWithDiagonals)
+        if (tile.Immutable) // No need to process immutable tiles
+            return tile;
+
+        // This one isn't directional because diagonally heat always has to travel through
+        // materials with a different heat transfer coefficient.
+        foreach (var dir in SharedSubGridSystem.Directions)
         {
             if (!_subGrid.TryGetAtmosphereTileRelative(chunkBuffer, chunkIndices, index, dir, out var found))
                 continue;
-
-            // The coefficients for interaction get halved when going diagonally,
-            // since Characteristic Length is multiplied by √2 and surface area is multiplied by √2/2.
-            var alteredTime = deltaTime * AtmosSpeedup;
-            if (!SharedSubGridSystem.Directions.Contains(dir))
-            {
-                alteredTime /= 2f;
-
-                // Diagonal movement is only possible if there are also neighbouring tiles.
-                if (!_subGrid.TryGetAtmosphereTileRelative(chunkBuffer, chunkIndices, index, new Vector2i(dir.X, 0), out var foundFirst)
-                    || !_subGrid.TryGetAtmosphereTileRelative(chunkBuffer, chunkIndices, index, new Vector2i(0, dir.Y), out var foundSecond)
-                    || !foundFirst.Value.Initialized
-                    || !foundSecond.Value.Initialized)
-                    continue;
-            }
 
             GasManager.ShareTiles(
                 ref tile,
                 found.Value,
                 _subGrid.SubGridWorldSize,
-                alteredTime,
+                deltaTime * AtmosSpeedup,
                 AtmosTransferCoefficient,
                 pool);
         }

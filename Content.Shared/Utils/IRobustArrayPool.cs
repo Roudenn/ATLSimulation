@@ -61,16 +61,12 @@ public interface IRobustArrayPool<T>
     /// Returns an array back to the pool.
     /// </summary>
     /// <param name="obj">An array to return back.</param>
-    /// <param name="clearArray">If true, clears the contents of the array.
-    /// If <see cref="Factory"/> is not null, also initializes each element in the array.</param>
-    void Return(T[] obj, bool clearArray = false);
+    void Return(T[] obj);
 
     /// <summary>
-    /// Returns an array back to the pool.
+    /// Returns an array back to the pool and clears its contents back to the default state.
+    /// If <see cref="Factory"/> is not null, also initializes each element in the array.
     /// </summary>
-    /// <returns>True if the array was successfully returned to the pool.</returns>
     /// <param name="obj">An array to return back.</param>
-    /// <param name="clearArray">If true, clears the contents of the array.
-    /// If <see cref="Factory"/> is not null, also initializes each element in the array.</param>
-    bool TryReturn(T[] obj, bool clearArray = false);
+    void ReturnClean(T[] obj);
 }

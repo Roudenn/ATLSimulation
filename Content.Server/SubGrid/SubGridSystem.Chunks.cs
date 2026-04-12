@@ -263,7 +263,6 @@ public sealed partial class SubGridSystem
     {
         // Check if it is located near space, and add a boundary layer of atmosphere tiles.
         var spaceMix = _atmos.GetEmptyMixture();
-        GasFactory.MarkImmutable(ref spaceMix);
         foreach (var vecDir in DirectionsWithDiagonals)
         {
             var tileRef = MapSystem.GetTileRef(grid.Owner, grid.Comp2, gridIndices + vecDir);
@@ -289,7 +288,7 @@ public sealed partial class SubGridSystem
                         || foundAtmosGridCorner.TemperatureMap[index].Initialized)
                         continue;
 
-                    foundAtmosGridCorner.AtmosphereMap[index] = new TileAtmos(spaceMix);
+                    foundAtmosGridCorner.AtmosphereMap[index] = new TileAtmos(spaceMix, true);
                 }
             }
 

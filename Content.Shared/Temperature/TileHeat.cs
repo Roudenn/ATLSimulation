@@ -19,6 +19,9 @@ public partial struct TileHeat : IRobustCloneable<TileHeat>, ISubGridTile
     [DataField]
     public ConductiveHeatContainer Container;
 
+    [DataField]
+    public bool Immutable;
+
     /// <summary>
     /// This is basically a hack that allows to distinct default
     /// uninitialized values in an array of structs from initialized tiles.
@@ -29,20 +32,23 @@ public partial struct TileHeat : IRobustCloneable<TileHeat>, ISubGridTile
 
     public TileHeat(float heatCapacity, float temperature, float thermalConductance, bool immutable = false)
     {
-        CachedContainer = new ConductiveHeatContainer(heatCapacity, temperature, thermalConductance, immutable);
-        Container = new ConductiveHeatContainer(heatCapacity, temperature, thermalConductance, immutable);
+        CachedContainer = new ConductiveHeatContainer(heatCapacity, temperature, thermalConductance);
+        Container = new ConductiveHeatContainer(heatCapacity, temperature, thermalConductance);
+        Immutable = immutable;
     }
 
-    public TileHeat(ConductiveHeatContainer cachedContainer)
+    public TileHeat(ConductiveHeatContainer cachedContainer, bool immutable = false)
     {
         CachedContainer = cachedContainer;
         Container = cachedContainer;
+        Immutable = immutable;
     }
 
     public TileHeat(TileHeat c)
     {
         CachedContainer = c.CachedContainer;
         Container = c.Container;
+        Immutable = c.Immutable;
     }
 
     public TileHeat Clone()

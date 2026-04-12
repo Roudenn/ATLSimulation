@@ -19,14 +19,10 @@ public static partial class HeatContainerHelpers
         fraction = Math.Clamp(fraction, 0f, 1f);
         var newHeatCapacity = c.HeatCapacity * fraction;
 
-        if (!cSplit.Immutable)
-        {
-            cSplit.HeatCapacity = newHeatCapacity;
-            cSplit.Temperature = c.Temperature;
-        }
+        cSplit.HeatCapacity = newHeatCapacity;
+        cSplit.Temperature = c.Temperature;
 
-        if (!c.Immutable)
-            c.HeatCapacity -= newHeatCapacity;
+        c.HeatCapacity -= newHeatCapacity;
     }
 
     /// <summary>

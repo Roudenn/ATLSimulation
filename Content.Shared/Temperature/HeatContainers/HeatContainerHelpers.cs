@@ -18,7 +18,7 @@ public static partial class HeatContainerHelpers
     [PublicAPI]
     public static void AddHeat<T>(ref T c, float dQ) where T : IHeatContainer
     {
-        c.Temperature = c.Immutable ? c.Temperature : AddHeatQuery(ref c, dQ);
+        c.Temperature = AddHeatQuery(ref c, dQ);
     }
 
     /// <summary>
@@ -49,19 +49,8 @@ public static partial class HeatContainerHelpers
     public static void SetHeatCapacity<T>(ref T c, float newHeatCapacity) where T : IHeatContainer
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(c.HeatCapacity);
-        if (c.Immutable)
-            return;
-
         var currentEnergy = c.InternalEnergy;
         c.HeatCapacity = newHeatCapacity;
         c.Temperature = currentEnergy / c.HeatCapacity;
     }
-
-    /// <summary>
-    /// Marks the heat container as immutable.
-    /// After it was marked, it can't be made mutable again.
-    /// </summary>
-    [PublicAPI]
-    public static void MarkImmutable<T>(ref T m) where T : IHeatContainer
-        => m.Immutable = true;
 }

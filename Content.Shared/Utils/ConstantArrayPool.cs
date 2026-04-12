@@ -95,53 +95,34 @@ public sealed class ConstantArrayPool<T> : IRobustArrayPool<T>
     /// The array size has to be equal to the <see cref="ArraySize"/> of the pool.
     /// </remarks>
     /// <param name="obj">An array to return back.</param>
-    /// <param name="clearArray">If true, clears the contents of the array.
-    /// If <see cref="Factory"/> is not null, also initializes each element in the array.</param>
-    public void Return(T[] obj, bool clearArray = false)
+    public void Return(T[] obj)
     {
         ArgumentOutOfRangeException.ThrowIfNotEqual(obj.Length, ArraySize);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(Length + 1, ArraySize);
-
-        if (clearArray)
-        {
-            var objSpan = obj.AsSpan();
-            objSpan.Clear();
-            if (Factory != null)
-                objSpan.Fill(Factory());
-            objSpan.CopyTo(obj);
-        }
-
         Length++;
         Buffer[Length] = obj;
     }
 
     /// <summary>
-    /// Returns an array back to the pool.
+    /// Returns an array back to the pool and clears its contents back to the default state.
+    /// If <see cref="Factory"/> is not null, also initializes each element in the array.
     /// </summary>
     /// <remarks>
     /// The array size has to be equal to the <see cref="ArraySize"/> of the pool.
     /// </remarks>
     /// <param name="obj">An array to return back.</param>
-    /// <param name="clearArray">If true, clears the contents of the array.
-    /// If <see cref="Factory"/> is not null, also initializes each element in the array.</param>
-    public bool TryReturn(T[] obj, bool clearArray = false)
+    public void ReturnClean(T[] obj)
     {
-        if (obj.Length != ArraySize
-            || Length >= ArraySize)
-            return false;
+        ArgumentOutOfRangeException.ThrowIfNotEqual(obj.Length, ArraySize);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(Length + 1, ArraySize);
 
-        if (clearArray)
-        {
-            var objSpan = obj.AsSpan();
-            objSpan.Clear();
-            if (Factory != null)
-                objSpan.Fill(Factory());
-            objSpan.CopyTo(obj);
-        }
+        var objSpan = obj.AsSpan();
+        objSpan.Clear();
+        if (Factory != null)
+            objSpan.Fill(Factory());
+        objSpan.CopyTo(obj);
 
         Length++;
         Buffer[Length] = obj;
-
-        return true;
     }
 }

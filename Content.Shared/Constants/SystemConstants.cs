@@ -8,12 +8,12 @@ public static class SystemConstants
     /// Required for delicious memory performance.
     /// </summary>
     public const int PvsChunkSize = 8;
-    
+
     /// <summary>
     /// The amount of pixels per meter in the simulation.
     /// </summary>
     public const int PixelsPerMeter = 32;
-    
+
     /// <summary>
     ///     Do not allow any gas mixture temperatures to exceed this number. It is occasionally possible
     ///     to have very small heat capacity (e.g. room that was just unspaced) and for large amounts of
@@ -22,14 +22,19 @@ public static class SystemConstants
     ///     gas that you would have transforms into plasma.
     /// </summary>
     public const float Tmax = 262144; // 1/64 of max safe integer, any values above will result in a ~0.03K epsilon
-    
+
     /// <summary>
     ///     Minimum number of moles a gas can have.
     /// </summary>
     public const float GasMinMoles = 0.00000005f;
-    
+
     /// <summary>
     ///     Minimum heat capacity.
     /// </summary>
     public const float Epsilon = 0.0003f;
+
+    /// <summary>
+    ///     Minimum amount of moles that can be transfered between two mixtures.
+    /// </summary>
+    public const float TransferEpsilon = 0.00003f;
 }
