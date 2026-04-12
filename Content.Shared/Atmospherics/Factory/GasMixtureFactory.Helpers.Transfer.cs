@@ -32,12 +32,16 @@ public sealed partial class GasMixtureFactory
         var buffer1 = pool.Rent();
         var buffer2 = pool.Rent();
         // Total pressure difference because the diffusion is already implemented.
-        var deltaPressure = (GetPressure(ref m2) - GetPressure(ref m1));
+        var deltaPressure = (GetPressure(ref m1) - GetPressure(ref m2));
         var molesMoved = deltaPressure * deltaTime * cLength * k;
         GetMolesRatio(ref m1, buffer1);
         GetMolesRatio(ref m2, buffer2);
         NumericsHelpers.Multiply(buffer1, molesMoved, firstMoles);
         NumericsHelpers.Multiply(buffer2, molesMoved, secondMoles);
+
+        // Only dominant mixture transfers the gas
+        NumericsHelpers.Min(molesMoved > 0f ? secondMoles : firstMoles, 0f);
+
         pool.Return(buffer1);
         pool.Return(buffer2);
     }
@@ -67,7 +71,7 @@ public sealed partial class GasMixtureFactory
         // A safety mechanism against floating point errors
         // TODO find a faster method
         if (NumericsHelpers.HorizontalAdd(firstMoles) < SystemConstants.TransferEpsilon
-            || NumericsHelpers.HorizontalAdd(secondMoles) < SystemConstants.TransferEpsilon)
+            && NumericsHelpers.HorizontalAdd(secondMoles) < SystemConstants.TransferEpsilon)
             return;
 
         var firstOldCapacity = GetHeatCapacity(ref m1, pool);
