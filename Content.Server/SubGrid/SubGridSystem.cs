@@ -72,8 +72,8 @@ public sealed partial class SubGridSystem : SharedSubGridSystem
     public override void Update(float frameTime)
     {
         base.Update(frameTime);
-        _atmos.UpdateAtmos();
         _temperature.UpdateHeat();
+        _atmos.UpdateAtmos();
 
         var curTick = _timing.CurTick;
         if (curTick.Value - _lastDirtyTick.Value < SubGridNetFrequency)

@@ -2,6 +2,7 @@
 using Content.Shared.Subgrid.Chunks;
 using Content.Shared.Subgrid.Components;
 using Content.Shared.Subgrid.Systems;
+using Content.Shared.Temperature;
 using Content.Shared.Utils;
 using Robust.Shared.Collections;
 using Robust.Shared.Threading;
@@ -14,11 +15,13 @@ public sealed partial class AtmosphericsSystem
 
     private ProcessSimpleAtmosMovement _simpleMovementJob;
     private ProcessAtmosDiffusion _diffusionJob;
+    private ProcessAtmosHeatConduction _conductionJob;
 
     private void InitializeUpdate()
     {
         _diffusionJob = new(_subGrid, this);
         _simpleMovementJob = new(_subGrid, this);
+        _conductionJob = new(_subGrid, this);
     }
 
     public void UpdateAtmos()
@@ -50,7 +53,7 @@ public sealed partial class AtmosphericsSystem
 
                     foreach (var chunk in chunks)
                     {
-                        for (var index = 0; index < chunk.Comp.ChunkData.TemperatureMap.Length; index++)
+                        for (var index = 0; index < chunk.Comp.ChunkData.AtmosphereMap.Length; index++)
                         {
                             chunk.Comp.ChunkData.AtmosphereMap[index].Mixture =
                                 chunk.Comp.ChunkData.AtmosphereMap[index].CachedMixture;
@@ -71,10 +74,36 @@ public sealed partial class AtmosphericsSystem
 
                     foreach (var chunk in chunks)
                     {
-                        for (var index = 0; index < chunk.Comp.ChunkData.TemperatureMap.Length; index++)
+                        for (var index = 0; index < chunk.Comp.ChunkData.AtmosphereMap.Length; index++)
                         {
                             chunk.Comp.ChunkData.AtmosphereMap[index].Mixture =
                                 chunk.Comp.ChunkData.AtmosphereMap[index].CachedMixture;
+                        }
+                    }
+                }
+            }
+
+            if (AtmosHeatConductionEnabled)
+            {
+                _conductionJob.SubGrid = (uid, comp);
+                _conductionJob.Chunks = chunks;
+                _conductionJob.DeltaTime = deltaTime / AtmosSteps;
+
+                for (int i = 0; i < AtmosSteps; i++)
+                {
+                    _parallel.ProcessNow(_conductionJob, comp.ChunkEntities.Count);
+
+                    foreach (var chunk in chunks)
+                    {
+                        for (var index = 0; index < chunk.Comp.ChunkData.AtmosphereMap.Length; index++)
+                        {
+                            chunk.Comp.ChunkData.AtmosphereMap[index].Mixture =
+                                chunk.Comp.ChunkData.AtmosphereMap[index].CachedMixture;
+                        }
+                        for (var index = 0; index < chunk.Comp.ChunkData.TemperatureMap.Length; index++)
+                        {
+                            chunk.Comp.ChunkData.TemperatureMap[index].Container =
+                                chunk.Comp.ChunkData.TemperatureMap[index].CachedContainer;
                         }
                     }
                 }
@@ -198,7 +227,7 @@ public sealed partial class AtmosphericsSystem
         for (var i = 0; i < chunkData.AtmosphereMap.Length; i++)
         {
             var tile = chunkData.AtmosphereMap[i];
-            if (!tile.Initialized)
+            if (!tile.Initialized || tile.Immutable)
                 continue;
 
             chunkData.AtmosphereMap[i] = ProcessSimpleAtmosMovementChunkTile(tile, i, chunkBuffer, indices, deltaTime, pool);
@@ -213,9 +242,6 @@ public sealed partial class AtmosphericsSystem
         float deltaTime,
         IRobustArrayPool<float> pool)
     {
-        if (tile.Immutable) // No need to process immutable tiles
-            return tile;
-
         foreach (var dir in SharedSubGridSystem.DirectionsWithDiagonals)
         {
             if (!_subGrid.TryGetAtmosphereTileRelative(chunkBuffer, chunkIndices, index, dir, out var found))
@@ -248,6 +274,31 @@ public sealed partial class AtmosphericsSystem
         return tile;
     }
 
+    private record struct ProcessAtmosHeatConduction(SharedSubGridSystem SubGridSystem, AtmosphericsSystem AtmosphericsSystem) : IParallelRobustJob
+    {
+        public int BatchSize => 1;
+
+        public readonly SharedSubGridSystem SubGridSystem = SubGridSystem;
+
+        public readonly AtmosphericsSystem AtmosphericsSystem = AtmosphericsSystem;
+
+        public Entity<SubGridComponent> SubGrid;
+
+        public ValueList<Entity<SubGridChunkComponent>> Chunks = new();
+
+        public float DeltaTime;
+
+        public void Execute(int index)
+        {
+            var indices = Chunks[index].Comp.ChunkIndices;
+            var chunkBuffer = Chunks[index].Comp.ChunkBuffer;
+            var chunkGasBuffer = Chunks[index].Comp.GasArrayPool;
+            chunkBuffer.Clear();
+            SubGridSystem.ResolveMapRelativeToChunk(SubGrid, ref chunkBuffer, indices);
+            AtmosphericsSystem.ProcessAtmosHeatConductionChunk(chunkBuffer, indices, DeltaTime, chunkGasBuffer);
+        }
+    }
+
     public void ProcessAtmosHeatConductionChunk(
         Dictionary<Vector2i, SubGridChunk> chunkBuffer,
         Vector2i indices,
@@ -258,10 +309,18 @@ public sealed partial class AtmosphericsSystem
         for (var i = 0; i < chunkData.AtmosphereMap.Length; i++)
         {
             var tile = chunkData.AtmosphereMap[i];
-            if (!tile.Initialized)
+            if (!tile.Initialized || tile.Immutable)
                 continue;
 
             chunkData.AtmosphereMap[i] = ProcessAtmosHeatConductionTile(tile, i, chunkBuffer, indices, deltaTime, pool);
+        }
+        for (var i = 0; i < chunkData.TemperatureMap.Length; i++)
+        {
+            var tile = chunkData.TemperatureMap[i];
+            if (!tile.Initialized || tile.Immutable)
+                continue;
+
+            chunkData.TemperatureMap[i] = ProcessHeatConductionTile(tile, i, chunkBuffer, indices, deltaTime, pool);
         }
     }
 
@@ -273,9 +332,32 @@ public sealed partial class AtmosphericsSystem
         float deltaTime,
         IRobustArrayPool<float> pool)
     {
-        if (tile.Immutable) // No need to process immutable tiles
-            return tile;
+        // This one isn't directional because diagonally heat always has to travel through
+        // materials with a different heat transfer coefficient.
+        foreach (var dir in SharedSubGridSystem.Directions)
+        {
+            if (!_subGrid.TryGetHeatTileRelative(chunkBuffer, chunkIndices, index, dir, out var found))
+                continue;
 
+            GasManager.ConductTileAtmos(
+                ref tile,
+                found.Value,
+                _subGrid.SubGridWorldSize,
+                deltaTime * AtmosSpeedup,
+                pool);
+        }
+
+        return tile;
+    }
+
+    private TileHeat ProcessHeatConductionTile(
+        TileHeat tile,
+        int index,
+        Dictionary<Vector2i, SubGridChunk> chunkBuffer,
+        Vector2i chunkIndices,
+        float deltaTime,
+        IRobustArrayPool<float> pool)
+    {
         // This one isn't directional because diagonally heat always has to travel through
         // materials with a different heat transfer coefficient.
         foreach (var dir in SharedSubGridSystem.Directions)
@@ -283,12 +365,11 @@ public sealed partial class AtmosphericsSystem
             if (!_subGrid.TryGetAtmosphereTileRelative(chunkBuffer, chunkIndices, index, dir, out var found))
                 continue;
 
-            GasManager.ShareTiles(
+            GasManager.ConductTileHeat(
                 ref tile,
                 found.Value,
                 _subGrid.SubGridWorldSize,
                 deltaTime * AtmosSpeedup,
-                AtmosTransferCoefficient,
                 pool);
         }
 

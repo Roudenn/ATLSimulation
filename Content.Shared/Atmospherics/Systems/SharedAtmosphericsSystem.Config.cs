@@ -11,6 +11,9 @@ public abstract partial class SharedAtmosphericsSystem
     public bool AtmosDiffusionEnabled;
 
     [ViewVariables]
+    public bool AtmosHeatConductionEnabled;
+
+    [ViewVariables]
     public float AtmosSpeedup;
 
     [ViewVariables]
@@ -23,6 +26,7 @@ public abstract partial class SharedAtmosphericsSystem
     {
         Subs.CVar(_config, GameConfigVars.AtmosMovementEnabled, b => AtmosMovementEnabled = b, true);
         Subs.CVar(_config, GameConfigVars.AtmosDiffusionEnabled, b => AtmosDiffusionEnabled = b, true);
+        Subs.CVar(_config, GameConfigVars.AtmosHeatConductionEnabled, b => AtmosHeatConductionEnabled = b, true);
         Subs.CVar(_config, GameConfigVars.AtmosSpeedup, f => AtmosSpeedup = f, true);
         Subs.CVar(_config, GameConfigVars.AtmosTransferCoefficient, f => AtmosTransferCoefficient = f, true);
         Subs.CVar(_config, GameConfigVars.AtmosSteps, i => AtmosSteps = i, true);

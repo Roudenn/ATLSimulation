@@ -10,7 +10,7 @@ public sealed class StatisticsSystem : SharedStatisticsSystem
 {
     [Dependency] private readonly IGameTiming _timing = default!;
 
-    public SimulationStats? ArchivedStatistics;
+    public SimulationStats ArchivedStatistics;
 
     private TimeSpan _nextUpdate = TimeSpan.Zero;
 

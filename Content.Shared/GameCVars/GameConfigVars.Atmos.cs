@@ -10,6 +10,9 @@ public sealed partial class GameConfigVars
     public static readonly CVarDef<bool> AtmosMovementEnabled =
         CVarDef.Create("atmos.movement.enabled", false, CVar.SERVER | CVar.REPLICATED | CVar.ARCHIVE);
 
+    public static readonly CVarDef<bool> AtmosHeatConductionEnabled =
+        CVarDef.Create("atmos.conduction.enabled", false, CVar.SERVER | CVar.REPLICATED | CVar.ARCHIVE);
+
     public static readonly CVarDef<float> AtmosTransferCoefficient =
         CVarDef.Create("atmos.movement.transfer_coefficient", 1f, CVar.SERVER | CVar.REPLICATED);
 

@@ -8,22 +8,49 @@ namespace Content.Shared.Atmospherics.Factory;
 
 public sealed partial class GasMixtureFactory
 {
-    public void ConductTiles(ref TileAtmos m, ref TileHeat c, float cLength, float deltaTime, float k, IRobustArrayPool<float> pool)
+    [PublicAPI]
+    public void ConductTileAtmos(ref TileAtmos m, TileHeat c, float cLength, float deltaTime, IRobustArrayPool<float> pool)
     {
-        var dQ = ConductHeatQuery(ref c.Container, ref m.Mixture, cLength, cLength, deltaTime);
+        var dQ = ConductHeatQuery(ref c.Container, ref m.Mixture, cLength, deltaTime, pool);
         HeatContainerHelpers.AddHeat(ref c.CachedContainer, dQ);
-        AddHeat(ref m.CachedMixture, -dQ);
+        AddHeat(ref m.CachedMixture, -dQ, pool);
     }
 
-    /// <inheritdoc cref="ConductHeatQuery{T1,T2}"/>
     [PublicAPI]
-    public float ConductHeat<T1, T2>(ref T1 cA, ref T2 cB, float cLength, float heatG, float deltaTime)
+    public void ConductTileHeat(ref TileHeat c, TileAtmos m, float cLength, float deltaTime, IRobustArrayPool<float> pool)
+    {
+        var dQ = ConductHeatQuery(ref c.Container, ref m.Mixture, cLength, deltaTime, pool);
+        HeatContainerHelpers.AddHeat(ref c.CachedContainer, dQ);
+        AddHeat(ref m.CachedMixture, -dQ, pool);
+    }
+
+    /// <summary>
+    /// Calculates the amount of heat that would be conducted between <see cref="IHeatContainer"/> and a <see cref="IGasMixture"/>,
+    /// given some time delta.
+    /// </summary>
+    /// <param name="c">The <see cref="IHeatContainer"/> to conduct heat to.</param>
+    /// <param name="m">The <see cref="IGasMixture"/> to conduct heat to.</param>
+    /// <param name="cLength">Characteristic length of both containers.</param>
+    /// <param name="heatG">The thermal conductance of the heat container in watt per kelvin.</param>
+    /// <param name="deltaTime">
+    /// The amount of time that the heat is allowed to conduct, in seconds.
+    /// This value should be small such that deltaTime &lt;&lt; C / g where C is the heat capacity of the container.
+    /// If you need to simulate a larger time step split it into several smaller ones.
+    /// </param>
+    /// <returns>The amount of heat in joules that would be exchanged between the bodies.</returns>
+    /// <example>A positive value indicates heat transfer from a hot c2 to a cold c1.</example>
+    /// <remarks>
+    /// This performs a single step using the Euler method for solving the Fourier heat equation
+    /// \frac{dQ}{dt} = g \Delta T.
+    /// </remarks>
+    [PublicAPI]
+    public float ConductHeat<T1, T2>(ref T1 c, ref T2 m, float cLength, float heatG, float deltaTime)
         where T1 : IHeatContainer
         where T2 : IGasMixture
     {
-        var dQ = ConductHeatQuery(ref cA, ref cB, cLength, cLength, deltaTime);
-        HeatContainerHelpers.AddHeat(ref cA, dQ);
-        AddHeat(ref cB, -dQ);
+        var dQ = ConductHeatQuery(ref c, ref m, cLength, cLength, deltaTime);
+        HeatContainerHelpers.AddHeat(ref c, dQ);
+        AddHeat(ref m, -dQ);
         return dQ;
     }
 
@@ -47,26 +74,75 @@ public sealed partial class GasMixtureFactory
     /// \frac{dQ}{dt} = g \Delta T.
     /// </remarks>
     [PublicAPI]
-    public float ConductHeatQuery<T1, T2>(ref T1 c, ref T2 m, float cLength, float heatG, float deltaTime)
+    public float ConductHeatQuery<T1, T2>(ref T1 c,
+        ref T2 m,
+        float cLength,
+        float heatG,
+        float deltaTime)
+        where T1 : IHeatContainer
+        where T2 : IGasMixture
+    {
+        return ConductHeatQuery(ref c, ref m, cLength, heatG, deltaTime, SharedPool);
+    }
+
+    /// <summary>
+    /// Calculates the amount of heat that would be conducted between <see cref="IHeatContainer"/> and a <see cref="IGasMixture"/>,
+    /// given some time delta. Does not modify the containers.
+    /// </summary>
+    /// <param name="c">The <see cref="IHeatContainer"/> to conduct heat to.</param>
+    /// <param name="m">The <see cref="IGasMixture"/> to conduct heat to.</param>
+    /// <param name="cLength">Characteristic length of both containers.</param>
+    /// <param name="heatG">The thermal conductance of the heat container in watt per kelvin.</param>
+    /// <param name="deltaTime">
+    /// The amount of time that the heat is allowed to conduct, in seconds.
+    /// This value should be small such that deltaTime &lt;&lt; C / g where C is the heat capacity of the container.
+    /// If you need to simulate a larger time step split it into several smaller ones.
+    /// </param>
+    /// <param name="pool">Pool for taking gas buffers and using them for calculations.</param>
+    /// <returns>The amount of heat in joules that would be exchanged between the bodies.</returns>
+    /// <example>A positive value indicates heat transfer from a hot c2 to a cold c1.</example>
+    /// <remarks>
+    /// This performs a single step using the Euler method for solving the Fourier heat equation
+    /// \frac{dQ}{dt} = g \Delta T.
+    /// </remarks>
+    [PublicAPI]
+    public float ConductHeatQuery<T1, T2>(ref T1 c, ref T2 m, float cLength, float heatG, float deltaTime, IRobustArrayPool<float> pool)
         where T1 : IHeatContainer
         where T2 : IGasMixture
     {
         // The harmonic mean is used because conductance adds up inversely proportional.
-        var mixtureG = GetThermalConductivity(ref m) * cLength;
+        var mixtureG = GetThermalConductivity(ref m, pool) * cLength;
         var g = 2f * heatG * mixtureG / (heatG + mixtureG);
         var dQ = g * (m.Temperature - c.Temperature) * deltaTime;
         var dQMax = Math.Min(Math.Abs(HeatContainerHelpers.ConductHeatToTempQuery(ref c, m.Temperature)),
-            Math.Abs(ConductHeatToTempQuery(ref m, c.Temperature)));
+            Math.Abs(ConductHeatToTempQuery(ref m, c.Temperature, pool)));
 
         // Clamp the transferred heat amount in case we are overshooting the equilibrium temperature because our time step was too large.
         return Math.Clamp(dQ, -dQMax, dQMax);
     }
 
-    /// <inheritdoc cref="ConductHeatQuery{T1}"/>
+    /// <summary>
+    /// Calculates the amount of heat that would be conducted between two <see cref="IHeatContainer"/>s,
+    /// given some time delta.
+    /// </summary>
+    /// <param name="c">The <see cref="ConductiveHeatContainer"/> to conduct heat to.</param>
+    /// <param name="m">The <see cref="IGasMixture"/> to conduct heat to.</param>
+    /// <param name="cLength">Characteristic length of both containers.</param>
+    /// <param name="deltaTime">
+    /// The amount of time that the heat is allowed to conduct, in seconds.
+    /// This value should be small such that deltaTime &lt;&lt; C / g where C is the heat capacity of the container.
+    /// If you need to simulate a larger time step split it into several smaller ones.
+    /// </param>
+    /// <returns>The amount of heat in joules that would be exchanged between the bodies.</returns>
+    /// <example>A positive value indicates heat transfer from a hot c2 to a cold c1.</example>
+    /// <remarks>
+    /// This performs a single step using the Euler method for solving the Fourier heat equation
+    /// \frac{dQ}{dt} = g \Delta T.
+    /// </remarks>
     [PublicAPI]
     public float ConductHeat<T>(ref ConductiveHeatContainer c, ref T m, float cLength, float deltaTime) where T : IGasMixture
     {
-        var dQ = ConductHeatQuery(ref c, ref m, cLength, cLength, deltaTime);
+        var dQ = ConductHeatQuery(ref c, ref m, cLength, c.ThermalConductance, deltaTime);
         HeatContainerHelpers.AddHeat(ref c, dQ);
         AddHeat(ref m, -dQ);
         return dQ;
@@ -91,14 +167,48 @@ public sealed partial class GasMixtureFactory
     /// \frac{dQ}{dt} = g \Delta T.
     /// </remarks>
     [PublicAPI]
-    public float ConductHeatQuery<T>(ref ConductiveHeatContainer c, ref T m, float cLength, float deltaTime) where T : IGasMixture
+    public float ConductHeatQuery<T>(
+        ref ConductiveHeatContainer c,
+        ref T m,
+        float cLength,
+        float deltaTime) where T : IGasMixture
+    {
+        return ConductHeatQuery(ref c, ref m, cLength, deltaTime, SharedPool);
+    }
+
+    /// <summary>
+    /// Calculates the amount of heat that would be conducted between two <see cref="IHeatContainer"/>s,
+    /// given some time delta. Does not modify the containers.
+    /// </summary>
+    /// <param name="c">The <see cref="ConductiveHeatContainer"/> to conduct heat to.</param>
+    /// <param name="m">The <see cref="IGasMixture"/> to conduct heat to.</param>
+    /// <param name="cLength">Characteristic length of both containers.</param>
+    /// <param name="deltaTime">
+    /// The amount of time that the heat is allowed to conduct, in seconds.
+    /// This value should be small such that deltaTime &lt;&lt; C / g where C is the heat capacity of the container.
+    /// If you need to simulate a larger time step split it into several smaller ones.
+    /// </param>
+    /// <param name="pool">Pool for taking gas buffers and using them for calculations.</param>
+    /// <returns>The amount of heat in joules that would be exchanged between the bodies.</returns>
+    /// <example>A positive value indicates heat transfer from a hot c2 to a cold c1.</example>
+    /// <remarks>
+    /// This performs a single step using the Euler method for solving the Fourier heat equation
+    /// \frac{dQ}{dt} = g \Delta T.
+    /// </remarks>
+    [PublicAPI]
+    public float ConductHeatQuery<T>(
+        ref ConductiveHeatContainer c,
+        ref T m,
+        float cLength,
+        float deltaTime,
+        IRobustArrayPool<float> pool) where T : IGasMixture
     {
         // The harmonic mean is used because conductance adds up inversely proportional.
-        var mixtureG = GetThermalConductivity(ref m) * cLength;
+        var mixtureG = GetThermalConductivity(ref m, pool) * cLength;
         var g = 2f * c.ThermalConductance * mixtureG / (c.ThermalConductance + mixtureG);
         var dQ = g * (m.Temperature - c.Temperature) * deltaTime;
         var dQMax = Math.Min(Math.Abs(HeatContainerHelpers.ConductHeatToTempQuery(ref c, m.Temperature)),
-            Math.Abs(ConductHeatToTempQuery(ref m, c.Temperature)));
+            Math.Abs(ConductHeatToTempQuery(ref m, c.Temperature, pool)));
 
         // Clamp the transferred heat amount in case we are overshooting the equilibrium temperature because our time step was too large.
         return Math.Clamp(dQ, -dQMax, dQMax);
@@ -124,7 +234,7 @@ public sealed partial class GasMixtureFactory
     /// The calculations are done according to Newton's law of cooling.
     /// </remarks>
     [PublicAPI]
-    public float ConductHeatVelocityQuery(ref ConductiveHeatContainer c, ref GasMixture m, float cLength, float surfaceArea, float speed, float deltaTime)
+    public float ConductHeatVelocityQuery(ref ConductiveHeatContainer c, ref GasMixture m, float cLength, float surfaceArea, float speed, float deltaTime, IRobustArrayPool<float> pool)
     {
         // The harmonic mean is used because conductance adds up inversely proportional.
         var mixtureG = GetThermalConductivity(ref m) * cLength;
@@ -143,15 +253,15 @@ public sealed partial class GasMixtureFactory
 
         var dQ = h * surfaceArea * (m.Temperature - c.Temperature) * deltaTime;
         var dQMax = Math.Min(Math.Abs(HeatContainerHelpers.ConductHeatToTempQuery(ref c, m.Temperature)),
-            Math.Abs(ConductHeatToTempQuery(ref m, c.Temperature)));
+            Math.Abs(ConductHeatToTempQuery(ref m, c.Temperature, pool)));
 
         // Clamp the transferred heat amount in case we are overshooting the equilibrium temperature because our time step was too large.
         return Math.Clamp(dQ, -dQMax, dQMax);
     }
 
     [PublicAPI]
-    public float ConductHeatToTempQuery<T>(ref T m, float targetTemp) where T : IGasMixture
+    public float ConductHeatToTempQuery<T>(ref T m, float targetTemp, IRobustArrayPool<float> pool) where T : IGasMixture
     {
-        return (targetTemp - m.Temperature) * GetHeatCapacity(ref m);
+        return (targetTemp - m.Temperature) * GetHeatCapacity(ref m, pool);
     }
 }

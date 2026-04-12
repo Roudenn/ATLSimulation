@@ -44,7 +44,6 @@ public sealed class GameTicker : SharedGameTicker
 
     public void PostInitialize()
     {
-
         RestartSimulationMap();
     }
 
@@ -84,11 +83,11 @@ public sealed class GameTicker : SharedGameTicker
         var entity = Spawn(ObserverEntity, coords);
 
         // Spawn our player
-        if (_playerManager.SetAttachedEntity(session, entity))
-        {
-            PlayerJoinGame(session);
-            Log.Info($"Successfully spawned and attached player {session.Name}");
-        }
+        if (!_playerManager.SetAttachedEntity(session, entity))
+            return;
+
+        PlayerJoinGame(session);
+        Log.Info($"Successfully spawned and attached player {session.Name}");
     }
 
     private bool TryGetMainMap([NotNullWhen(true)] out EntityUid? map)
