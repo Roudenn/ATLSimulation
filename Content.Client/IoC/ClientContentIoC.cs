@@ -1,5 +1,6 @@
 using Content.Client.Clickable;
 using Content.Client.Fullscreen;
+using Content.Client.GameCVars;
 using Content.Client.Parallax.Managers;
 using Content.Client.Screenshot;
 using Content.Client.Stylesheets;
@@ -20,5 +21,6 @@ internal static class ClientContentIoC
         collection.Register<IClickMapManager, ClickMapManager>();
         collection.Register<IStylesheetManager, StylesheetManager>();
         collection.Register<ViewportManager, ViewportManager>();
+        collection.Register<ContentConfigurationManager, ContentConfigurationManager>();
     }
 }

@@ -1,0 +1,31 @@
+﻿<tabs:ServerTab xmlns="https://spacestation14.io"
+          xmlns:tabs="clr-namespace:Content.Client.Options.UI.Tabs"
+          xmlns:ui="clr-namespace:Content.Client.Options.UI">
+    <BoxContainer Orientation="Vertical">
+        <ScrollContainer VerticalExpand="True">
+            <BoxContainer Orientation="Vertical" Margin="8 8 8 8">
+                <!-- General server options -->
+                <Label Text="{Loc 'ui-viewport-header-simulation'}" StyleClasses="LabelHeading"/>
+                <ui:OptionSlider Name="DivisionsSlider" Title="{Loc 'ui-viewport-options-divisions'}"/>
+                <ui:OptionSlider Name="NetFrequencySlider" Title="{Loc 'ui-viewport-options-net-frequency'}"/>
+                <ui:OptionSlider Name="HeightSlider" Title="{Loc 'ui-viewport-options-height'}"/>
+
+                <!-- Atmosphere -->
+                <Label Text="{Loc 'ui-viewport-header-atmosphere'}" StyleClasses="LabelKeyText"/>
+                <CheckBox Name="AtmosMovementCheckBox" Text="{Loc 'ui-viewport-options-atmos-movement'}"/>
+                <CheckBox Name="AtmosDiffusionCheckBox" Text="{Loc 'ui-viewport-options-atmos-diffusion'}"/>
+                <CheckBox Name="AtmosHeatConductionCheckBox" Text="{Loc 'ui-viewport-options-atmos-heat-conduction'}"/>
+                <ui:OptionSlider Name="AtmosTransferCoefficientSlider" Title="{Loc 'ui-viewport-atmos-transfer-coefficient'}"/>
+                <ui:OptionSlider Name="AtmosSpeedupSlider" Title="{Loc 'ui-viewport-options-atmos-speedup'}"/>
+                <ui:OptionSlider Name="AtmosStepsSlider" Title="{Loc 'ui-viewport-options-atmos-steps'}"/>
+
+                <!-- Temperature -->
+                <Label Text="{Loc 'ui-viewport-header-temperature'}" StyleClasses="LabelKeyText"/>
+                <CheckBox Name="HeatConductionCheckBox" Text="{Loc 'ui-viewport-options-temperature-conduction'}"/>
+                <ui:OptionSlider Name="HeatSpeedupSlider" Title="{Loc 'ui-viewport-options-heat-speedup'}"/>
+                <ui:OptionSlider Name="HeatStepsSlider" Title="{Loc 'ui-viewport-options-heat-steps'}"/>
+            </BoxContainer>
+        </ScrollContainer>
+        <ui:OptionsTabControlRow Name="Control" Access="Public" />
+    </BoxContainer>
+</tabs:ServerTab>

@@ -32,6 +32,21 @@ ui-viewport-tabs-visuals-debug-subgrid-tiles = Subgrid Tile boundaries
 ui-viewport-submit-map = Submit Map
 ui-viewport-restart = Restart Simulation
 
+ui-viewport-options-divisions = Divisions
+ui-viewport-options-net-frequency = Net Frequency
+ui-viewport-options-height = Grid Height
+
+ui-viewport-options-atmos-movement = Gas Movement
+ui-viewport-options-atmos-diffusion = Gas Diffusion
+ui-viewport-options-atmos-heat-conduction = Gas Heat Conduction
+ui-viewport-atmos-transfer-coefficient = Gas Transfer Coefficient
+ui-viewport-options-atmos-speedup = Atmosphere Speedup
+ui-viewport-options-atmos-steps = Atmosphere Steps
+
+ui-viewport-options-temperature-conduction = Solid Heat Conduction
+ui-viewport-options-heat-speedup = Heat Speedup
+ui-viewport-options-heat-steps = Heat Steps
+
 # Editor tab
 unit-moles = moles
 unit-mega-joules = MJ
