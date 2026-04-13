@@ -242,6 +242,8 @@ public sealed partial class AtmosphericsSystem
         float deltaTime,
         IRobustArrayPool<float> pool)
     {
+        var tiles = new ValueList<(Vector2i, TileAtmos)>();
+        var neighboursCoefficient = 0f;
         foreach (var dir in SharedSubGridSystem.DirectionsWithDiagonals)
         {
             if (!_subGrid.TryGetAtmosphereTileRelative(chunkBuffer, chunkIndices, index, dir, out var found))
@@ -249,25 +251,38 @@ public sealed partial class AtmosphericsSystem
 
             // The coefficients for interaction get halved when going diagonally,
             // since Characteristic Length is multiplied by √2 and surface area is multiplied by √2/2.
-            var alteredTime = deltaTime * AtmosSpeedup;
             if (!SharedSubGridSystem.Directions.Contains(dir))
             {
-                alteredTime /= 2f;
-
                 // Diagonal movement is only possible if there are also neighbouring tiles.
                 if (!_subGrid.TryGetAtmosphereTileRelative(chunkBuffer, chunkIndices, index, new Vector2i(dir.X, 0), out var foundFirst)
                     || !_subGrid.TryGetAtmosphereTileRelative(chunkBuffer, chunkIndices, index, new Vector2i(0, dir.Y), out var foundSecond)
                     || !foundFirst.Value.Initialized
                     || !foundSecond.Value.Initialized)
                     continue;
+
+                tiles.Add((dir, found.Value));
+                neighboursCoefficient += 0.5f;
             }
+            else
+            {
+                tiles.Add((dir, found.Value));
+                neighboursCoefficient += 1f;
+            }
+        }
+
+        foreach (var (dir, foundTile) in tiles)
+        {
+            var alteredTime = deltaTime * AtmosSpeedup;
+            if (!SharedSubGridSystem.Directions.Contains(dir))
+                alteredTime /= 2f;
 
             GasManager.ShareTiles(
                 ref tile,
-                found.Value,
+                foundTile,
                 _subGrid.SubGridWorldSize,
                 alteredTime,
                 AtmosTransferCoefficient,
+                neighboursCoefficient,
                 pool);
         }
 

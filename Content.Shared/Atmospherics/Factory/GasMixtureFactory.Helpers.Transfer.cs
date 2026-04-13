@@ -7,12 +7,12 @@ namespace Content.Shared.Atmospherics.Factory;
 
 public sealed partial class GasMixtureFactory
 {
-    public void ShareTiles(ref TileAtmos m1, TileAtmos m2, float cLength, float deltaTime, float k, IRobustArrayPool<float> pool)
+    public void ShareTiles(ref TileAtmos m1, TileAtmos m2, float cLength, float deltaTime, float k, float neighboursCoefficient, IRobustArrayPool<float> pool)
     {
         var buffer1 = pool.Rent();
         var buffer2 = pool.Rent();
-        ShareTilesQuery(ref m1.Mixture, ref m2.Mixture, cLength, deltaTime, k, buffer1, buffer2, pool);
-        TransferMoles(ref m1.CachedMixture, ref m2.CachedMixture, buffer1, buffer2, pool);
+        ShareTilesQuery(ref m1.Mixture, ref m2.Mixture, cLength, deltaTime, k, neighboursCoefficient,buffer1, buffer2, pool);
+        TransferMoles(ref m1.CachedMixture, ref m2.CachedMixture, buffer1, buffer2, pool, neighboursCoefficient);
         pool.Return(buffer1);
         pool.Return(buffer2);
     }
@@ -23,6 +23,7 @@ public sealed partial class GasMixtureFactory
         float cLength,
         float deltaTime,
         float k,
+        float neighboursCoefficient,
         Span<float> firstMoles,
         Span<float> secondMoles,
         IRobustArrayPool<float> pool)
@@ -33,7 +34,7 @@ public sealed partial class GasMixtureFactory
         var buffer2 = pool.Rent();
         // Total pressure difference because the diffusion is already implemented.
         var deltaPressure = GetPressure(ref m1) - GetPressure(ref m2);
-        var molesMoved = deltaPressure * deltaTime * cLength * k;
+        var molesMoved = deltaPressure * deltaTime * cLength * k / neighboursCoefficient;
         GetMolesRatio(ref m1, buffer1);
         GetMolesRatio(ref m2, buffer2);
         NumericsHelpers.Multiply(buffer1, molesMoved, firstMoles);
@@ -64,7 +65,7 @@ public sealed partial class GasMixtureFactory
     }
 
     [PublicAPI]
-    public void TransferMoles<T1, T2>(ref T1 m1, ref T2 m2, Span<float> firstMoles, Span<float> secondMoles, IRobustArrayPool<float> pool)
+    public void TransferMoles<T1, T2>(ref T1 m1, ref T2 m2, Span<float> firstMoles, Span<float> secondMoles, IRobustArrayPool<float> pool, float neighboursCoefficient = 1f)
         where T1 : IGasMixture
         where T2 : IGasMixture
     {
