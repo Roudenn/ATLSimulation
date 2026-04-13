@@ -31,3 +31,12 @@ ui-viewport-tabs-visuals-debug-subgrid-tiles = Subgrid Tile boundaries
 # Simulation tab
 ui-viewport-submit-map = Submit Map
 ui-viewport-restart = Restart Simulation
+
+# Editor tab
+unit-moles = moles
+unit-mega-joules = MJ
+
+editor-gas-selected-none = None
+
+ui-editor-add-gas = Add gas:
+ui-editor-add-heat = Add heat:

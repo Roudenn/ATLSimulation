@@ -2,9 +2,20 @@
           xmlns:visuals="clr-namespace:Content.Client.UserInterface.Systems.Tabs">
     <BoxContainer Orientation="Vertical">
         <ScrollContainer VerticalExpand="True">
-            <BoxContainer Name="Editor" Orientation="Vertical" Margin="8 8 8 8">
-                <OptionButton Name="EditorModes"/>
-                <OptionButton Name="GasOptions"/>
+            <BoxContainer Orientation="Vertical">
+                <BoxContainer Name="GasEditor" Orientation="Vertical" Margin="8 8 8 8">
+                    <Label Text="{Loc 'ui-viewport-header-atmosphere'}" StyleClasses="LabelKeyText"/>
+                    <OptionButton Name="GasOptions"/>
+                    <BoxContainer Name="AddGasBox" Orientation="Horizontal">
+                        <Label Text="{Loc 'ui-editor-add-gas'}"/>
+                    </BoxContainer>
+                </BoxContainer>
+                <BoxContainer Name="HeatEditor" Orientation="Vertical" Margin="8 8 8 8">
+                    <Label Text="{Loc 'ui-viewport-header-temperature'}" StyleClasses="LabelKeyText"/>
+                    <BoxContainer Name="AddHeatBox" Orientation="Horizontal">
+                        <Label Text="{Loc 'ui-editor-add-heat'}"/>
+                    </BoxContainer>
+                </BoxContainer>
             </BoxContainer>
         </ScrollContainer>
     </BoxContainer>

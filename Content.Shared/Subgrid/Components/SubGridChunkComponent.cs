@@ -35,12 +35,12 @@ public sealed partial class SubGridChunkComponent : Component
     /// <summary>
     /// A buffer used when serializing the full state on server side.
     /// </summary>
-    public GasMixture[] AtmosBuffer = new GasMixture[0];
+    public GasMixture[] AtmosBuffer;
 
     /// <summary>
     /// A buffer used when serializing the full state on server side.
     /// </summary>
-    public ConductiveHeatContainer[] HeatBuffer = new ConductiveHeatContainer[0];
+    public ConductiveHeatContainer[] HeatBuffer;
 }
 
 [Serializable, NetSerializable]

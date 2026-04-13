@@ -8,8 +8,6 @@
             <PanelContainer.PanelOverride>
                 <graphics:StyleBoxFlat BorderColor="#4f4f4f" />
             </PanelContainer.PanelOverride>
-            <controls:HeatInspectControl Name="HeatInspect"/>
-
             <!-- The rest is filled by the Populate function to the DataContainer -->
             <BoxContainer Name="DataContainer" Orientation="Vertical" VerticalExpand="True" Margin="4"/>
         </PanelContainer>

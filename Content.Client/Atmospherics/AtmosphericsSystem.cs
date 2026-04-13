@@ -19,10 +19,13 @@ public sealed class AtmosphericsSystem : SharedAtmosphericsSystem
     [Dependency] private readonly SharedMapSystem _map = default!;
     [Dependency] private readonly SharedTransformSystem _xform = default!;
 
-    public SubGridPlacementMode CurrentMode = SubGridPlacementMode.None;
+    [ViewVariables]
+    public float GasChangeAmount = 0f;
 
-    public float ChangeAmount = 0f;
+    [ViewVariables]
+    public float HeatChangeAmount = 0f;
 
+    [ViewVariables]
     public ProtoId<GasPrototype>? SelectedGas = null;
 
     public override void Initialize()
@@ -32,11 +35,11 @@ public sealed class AtmosphericsSystem : SharedAtmosphericsSystem
             .Bind(ContentKeyFunctions.AdjustSubgridElement,
                 InputCmdHandler.FromDelegate(_ => AdjustSubgridElement()))
             .Bind(ContentKeyFunctions.ReduceSubgridElement,
-                InputCmdHandler.FromDelegate(_ => ReduceSubgridElement()))
+                InputCmdHandler.FromDelegate(_ => AdjustSubgridElement(true)))
             .Register<SharedAtmosphericsSystem>();
     }
 
-    private void AdjustSubgridElement()
+    private void AdjustSubgridElement(bool invert = false)
     {
         var mousePos = _eyeMan.PixelToMap(_inputMan.MouseScreenPosition);
         if (!_mapMan.TryFindGridAt(mousePos, out var gridUid, out var gridComp))
@@ -45,59 +48,13 @@ public sealed class AtmosphericsSystem : SharedAtmosphericsSystem
         var localPos = Vector2.Transform(mousePos.Position, _xform.GetInvWorldMatrix(gridUid));
         var tile = _map.LocalToTile(gridUid, gridComp, new EntityCoordinates(gridUid, localPos));
 
-        switch (CurrentMode)
+        if (SelectedGas != null)
         {
-            case SubGridPlacementMode.None:
-                return;
-            case SubGridPlacementMode.Moles:
-                if (SelectedGas == null)
-                    return;
-
-                var atmosEv = new SubGridAddMolesMessage(GetNetEntity(gridUid), tile, SelectedGas.Value, ChangeAmount);
-                RaiseNetworkEvent(atmosEv);
-                break;
-            case SubGridPlacementMode.Temperature:
-                var heatEv = new SubGridAddHeatMessage(GetNetEntity(gridUid), tile, ChangeAmount);
-                RaiseNetworkEvent(heatEv);
-                break;
-            default:
-                throw new ArgumentOutOfRangeException();
+            var atmosEv = new SubGridAddMolesMessage(GetNetEntity(gridUid), tile, SelectedGas.Value, invert ? -GasChangeAmount : GasChangeAmount);
+            RaiseNetworkEvent(atmosEv);
         }
+
+        var heatEv = new SubGridAddHeatMessage(GetNetEntity(gridUid), tile, invert ? -HeatChangeAmount : HeatChangeAmount);
+        RaiseNetworkEvent(heatEv);
     }
-
-    private void ReduceSubgridElement()
-    {
-        var mousePos = _eyeMan.PixelToMap(_inputMan.MouseScreenPosition);
-        if (!_mapMan.TryFindGridAt(mousePos, out var gridUid, out var gridComp))
-            return;
-
-        var localPos = Vector2.Transform(mousePos.Position, _xform.GetInvWorldMatrix(gridUid));
-        var tile = _map.LocalToTile(gridUid, gridComp, new EntityCoordinates(gridUid, localPos));
-
-        switch (CurrentMode)
-        {
-            case SubGridPlacementMode.None:
-                return;
-            case SubGridPlacementMode.Moles:
-                if (SelectedGas == null)
-                    return;
-
-                var atmosEv = new SubGridAddMolesMessage(GetNetEntity(gridUid), tile, SelectedGas.Value, -ChangeAmount);
-                RaisePredictiveEvent(atmosEv);
-                break;
-            case SubGridPlacementMode.Temperature:
-                var heatEv = new SubGridAddHeatMessage(GetNetEntity(gridUid), tile, -ChangeAmount);
-                RaisePredictiveEvent(heatEv);
-                break;
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
-    }
-}
-
-public enum SubGridPlacementMode
-{
-    None,
-    Moles,
-    Temperature,
 }

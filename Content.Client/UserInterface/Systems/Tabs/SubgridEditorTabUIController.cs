@@ -32,8 +32,8 @@ public sealed class SubgridEditorTabUIController : UIController
         if (EditorTab == null)
             return;
 
-        EditorTab.OnModeSelected += OnModeSelected;
-        EditorTab.OnValueChanged += OnValueChanged;
+        EditorTab.OnHeatValueChanged += OnHeatValueChanged;
+        EditorTab.OnGasValueChanged += OnGasValueChanged;
         EditorTab.OnGasSelected += OnGasSelected;
         EditorTab?.UpdateGasOptions();
     }
@@ -43,25 +43,23 @@ public sealed class SubgridEditorTabUIController : UIController
         if (EditorTab == null)
             return;
 
-        EditorTab.OnModeSelected -= OnModeSelected;
-        EditorTab.OnValueChanged -= OnValueChanged;
+        EditorTab.OnHeatValueChanged -= OnHeatValueChanged;
+        EditorTab.OnGasValueChanged -= OnGasValueChanged;
         EditorTab.OnGasSelected -= OnGasSelected;
     }
 
-    private void OnModeSelected(int id)
+    private void OnGasSelected(int gasId)
     {
-        var selected = (SubGridPlacementMode) id;
-        EditorTab?.SetGasOptionVisible(selected is SubGridPlacementMode.Moles);
-        _atmos.CurrentMode = selected;
+        _atmos.SelectedGas = gasId == -1 ? null : _gasFactory[gasId].ID;
     }
 
-    private void OnGasSelected(byte gasId)
+    private void OnGasValueChanged(float value)
     {
-        _atmos.SelectedGas = _gasFactory[gasId].ID;
+        _atmos.GasChangeAmount = value;
     }
 
-    private void OnValueChanged(float value)
+    private void OnHeatValueChanged(float value)
     {
-        _atmos.ChangeAmount = value;
+        _atmos.HeatChangeAmount = value;
     }
 }

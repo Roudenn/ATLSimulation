@@ -85,12 +85,6 @@ public sealed partial class GasInspectControl : BoxContainer
         });
         CEnvironmentMix.AddChild(tempBox);
 
-        // If there is no gas, it doesn't really have a temperature, so skip displaying it
-        if (gasMix.Pressure > SystemConstants.GasMinMoles)
-        {
-            HeatInspect.Populate(gasMix.Temperature, gasMix.HeatCapacity, gasMix.ThermalConductivity);
-        }
-
         if (gasMix.Gases == null || gasMix.Gases?.Length == 0)
         {
             // Separator
@@ -137,13 +131,13 @@ public sealed partial class GasInspectControl : BoxContainer
                 new Control
                 {
                     MinSize = new Vector2(10, 0),
-                    HorizontalExpand = true
+                    HorizontalExpand = true,
                 },
                 tableVal,
                 new Control
                 {
                     MinSize = new Vector2(10, 0),
-                    HorizontalExpand = true
+                    HorizontalExpand = true,
                 },
                 tablePercent
             }
