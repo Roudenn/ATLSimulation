@@ -1,50 +1,50 @@
-# Project ATLAS
-Project ATLAS is an Atmospheric, Temperature, and Liquid tile-based simulation with high level of customization, that can be used both for educational purposes and video games.
+# Проект ATLAS
+Проект ATLAS - это симуляция Атмосферы, Температуры и жидкостей, основанная на методе конечных разносей с высокой степенью кастомизации, которую можно использовать как в образовательных, так и в развлекательных целях.
 
 > [!WARNING]
 >
 > WIP
 >
-> This project is still under development! Not recommended for serious use. Check [Roadmap](##roadmap) to see the progress.
+> Этот проект всё ещё находится в разработке! Не рекомендуется для серьёзного использования. Смотрите [Карту прогресса](#карта-прогресса).
 
 ## Overview
 
-Project ATLAS runs on [Robust Toolbox](https://github.com/space-wizards/RobustToolbox), an engine primarily developed for [Space Station 14](https://github.com/space-wizards/space-station-14). The project was inspired by atmospheric and puddle systems from a said game, but they've been rewritten from scratch to be as customizable as possible.
+Проект ATLAS запущен на игровом движке [Robust Toolbox](https://github.com/space-wizards/RobustToolbox), который преимущественно разрабатывается для игры [Space Station 14](https://github.com/space-wizards/space-station-14). Проект изначально был вдохновлён системой атмосферы и луж из данной игры, однако данные системы были написаны с нуля для расширения спектра применимости.
 
-### Main features of this project:
-- **Real physical laws** - Realistic heat conduction and gas diffusion are already implemented.
-- **8-directional interaction** - tiles interact in all directions instead of just 4, preventing it from forming "star" shapes.
-- **Customizable grid** - the main subgrid which stores smallest elements of the simulation can be easily scaled to be as precise as you want.
-- **Multithreading for chunks** - each chunk is processed in parallel, providing improved performance.
+### Основные характеристики:
+- **Реальные физические законы** - Уже добавлена реалистичная проводимость тепла и диффузия газов.
+- **Взаимодействие клеток по 8-ми направлениям** - клетки взаимодействуют друг с другом через 8 сторон света вместо 4, предотвращая образование "звёзд" при запуске симуляции.
+- **Настраиваемая сетка** - основная сетка, хранящая мельчайшие элементы симуляции, может быть легко масштабирована для повышения или снижения качества.
+- **Многопоточность для чанков** - каждый чанк расчитывается в собственном потоке, что даёт прибавку к производительности.
 
-## Quick start
+## Быстрый старт
 
-1. Clone this repo:
+1. Склонируйте данный репозиторий:
 ```shell
 git clone https://github.com/space-wizards/space-station-14.git
 ```
-2. Go to the project folder and run `RUN_THIS.py` to initialize the submodules and load the engine:
+2. Перейдите в папку проекта и запустите `RUN_THIS.py`, чтобы инициализировать субмодули и загрузить движок:
 ```shell
 cd space-station-14
 python RUN_THIS.py
 ```
-3. Compile the solution:
+3. Скомпилируйте решение:
 
 Depending on your system, launch `Scripts/bat/buildAllRelease.bat` or `Scripts/sh/buildAllRelease.sh`.
 
-4. Launch the compiled solution:
+4. Запустите скомпилированное решение:
 
 Depending on your system, launch `Scripts/bat/runQuickAll.bat`. or `Scripts/sh/runQuickAll.sh`.
 
-## Roadmap
+## Карта прогресса
 
 TODO
 
-## Code & assets
-Most of the code unrelated to the project's goals and all graphical assets were taken from [Space Station 14](https://github.com/space-wizards/space-station-14).
+## Код и использованные ресурсы
+Большинство кода, не относящегося к целям проекта, а также все графические ресурсы (текстуры и интерфейс) были взяты из [Space Station 14](https://github.com/space-wizards/space-station-14).
 
 ## License
 
-All code for the content repository is licensed under the [MIT license](https://github.com/space-wizards/space-station-14/blob/master/LICENSE.TXT).
+Весь код в данном репозитории лицензирован под [MIT license](https://github.com/space-wizards/space-station-14/blob/master/LICENSE.TXT).
 
-Most assets are licensed under [CC-BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/) unless stated otherwise. Assets have their license and copyright specified in the metadata file.
+Большинство ассетов лицензированы под [CC-BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/), если не сказано иначе. Лицензия и авторские права для всех ассетов указаны в файлах с названием meta.json.
