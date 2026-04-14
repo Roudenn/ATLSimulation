@@ -1,5 +1,5 @@
 # Проект ATLAS
-Проект ATLAS - это симуляция Атмосферы, Температуры и жидкостей, основанная на методе конечных разносей с высокой степенью кастомизации, которую можно использовать как в образовательных, так и в развлекательных целях.
+Проект ATLAS - это симуляция Атмосферы, Температуры и Жидкостей, основанная на методе конечных разносей с высокой степенью кастомизации, которую можно использовать как в образовательных, так и в развлекательных целях.
 
 > [!WARNING]
 >
@@ -7,7 +7,7 @@
 >
 > Этот проект всё ещё находится в разработке! Не рекомендуется для серьёзного использования. Смотрите [Карту прогресса](#карта-прогресса).
 
-## Overview
+## Описание
 
 Проект ATLAS запущен на игровом движке [Robust Toolbox](https://github.com/space-wizards/RobustToolbox), который преимущественно разрабатывается для игры [Space Station 14](https://github.com/space-wizards/space-station-14). Проект изначально был вдохновлён системой атмосферы и луж из данной игры, однако данные системы были написаны с нуля для расширения спектра применимости.
 
@@ -30,11 +30,11 @@ python RUN_THIS.py
 ```
 3. Скомпилируйте решение:
 
-Depending on your system, launch `Scripts/bat/buildAllRelease.bat` or `Scripts/sh/buildAllRelease.sh`.
+В зависимости от вашей системы, запустите `Scripts/bat/buildAllRelease.bat` или `Scripts/sh/buildAllRelease.sh`.
 
 4. Запустите скомпилированное решение:
 
-Depending on your system, launch `Scripts/bat/runQuickAll.bat`. or `Scripts/sh/runQuickAll.sh`.
+В зависимости от вашей системы, запустите `Scripts/bat/runQuickAll.bat`. или `Scripts/sh/runQuickAll.sh`.
 
 ## Карта прогресса
 
@@ -43,7 +43,7 @@ TODO
 ## Код и использованные ресурсы
 Большинство кода, не относящегося к целям проекта, а также все графические ресурсы (текстуры и интерфейс) были взяты из [Space Station 14](https://github.com/space-wizards/space-station-14).
 
-## License
+## Лицензия
 
 Весь код в данном репозитории лицензирован под [MIT license](https://github.com/space-wizards/space-station-14/blob/master/LICENSE.TXT).
 
