@@ -14,6 +14,7 @@ public sealed partial class ServerTab : Control
         RobustXamlLoader.Load(this);
 
         Control.AddServerOptionSlider(GameConfigVars.SubGridSize, DivisionsSlider, 0, 3);
+        Control.AddServerOptionSlider(GameConfigVars.SubGridUpdateFrequency, UpdateFrequencySlider, 1, 10);
         Control.AddServerOptionSlider(GameConfigVars.SubGridNetFrequency, NetFrequencySlider, 1, 30);
         Control.AddServerOptionFloatSlider(GameConfigVars.SubGridHeight, HeightSlider, 0.1f, 10f, 1f);
 

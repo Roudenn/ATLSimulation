@@ -7,6 +7,7 @@
                 <!-- General server options -->
                 <Label Text="{Loc 'ui-viewport-header-simulation'}" StyleClasses="LabelHeading"/>
                 <ui:OptionSlider Name="DivisionsSlider" Title="{Loc 'ui-viewport-options-divisions'}"/>
+                <ui:OptionSlider Name="UpdateFrequencySlider" Title="{Loc 'ui-viewport-options-update-frequency'}"/>
                 <ui:OptionSlider Name="NetFrequencySlider" Title="{Loc 'ui-viewport-options-net-frequency'}"/>
                 <ui:OptionSlider Name="HeightSlider" Title="{Loc 'ui-viewport-options-height'}"/>
 

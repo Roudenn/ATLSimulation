@@ -7,6 +7,9 @@ public sealed partial class GameConfigVars
     public static readonly CVarDef<int> SubGridSize =
         CVarDef.Create("subgrid.size", 2, CVar.SERVER | CVar.REPLICATED | CVar.ARCHIVE);
 
+    public static readonly CVarDef<int> SubGridUpdateFrequency =
+        CVarDef.Create("subgrid.update_frequency", 1, CVar.SERVER | CVar.REPLICATED | CVar.ARCHIVE);
+
     public static readonly CVarDef<int> SubGridNetFrequency =
         CVarDef.Create("subgrid.net_frequency", 2, CVar.SERVER | CVar.REPLICATED | CVar.ARCHIVE);
 

@@ -48,12 +48,16 @@ public abstract partial class SharedSubGridSystem
     public int SubGridChunkArea { get; private set; }
 
     [ViewVariables]
+    public int SubGridUpdateFrequency { get; private set; }
+
+    [ViewVariables]
     public int SubGridNetFrequency { get; private set; }
 
     private void InitializeCVars()
     {
         Subs.CVar(CfgManager, GameConfigVars.SubGridHeight, OnHeightChanged, true);
         Subs.CVar(CfgManager, GameConfigVars.SubGridSize, OnSubGridSizeChanged, true);
+        Subs.CVar(CfgManager, GameConfigVars.SubGridUpdateFrequency, f => SubGridUpdateFrequency = f, true);
         Subs.CVar(CfgManager, GameConfigVars.SubGridNetFrequency, f => SubGridNetFrequency = f, true);
     }
 

@@ -33,6 +33,7 @@ ui-viewport-submit-map = Выбрать карту
 ui-viewport-restart = Перезапустить симуляцию
 
 ui-viewport-options-divisions = Деления сетки
+ui-viewport-options-update-frequency = Частота обновления
 ui-viewport-options-net-frequency = Частота обновления сети
 ui-viewport-options-height = Высота сетки
 

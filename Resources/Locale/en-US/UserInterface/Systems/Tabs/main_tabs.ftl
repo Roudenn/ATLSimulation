@@ -33,6 +33,7 @@ ui-viewport-submit-map = Submit Map
 ui-viewport-restart = Restart Simulation
 
 ui-viewport-options-divisions = Divisions
+ui-viewport-options-update-frequency = Update Frequency
 ui-viewport-options-net-frequency = Net Frequency
 ui-viewport-options-height = Grid Height
 

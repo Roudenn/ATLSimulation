@@ -25,6 +25,7 @@ public sealed partial class SubGridSystem : SharedSubGridSystem
     private EntityQuery<MaterialComponent> _materialQuery;
     private EntityQuery<GasMarkerComponent> _markerQuery;
 
+    private GameTick _lastUpdateTick;
     private GameTick _lastDirtyTick;
 
     public override void Initialize()
@@ -75,10 +76,13 @@ public sealed partial class SubGridSystem : SharedSubGridSystem
     public override void Update(float frameTime)
     {
         base.Update(frameTime);
+        var curTick = _timing.CurTick;
+        if (curTick.Value - _lastUpdateTick.Value < SubGridUpdateFrequency)
+            return;
+
         _temperature.UpdateHeat();
         _atmos.UpdateAtmos();
 
-        var curTick = _timing.CurTick;
         if (curTick.Value - _lastDirtyTick.Value < SubGridNetFrequency)
             return;
 
