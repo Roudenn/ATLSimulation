@@ -1,2 +1,0 @@
-ent-MobObserver = камера
-    .desc = { "" }
