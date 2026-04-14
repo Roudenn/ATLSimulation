@@ -17,14 +17,14 @@ public sealed partial class ServerTab : Control
         Control.AddServerOptionSlider(GameConfigVars.SubGridNetFrequency, NetFrequencySlider, 1, 30);
         Control.AddServerOptionFloatSlider(GameConfigVars.SubGridHeight, HeightSlider, 0.1f, 10f, 1f);
 
-        Control.AddOptionServerCheckBox(GameConfigVars.AtmosDiffusionEnabled, AtmosDiffusionCheckBox);
-        Control.AddOptionServerCheckBox(GameConfigVars.AtmosMovementEnabled, AtmosMovementCheckBox);
-        Control.AddOptionServerCheckBox(GameConfigVars.AtmosHeatConductionEnabled, AtmosHeatConductionCheckBox);
+        Control.AddServerOptionCheckBox(GameConfigVars.AtmosDiffusionEnabled, AtmosDiffusionCheckBox);
+        Control.AddServerOptionCheckBox(GameConfigVars.AtmosMovementEnabled, AtmosMovementCheckBox);
+        Control.AddServerOptionCheckBox(GameConfigVars.AtmosHeatConductionEnabled, AtmosHeatConductionCheckBox);
         Control.AddServerOptionFloatSlider(GameConfigVars.AtmosTransferCoefficient, AtmosTransferCoefficientSlider, 0.1f, 10f, 1f);
         Control.AddServerOptionSlider(GameConfigVars.AtmosSteps, AtmosStepsSlider, 1, 20);
         Control.AddServerOptionFloatSlider(GameConfigVars.AtmosSpeedup, AtmosSpeedupSlider, 0.1f, 10f, 1f);
 
-        Control.AddOptionServerCheckBox(GameConfigVars.HeatEnabled, HeatConductionCheckBox);
+        Control.AddServerOptionCheckBox(GameConfigVars.HeatEnabled, HeatConductionCheckBox);
         Control.AddServerOptionSlider(GameConfigVars.HeatSteps, HeatStepsSlider, 1, 20);
         Control.AddServerOptionFloatSlider(GameConfigVars.HeatSpeedup, HeatSpeedupSlider, 0.1f, 100f, 1f);
 

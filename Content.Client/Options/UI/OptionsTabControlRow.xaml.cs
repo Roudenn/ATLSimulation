@@ -94,7 +94,7 @@ public sealed partial class OptionsTabControlRow : Control
         return AddOption(new OptionCheckboxCVar(this, _cfg, cVar, checkBox, invert));
     }
 
-    public ServerOptionCheckboxCVar AddOptionServerCheckBox(CVarDef<bool> cVar, CheckBox checkBox, bool invert = false)
+    public ServerOptionCheckboxCVar AddServerOptionCheckBox(CVarDef<bool> cVar, CheckBox checkBox, bool invert = false)
     {
         return AddOption(new ServerOptionCheckboxCVar(this, _cfg, _contentCfg, cVar, checkBox, invert));
     }
