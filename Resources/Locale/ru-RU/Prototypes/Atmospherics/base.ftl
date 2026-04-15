@@ -1,0 +1,23 @@
+gas-name-Hydrogen = водород
+gas-name-Helium = гелий
+gas-name-Nitrogen = азот
+gas-name-Oxygen = кислород
+gas-name-Fluorine = фтор
+gas-name-Neon = неон
+gas-name-Chlorine = хлор
+gas-name-Argon = аргон
+gas-name-Krypton = криптон
+gas-name-Xenon = ксенон
+gas-name-Radon = радон
+
+gas-abbreviation-Hydrogen = H₂
+gas-abbreviation-Helium = He
+gas-abbreviation-Nitrogen = N₂
+gas-abbreviation-Oxygen = O₂
+gas-abbreviation-Fluorine = F₂
+gas-abbreviation-Neon = Ne
+gas-abbreviation-Chlorine = Cl₂
+gas-abbreviation-Argon = Ar
+gas-abbreviation-Krypton = Kr
+gas-abbreviation-Xenon = Xe
+gas-abbreviation-Radon = Rn

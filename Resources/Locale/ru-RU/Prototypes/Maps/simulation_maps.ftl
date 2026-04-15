@@ -1,0 +1,16 @@
+map-Empty = Пустота
+map-Empty-desc = Пустая карта без каких-либо объектов.
+map-SimpleBox = Простая коробка
+map-SimpleBox-desc = Единственный пустой тайл, окружённый стенами.
+map-TwoRooms = Две комнаты
+map-TwoRooms-desc = Две комнаты, соединённые небольшим проходом.
+map-RoomGrid = Комнатная сеть
+map-RoomGrid-desc = Сеть комнат 3x3, которые имеют общую систему стен.
+map-LargeField = Большая комната
+map-LargeField-desc = Большая комната с толстыми стенами.
+map-Maze = Лабиринт
+map-Maze-desc = Лабиринт из стен с выходом в космос.
+map-HeatPoint = Тепловая точка
+map-HeatPoint-desc = Сплошной куб из стен с огромной температурой в центре.
+map-Thermos = Термос
+map-Thermos-desc = Комната, окружённая вакуумом.
