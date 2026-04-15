@@ -47,8 +47,8 @@ public static class ProgressColorHelpers
         // map min to 1, max to 0
         value = (value - min) / (max - min);
         return value < 0.5f
-            ? Color.InterpolateBetween(Color.Yellow, Color.Orange, value * 2)
-            : Color.InterpolateBetween(Color.Orange, Color.Red, (value - 0.5f) * 2);
+            ? Color.InterpolateBetween(Color.Red, Color.Orange, value * 2)
+            : Color.InterpolateBetween(Color.Orange, Color.Yellow, (value - 0.5f) * 2);
     }
 
     /// <summary>
