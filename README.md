@@ -21,12 +21,11 @@
 
 1. Склонируйте данный репозиторий:
 ```shell
-git clone https://github.com/space-wizards/space-station-14.git
+git clone https://github.com/Roudenn/ATLSimulation.git
 ```
-2. Перейдите в папку проекта и запустите `RUN_THIS.py`, чтобы инициализировать субмодули и загрузить движок:
+2. Перейдите в папку проекта и запустите следующую команду, чтобы инициализировать субмодули и загрузить движок:
 ```shell
-cd space-station-14
-python RUN_THIS.py
+git submodule update --init --recursive
 ```
 3. Скомпилируйте решение:
 
